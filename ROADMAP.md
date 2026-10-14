@@ -1,8 +1,8 @@
 # 🗺️ Hoja de ruta — Inklus
 
-> Estado del proyecto y próximos pasos. La **guía técnica para la IA** está en [`AGENTS.md`](AGENTS.md) (arquitectura, flujos críticos, gotchas); el manual de usuario/instalación en [`README.md`](README.md).
+> Estado del proyecto y próximos pasos. **Próximo trabajo planificado: [`docs/REWORK.md`](docs/REWORK.md)** (gobernanza, UI premium, multilingüe); el manual de usuario/instalación en [`README.md`](README.md).
 
-## 🧭 Cómo leer esta hoja de ruta (para la IA)
+## 🧭 Cómo leer esta hoja de ruta (para colaboradores)
 
 - Cada fila es una **tarea independiente** con su *por qué / cómo*: el **por qué** justifica el valor, el **cómo** apunta a archivos y APIs concretas del código (no es una orden de implementación, es la pista).
 - Marcadores: **`✅`** = hecho e integrado; **`🔧`** = parcial / stub; el resto está **ordenado por valor** dentro de cada fase.

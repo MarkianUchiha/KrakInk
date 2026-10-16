@@ -230,6 +230,10 @@ P4 audio sincronizado, P5 ventana de zoom, R7 plugin nativo de latencia (solo si
 - Figuras: resaltador recto, ajuste a ejes. Drive: carpeta por cuaderno, sync selectiva desde Configuración y menú del cuaderno, diagnóstico de inicio de sesión. UI: portadas nuevas + "Tu imagen" visible, marketplace rediseñado.
 - Pendiente de verificar en tablet: edición de texto con S-Pen/teclado, y el inicio de sesión de Drive (registrar SHA-1 de debug y release en Google Cloud).
 
+### ✅ Identidad visual del README (2026-10)
+- Icono animado (`docs/assets/icon-animated.svg`) y cuatro animaciones «Cómo funciona» (presión, rechazo de palma, figuras, lazo) en es/en, generadas por `tool/docs_assets/generate.py` y enlazadas desde ambos README.
+- El icono de la app **ya existía** en `assets/icon/` (Android adaptativo) y se conserva tal cual; no hay icono de iOS/Linux/escritorio (ver abajo).
+
 ### 🏁 Camino a 2.0 (lo único que falta)
 > Distribución **sin Google Play**: GitHub Releases (APK firmados por la CI en tags `v*`) y opcionalmente IzzyOnDroid (F-Droid principal no admite ML Kit / Google Sign-In). Licencia GPL-3.0-or-later.
 
@@ -239,6 +243,13 @@ P4 audio sincronizado, P5 ventana de zoom, R7 plugin nativo de latencia (solo si
 | T1 | **Prueba en tablet** | Superar `docs/testing.md`; verificar texto con S-Pen/teclado e inicio de sesión de Drive (SHA-1 debug y release registrados). |
 | 1.5 | **Medir rendimiento** | `flutter run --profile` con `build/inklus_stress.inklus`; decide R7 y "páginas en archivos". |
 | 0.4 | **Keystore de release** (manual) | Secretos `ANDROID_KEYSTORE_*` en GitHub antes de repartir APKs. |
+
+| R3b | **Icono de escritorio** | `linux/` no tiene icono (la ventana sale sin él): copiar `docs/assets/icon.png` y fijarlo con `gtk_window_set_icon_from_file` en `my_application.cc`. |
+| A1 | **Accesibilidad** | TalkBack/`Semantics` en biblioteca y barra, escala de texto del sistema (hoy solo hay tooltips). |
+| L1 | **Latencia de tinta** («Ronda 2» del rework) | `getCoalescedEvents`, puntos predichos, curva de presión; solo si 1.5 la muestra alta. |
+| Q1 | **Tests de lienzo** | Borrador, lazo, deshacer y painters con goldens (pendiente de la Ronda 2). |
+| M1 | **Marketplace con contenido real** | Portadas, plantillas con imagen/PDF, planners y stickers; hoy solo plantillas paramétricas y paletas. |
+| I1 | **Revisión nativa pt/fr/de** y READMEs pt/fr/de | Las traducciones son correctas pero sin revisión de hablantes nativos. |
 
 Hecho de P1–P3, P7, P8, R1, R2, R4–R6, R9: ver versiones 1.4–1.8.
 

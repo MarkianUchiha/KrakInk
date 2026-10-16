@@ -1,4 +1,10 @@
-# ✒️ Inklus
+<p align="center">
+  <img src="docs/assets/icon-animated.svg" width="168" alt="Inklus">
+</p>
+
+<h1 align="center">Inklus</h1>
+
+<p align="center"><b>Handwriting for stylus tablets. Free, offline-first, open source.</b></p>
 
 🌐 **English** · [Español](README.es.md)
 
@@ -9,6 +15,15 @@ Handwriting app for **stylus** tablets, in the spirit of GoodNotes or Samsung No
 **Main platform:** Android (tablets) · **Secondary:** Linux desktop.
 
 > 📚 [`CHANGELOG.md`](CHANGELOG.md) · [Privacy](docs/privacy.md) · [On-device testing](docs/testing.md) · [Marketplace](marketplace/README.md)
+
+---
+
+## 🎬 How it works
+
+<table>
+<tr><td width="50%"><img src="docs/assets/anim/write.en.svg" alt="Real pressure"></td><td width="50%"><img src="docs/assets/anim/palm.en.svg" alt="Palm rejection"></td></tr>
+<tr><td width="50%"><img src="docs/assets/anim/shape.en.svg" alt="Shapes"></td><td width="50%"><img src="docs/assets/anim/lasso.en.svg" alt="Lasso"></td></tr>
+</table>
 
 ---
 
@@ -164,6 +179,14 @@ flutter test integration_test -d <device>             # critical flows on tablet
 ```
 
 GitHub Actions CI runs analysis, tests and integration tests on every PR, and publishes signed APKs when a `v*` tag is created (release notes come from the CHANGELOG).
+
+### Icon and README animations
+
+The icon source is `assets/icon/*.svg` (→ `dart run flutter_launcher_icons`). The animated icon and the *How it works* SVGs are generated, dependency-free, with:
+
+```bash
+python3 tool/docs_assets/generate.py   # → docs/assets/ (icon.svg, icon-animated.svg, icon.png, anim/*.svg)
+```
 
 ### Google Drive in your own build
 

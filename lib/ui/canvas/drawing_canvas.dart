@@ -858,7 +858,8 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
     if (wasTouch && _touchPointers.isEmpty && _twoFingerStartTime != null) {
       final elapsed = DateTime.now().difference(_twoFingerStartTime!);
       _twoFingerStartTime = null;
-      if (elapsed.inMilliseconds < 300 && !_twoFingerMoved && !_palm.stylusNearby) {
+      if (widget.controller.twoFingerUndo &&
+          elapsed.inMilliseconds < 300 && !_twoFingerMoved && !_palm.stylusNearby) {
         widget.controller.undo();
         return;
       }

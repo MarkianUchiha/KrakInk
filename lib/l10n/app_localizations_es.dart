@@ -942,7 +942,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get popShapeHoldHint =>
-      'Deja el lápiz quieto medio segundo al terminar una línea, círculo, triángulo o rectángulo.';
+      'Deja el lápiz quieto casi un segundo al terminar una línea, círculo, triángulo o rectángulo.';
 
   @override
   String get popShapeAlwaysHint =>
@@ -2134,4 +2134,18 @@ class AppLocalizationsEs extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get menuTwoFingerUndo => 'Deshacer con toque de dos dedos';
+
+  @override
+  String get popEraserAutoRevert =>
+      'Volver a la herramienta anterior al borrar';
+
+  @override
+  String get saveFailed =>
+      'No se pudo guardar la nota. Libera espacio: se reintentará solo.';
+
+  @override
+  String get tplHalfLetter => 'Media carta';
 }

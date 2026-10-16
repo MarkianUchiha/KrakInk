@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+
 import 'theme/inklus_colors.dart';
 
 import '../constants.dart';
@@ -12,6 +13,7 @@ import '../services/pdf_import_service.dart';
 import 'widgets/dialogs.dart';
 import 'widgets/notebook_covers.dart';
 import '../l10n/l10n.dart';
+import 'theme/tokens.dart';
 
 /// Resultado de la pantalla de creación de cuaderno.
 class CreateNotebookResult {
@@ -100,7 +102,9 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
     super.didChangeDependencies();
     if (!_nameInitialized) {
       _nameInitialized = true;
-      _nameController.text = context.l10n.createDefaultName(widget.notebookCount);
+      _nameController.text = context.l10n.createDefaultName(
+        widget.notebookCount,
+      );
     }
   }
 
@@ -110,15 +114,16 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
     super.dispose();
   }
 
-  Color get _effectiveCoverColor =>
-      _coverColorValue != null ? Color(_coverColorValue!) : context.colors.primary;
+  Color get _effectiveCoverColor => _coverColorValue != null
+      ? Color(_coverColorValue!)
+      : context.colors.primary;
 
   PageTemplate get _selectedTemplate => PageTemplate(
-        type: _templateType,
-        spacing: _spacing,
-        lineColorValue: _lineColor.toARGB32(),
-        infiniteFill: _infinite,
-      );
+    type: _templateType,
+    spacing: _spacing,
+    lineColorValue: _lineColor.toARGB32(),
+    infiniteFill: _infinite,
+  );
 
   Color get _lineColor => const Color(0xFF9DB6D9);
 
@@ -141,15 +146,15 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
   }
 
   static String _tplLabel(BuildContext context, TemplateType t) => switch (t) {
-        TemplateType.blank => context.l10n.createTplBlank,
-        TemplateType.ruled => context.l10n.createTplRuled,
-        TemplateType.grid => context.l10n.createTplGrid,
-        TemplateType.dots => context.l10n.createTplDots,
-        TemplateType.music => context.l10n.createTplMusic,
-        TemplateType.planner => context.l10n.createTplPlanner,
-        TemplateType.habit => context.l10n.createTplHabit,
-        _ => context.l10n.createTplSheet,
-      };
+    TemplateType.blank => context.l10n.createTplBlank,
+    TemplateType.ruled => context.l10n.createTplRuled,
+    TemplateType.grid => context.l10n.createTplGrid,
+    TemplateType.dots => context.l10n.createTplDots,
+    TemplateType.music => context.l10n.createTplMusic,
+    TemplateType.planner => context.l10n.createTplPlanner,
+    TemplateType.habit => context.l10n.createTplHabit,
+    _ => context.l10n.createTplSheet,
+  };
 
   void _nextStep() {
     if (_nameController.text.trim().isEmpty) return;
@@ -170,13 +175,18 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
         template: _selectedTemplate,
         coverStyle: _coverStyle,
         coverColorValue: _coverColorValue,
-        coverImagePath: _coverStyle == CoverStyle.custom ? _coverImagePath : null,
+        coverImagePath: _coverStyle == CoverStyle.custom
+            ? _coverImagePath
+            : null,
         backgrounds: _backgrounds,
       ),
     );
   }
 
-  void _setBackgrounds(List<({String path, int width, int height})> pages, String name) {
+  void _setBackgrounds(
+    List<({String path, int width, int height})> pages,
+    String name,
+  ) {
     if (pages.isEmpty || !mounted) return;
     setState(() {
       _backgrounds = pages;
@@ -187,7 +197,7 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
   /// Cuaderno a partir de un PDF: una página por hoja del PDF.
   Future<void> _pickPdf() async {
     if (!PdfImportService.isSupported) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.pdfUnsupported)));
+      showSnack(context, context.l10n.pdfUnsupported);
       return;
     }
     final file = await FilePicker.pickFile(
@@ -197,13 +207,16 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
     final path = file?.path;
     if (path == null || !mounted) return;
     final l10n = context.l10n;
-    final pages = await runWithLoading(context, () async => [
-          await for (final p in PdfImportService.importPages(path))
-            (path: p.path, width: p.widthPx, height: p.heightPx),
-        ]);
+    final pages = await runWithLoading(
+      context,
+      () async => [
+        await for (final p in PdfImportService.importPages(path))
+          (path: p.path, width: p.widthPx, height: p.heightPx),
+      ],
+    );
     if (!mounted) return;
     if (pages.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfReadFailed)));
+      showSnack(context, l10n.pdfReadFailed);
       return;
     }
     _setBackgrounds(pages, file!.name);
@@ -240,7 +253,7 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
       appBar: AppBar(
         title: Text(
           context.l10n.createTitle,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
         leading: IconButton(
@@ -258,22 +271,22 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
         transitionBuilder: (child, animation) {
           final isNewChild = child.key == const ValueKey(1);
           return SlideTransition(
-            position: Tween<Offset>(
-              begin: isNewChild ? const Offset(0.3, 0) : const Offset(-0.3, 0),
-              end: Offset.zero,
-            ).animate(CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOutCubic,
-            )),
-            child: FadeTransition(
-              opacity: animation,
-              child: child,
-            ),
+            position:
+                Tween<Offset>(
+                  begin: isNewChild
+                      ? const Offset(0.3, 0)
+                      : const Offset(-0.3, 0),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  ),
+                ),
+            child: FadeTransition(opacity: animation, child: child),
           );
         },
-        child: _currentStep == 0
-            ? _buildStep1(isDark)
-            : _buildStep2(isDark),
+        child: _currentStep == 0 ? _buildStep1(isDark) : _buildStep2(isDark),
       ),
     );
   }
@@ -285,30 +298,32 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
   Widget _buildStep1(bool isDark) {
     return SingleChildScrollView(
       key: const ValueKey(0),
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+      padding: const EdgeInsets.fromLTRB(
+        Spacing.xl,
+        Spacing.sm,
+        Spacing.xl,
+        Spacing.xl,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ---- Nombre ----
           Text(
             context.l10n.createName,
-            style: TextStyle(
-              fontSize: 13,
+            style: context.text.labelMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: context.colors.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: Spacing.sm),
           TextField(
             controller: _nameController,
             autofocus: true,
             decoration: InputDecoration(
               hintText: context.l10n.createNameHint,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              border: const OutlineInputBorder(borderRadius: Radii.mdAll),
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
+                horizontal: Spacing.lg,
                 vertical: 14,
               ),
             ),
@@ -320,13 +335,12 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
           // ---- Portada ----
           Text(
             context.l10n.createCover,
-            style: TextStyle(
-              fontSize: 13,
+            style: context.text.labelMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: context.colors.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: Spacing.sm),
 
           // Preview de la portada
           Center(
@@ -334,18 +348,13 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
               width: 180,
               height: 252,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: context.inklus.shadow,
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                borderRadius: Radii.mdAll,
+                boxShadow: context.shadowSoft,
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: _coverStyle == CoverStyle.custom && _coverImagePath != null
+                borderRadius: Radii.mdAll,
+                child:
+                    _coverStyle == CoverStyle.custom && _coverImagePath != null
                     ? Image.file(
                         File(_coverImagePath!),
                         fit: BoxFit.cover,
@@ -368,18 +377,17 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: Spacing.md),
 
           // Diseños de portada (con su nombre) + "Tu imagen" bien visible.
           Text(
             context.l10n.createDesign,
-            style: TextStyle(
-              fontSize: 13,
+            style: context.text.labelMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: context.colors.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: Spacing.sm),
           Wrap(
             spacing: 12,
             runSpacing: 12,
@@ -398,8 +406,11 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
                   ),
                 ),
               _CoverTile(
-                label: _coverImagePath == null ? context.l10n.createYourImage : context.l10n.createChangeImage,
-                selected: _coverStyle == CoverStyle.custom && _coverImagePath != null,
+                label: _coverImagePath == null
+                    ? context.l10n.createYourImage
+                    : context.l10n.createChangeImage,
+                selected:
+                    _coverStyle == CoverStyle.custom && _coverImagePath != null,
                 dashed: _coverImagePath == null,
                 onTap: _pickCoverImage,
                 child: _coverImagePath != null
@@ -416,52 +427,69 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
           const SizedBox(height: 20),
           Text(
             context.l10n.createColor,
-            style: TextStyle(
-              fontSize: 13,
+            style: context.text.labelMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: context.colors.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: Spacing.sm),
 
           // Selector de color de portada
           SizedBox(
-            height: 36,
+            height: Sizes.minTouch,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: _coverColors.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
+              separatorBuilder: (_, _) => const SizedBox(width: Spacing.xs),
               itemBuilder: (context, index) {
                 final (_, colorValue) = _coverColors[index];
                 final isSelected = colorValue == _coverColorValue;
-                return GestureDetector(
-                  onTap: () => setState(() => _coverColorValue = colorValue),
-                  child: Tooltip(
-                    message: coverColorName(context.l10n, colorValue),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(colorValue!),
-                        border: Border.all(
-                          color: isSelected ? Colors.white : context.colors.outline,
-                          width: isSelected ? 3 : 1,
+                return Semantics(
+                  button: true,
+                  selected: isSelected,
+                  label: coverColorName(context.l10n, colorValue),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => setState(() => _coverColorValue = colorValue),
+                    // Área táctil de 48 dp alrededor de la muestra de 36.
+                    child: Tooltip(
+                      message: coverColorName(context.l10n, colorValue),
+                      child: Padding(
+                        padding: const EdgeInsets.all(
+                          Spacing.sm - Spacing.xxs * 1,
                         ),
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: Color(colorValue).withAlpha(80),
-                                  blurRadius: 6,
-                                  spreadRadius: 1,
-                                ),
-                              ]
-                            : null,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(colorValue!),
+                            border: Border.all(
+                              color: isSelected
+                                  ? Colors.white
+                                  : context.colors.outline,
+                              width: isSelected ? 3 : 1,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: Color(colorValue).withAlpha(80),
+                                      blurRadius: 6,
+                                      spreadRadius: 1,
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: isSelected
+                              ? const Icon(
+                                  Icons.check,
+                                  size: 16,
+                                  color: Colors.white,
+                                )
+                              : null,
+                        ),
                       ),
-                      child: isSelected
-                          ? const Icon(Icons.check, size: 16, color: Colors.white)
-                          : null,
                     ),
                   ),
                 );
@@ -477,24 +505,24 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
             child: FilledButton(
               onPressed: _nameController.text.trim().isEmpty ? null : _nextStep,
               style: FilledButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: const RoundedRectangleBorder(borderRadius: Radii.mdAll),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     context.l10n.createNext,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: context.text.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  SizedBox(width: 8),
-                  Icon(Icons.arrow_forward, size: 20),
+                  const SizedBox(width: Spacing.sm),
+                  const Icon(Icons.arrow_forward, size: 20),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: Spacing.lg),
         ],
       ),
     );
@@ -507,13 +535,18 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
   Widget _buildStep2(bool isDark) {
     return SingleChildScrollView(
       key: const ValueKey(1),
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+      padding: const EdgeInsets.fromLTRB(
+        Spacing.xl,
+        Spacing.sm,
+        Spacing.xl,
+        Spacing.xl,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Resumen del paso 1
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(Spacing.md),
             decoration: BoxDecoration(
               color: context.colors.primary.withAlpha(15),
               borderRadius: BorderRadius.circular(10),
@@ -539,25 +572,23 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: Spacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         _nameController.text.trim(),
-                        style: const TextStyle(
-                          fontSize: 15,
+                        style: context.text.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: Spacing.xxs),
                       Text(
                         context.l10n.createStep2,
-                        style: TextStyle(
-                          fontSize: 12,
+                        style: context.text.labelSmall?.copyWith(
                           color: context.colors.onSurfaceVariant,
                         ),
                       ),
@@ -568,13 +599,16 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
                   tooltip: context.l10n.createBackToStep1,
                   icon: const Icon(Icons.edit_outlined, size: 20),
                   onPressed: _prevStep,
-                  padding: const EdgeInsets.all(8),
-                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  padding: const EdgeInsets.all(Spacing.sm),
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: Spacing.xl),
 
           // ---- Empezar desde un archivo (PDF / imágenes) ----
           if (_backgrounds.isNotEmpty)
@@ -583,7 +617,9 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
               child: ListTile(
                 leading: const Icon(Icons.picture_as_pdf_outlined),
                 title: Text(_backgroundsName ?? ''),
-                subtitle: Text(context.l10n.createFromFilePages(_backgrounds.length)),
+                subtitle: Text(
+                  context.l10n.createFromFilePages(_backgrounds.length),
+                ),
                 trailing: IconButton(
                   tooltip: context.l10n.createFromFileRemove,
                   icon: const Icon(Icons.close),
@@ -592,17 +628,16 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
               ),
             )
           else ...[
-          // ---- Plantilla ----
+            // ---- Plantilla ----
             Text(
               context.l10n.createTemplate,
-              style: TextStyle(
-                fontSize: 13,
+              style: context.text.labelMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: context.colors.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 12),
-  
+            const SizedBox(height: Spacing.md),
+
             // Grid de plantillas
             Wrap(
               spacing: 8,
@@ -612,11 +647,11 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
                   _templateTile(type, icon, label),
               ],
             ),
-  
+
             // Botón ver más / ver menos
             if (!_showAllTemplates)
               Padding(
-                padding: const EdgeInsets.only(top: 12),
+                padding: const EdgeInsets.only(top: Spacing.md),
                 child: TextButton.icon(
                   onPressed: () => setState(() => _showAllTemplates = true),
                   icon: const Icon(Icons.expand_more, size: 18),
@@ -625,27 +660,31 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
               )
             else
               Padding(
-                padding: const EdgeInsets.only(top: 12),
+                padding: const EdgeInsets.only(top: Spacing.md),
                 child: TextButton.icon(
                   onPressed: () => setState(() => _showAllTemplates = false),
                   icon: const Icon(Icons.expand_less, size: 18),
                   label: Text(context.l10n.createFewer),
                 ),
               ),
-  
+
             // Toggle infinito/finito para tipos que lo soportan
             if (_showInfiniteToggle) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: Spacing.lg),
               SwitchListTile(
                 title: Text(
                   context.l10n.createInfinite,
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  style: context.text.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 subtitle: Text(
                   _infinite
                       ? context.l10n.createInfiniteOn
                       : context.l10n.createInfiniteOff,
-                  style: TextStyle(fontSize: 12, color: context.colors.onSurfaceVariant),
+                  style: context.text.labelSmall?.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
                 ),
                 value: _infinite,
                 onChanged: (v) => setState(() => _infinite = v),
@@ -654,21 +693,22 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
               ),
             ],
 
-            const SizedBox(height: 24),
+            const SizedBox(height: Spacing.xl),
             Text(
               context.l10n.createFromFile,
-              style: TextStyle(
-                fontSize: 13,
+              style: context.text.labelMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: context.colors.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: Spacing.xs),
             Text(
               context.l10n.createFromFileHint,
-              style: TextStyle(fontSize: 12, color: context.colors.onSurfaceVariant),
+              style: context.text.labelSmall?.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: Spacing.md),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -687,7 +727,7 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
             ),
           ],
 
-          const SizedBox(height: 32),
+          const SizedBox(height: Spacing.xxl),
 
           // Botón crear
           SizedBox(
@@ -696,17 +736,17 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
             child: FilledButton(
               onPressed: _create,
               style: FilledButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: const RoundedRectangleBorder(borderRadius: Radii.mdAll),
               ),
               child: Text(
                 context.l10n.createAction,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: context.text.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: Spacing.lg),
         ],
       ),
     );
@@ -721,7 +761,9 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? context.colors.primary.withAlpha(20) : Colors.transparent,
+          color: isSelected
+              ? context.colors.primary.withAlpha(20)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected ? context.colors.primary : context.colors.outline,
@@ -734,15 +776,18 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
             Icon(
               icon,
               size: 18,
-              color: isSelected ? context.colors.primary : context.colors.onSurfaceVariant,
+              color: isSelected
+                  ? context.colors.primary
+                  : context.colors.onSurfaceVariant,
             ),
             const SizedBox(width: 6),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 13,
+              style: context.text.labelMedium?.copyWith(
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected ? context.colors.primary : context.colors.onSurfaceVariant,
+                color: isSelected
+                    ? context.colors.primary
+                    : context.colors.onSurfaceVariant,
               ),
             ),
           ],
@@ -761,17 +806,14 @@ class _StepIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        Expanded(child: Container(height: 3, color: context.colors.primary)),
+        const SizedBox(width: Spacing.xs),
         Expanded(
           child: Container(
             height: 3,
-            color: context.colors.primary,
-          ),
-        ),
-        const SizedBox(width: 4),
-        Expanded(
-          child: Container(
-            height: 3,
-            color: currentStep >= 1 ? context.colors.primary : context.colors.outlineVariant,
+            color: currentStep >= 1
+                ? context.colors.primary
+                : context.colors.outlineVariant,
           ),
         ),
       ],
@@ -806,7 +848,7 @@ class _CoverTile extends StatelessWidget {
       label: context.l10n.createCoverSemantics(label),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: Radii.mdAll,
         child: SizedBox(
           width: 88,
           child: Column(
@@ -817,7 +859,7 @@ class _CoverTile extends StatelessWidget {
                 height: 118,
                 padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: Radii.mdAll,
                   border: Border.all(
                     color: selected ? scheme.primary : scheme.outlineVariant,
                     width: selected ? 2.5 : 1,
@@ -827,7 +869,9 @@ class _CoverTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(9),
                   child: dashed
                       ? CustomPaint(
-                          foregroundPainter: _DashedBorderPainter(scheme.primary),
+                          foregroundPainter: _DashedBorderPainter(
+                            scheme.primary,
+                          ),
                           child: child,
                         )
                       : child,
@@ -838,8 +882,7 @@ class _CoverTile extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
+                style: context.text.labelSmall?.copyWith(
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   color: selected ? scheme.primary : scheme.onSurfaceVariant,
                 ),
@@ -857,12 +900,15 @@ class _AddImagePlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ColoredBox(
-        color: context.colors.primaryContainer.withAlpha(110),
-        child: Center(
-          child: Icon(Icons.add_photo_alternate_outlined,
-              size: 34, color: context.colors.primary),
-        ),
-      );
+    color: context.colors.primaryContainer.withAlpha(110),
+    child: Center(
+      child: Icon(
+        Icons.add_photo_alternate_outlined,
+        size: 34,
+        color: context.colors.primary,
+      ),
+    ),
+  );
 }
 
 class _DashedBorderPainter extends CustomPainter {
@@ -876,7 +922,9 @@ class _DashedBorderPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.6;
     final rrect = RRect.fromRectAndRadius(
-        (Offset.zero & size).deflate(3), const Radius.circular(8));
+      (Offset.zero & size).deflate(3),
+      const Radius.circular(8),
+    );
     final path = Path()..addRRect(rrect);
     for (final metric in path.computeMetrics()) {
       var d = 0.0;

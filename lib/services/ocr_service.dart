@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -177,7 +178,7 @@ class OcrService {
 
       return OcrResult(text: text, blocks: blocks);
     } finally {
-      recognizer.close();
+      unawaited(recognizer.close());
     }
   }
 

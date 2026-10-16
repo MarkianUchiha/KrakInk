@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import 'dart:async';
 import 'package:flutter/material.dart';
 
+import '../../l10n/l10n.dart';
 import '../theme/inklus_colors.dart';
 
 /// Diálogos reutilizables (antes había varias copias casi idénticas, y
@@ -16,8 +18,8 @@ Future<String?> showTextPrompt(
   String? hint,
   String initialValue = '',
   bool obscure = false,
-  String confirmLabel = 'Aceptar',
-  String cancelLabel = 'Cancelar',
+  String? confirmLabel,
+  String? cancelLabel,
   String? secondaryLabel,
   String? secondaryValue,
   bool multiline = false,
@@ -30,8 +32,8 @@ Future<String?> showTextPrompt(
       hint: hint,
       initialValue: initialValue,
       obscure: obscure,
-      confirmLabel: confirmLabel,
-      cancelLabel: secondaryLabel ?? cancelLabel,
+      confirmLabel: confirmLabel ?? context.l10n.commonOk,
+      cancelLabel: secondaryLabel ?? cancelLabel ?? context.l10n.commonCancel,
       cancelValue: secondaryLabel != null ? secondaryValue : null,
       multiline: multiline,
       keyboardType: keyboardType,
@@ -110,8 +112,8 @@ Future<bool> showConfirmDialog(
   BuildContext context, {
   required String title,
   required String message,
-  String confirmLabel = 'Aceptar',
-  String cancelLabel = 'Cancelar',
+  String? confirmLabel,
+  String? cancelLabel,
   bool destructive = false,
 }) async {
   final ok = await showDialog<bool>(
@@ -122,7 +124,7 @@ Future<bool> showConfirmDialog(
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: Text(cancelLabel),
+          child: Text(cancelLabel ?? context.l10n.commonCancel),
         ),
         FilledButton(
           style: destructive
@@ -132,7 +134,7 @@ Future<bool> showConfirmDialog(
                 )
               : null,
           onPressed: () => Navigator.pop(context, true),
-          child: Text(confirmLabel),
+          child: Text(confirmLabel ?? context.l10n.commonOk),
         ),
       ],
     ),
@@ -144,7 +146,7 @@ Future<bool> showConfirmDialog(
 /// al terminar (también si falla; el error se propaga al llamador).
 Future<T> runWithLoading<T>(BuildContext context, Future<T> Function() task) async {
   final navigator = Navigator.of(context, rootNavigator: true);
-  showDialog<void>(
+  unawaited(showDialog<void>(
     context: context,
     barrierDismissible: false,
     useRootNavigator: true,
@@ -152,10 +154,26 @@ Future<T> runWithLoading<T>(BuildContext context, Future<T> Function() task) asy
       canPop: false,
       child: Center(child: CircularProgressIndicator()),
     ),
-  );
+  ));
   try {
     return await task();
   } finally {
     navigator.pop();
   }
+}
+
+/// Aviso breve (snackbar) único de la app: reemplaza el anterior si lo hay.
+void showSnack(
+  BuildContext context,
+  String message, {
+  SnackBarAction? action,
+  Duration? duration,
+}) {
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(
+      content: Text(message),
+      action: action,
+      duration: duration ?? const Duration(seconds: 4),
+    ));
 }

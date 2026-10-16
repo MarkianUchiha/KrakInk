@@ -73,7 +73,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   /// Textos traducidos (atajo seguro tras `await`: el `context` del State vive mientras esté montado).
   AppLocalizations get _l10n => context.l10n;
@@ -119,6 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _templateLibrary.init();
     _stats.load();
     _reminders.load();
@@ -139,28 +140,19 @@ class _HomeScreenState extends State<HomeScreen> {
     };
     _controller.onUndoableNotice = (notice, undo) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text(_noticeText(notice)),
-          action: SnackBarAction(label: context.l10n.tbUndo, onPressed: undo),
-        ));
+      showSnack(context, _noticeText(notice),
+          action: SnackBarAction(label: context.l10n.tbUndo, onPressed: undo));
     };
     _controller.onLayerBlocked = () {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(context.l10n.edLayerLocked),
-              duration: Duration(milliseconds: 1500),
-            ),
-          );
+        showSnack(context, context.l10n.edLayerLocked,
+            duration: const Duration(milliseconds: 1500));
       }
     };
     // El guardado local ocurre cada ~600 ms; subir a Drive con esa
     // frecuencia es tráfico inútil. Se agrupa: como mucho una subida cada
     // [_remoteSyncDelay], y otra al salir del editor si quedó algo pendiente.
+    _controller.onSaveError = (_) => _snack(_l10n.saveFailed);
     _controller.onRemoteSync = (_) async {
       _remoteSyncPending = true;
       _remoteSyncTimer ??= Timer(_remoteSyncDelay, _runRemoteSync);
@@ -297,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
       showStrokesOnly: showStrokesOnly,
     );
     if (options == null) return; // cancelado
-    _export(() => render(options), defaultName);
+    unawaited(_export(() => render(options), defaultName));
   }
 
   Future<ExportOptions?> _showExportOptionsDialog({
@@ -330,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (v != null) setDialogState(() => maxDimension = v);
                 },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: Spacing.md),
               // Fondo transparente
               SwitchListTile(
                 title: Text(context.l10n.expTransparent),
@@ -448,25 +440,25 @@ class _HomeScreenState extends State<HomeScreen> {
       _snack(context.l10n.ocrUnsupported);
       return;
     }
-    showDialog<void>(
+    unawaited(showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (_) => Center(
         child: Card(
           child: Padding(
-            padding: EdgeInsets.all(Spacing.xl),
+            padding: const EdgeInsets.all(Spacing.xl),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: Spacing.lg),
+                const CircularProgressIndicator(),
+                const SizedBox(height: Spacing.lg),
                 Text(context.l10n.ocrWorking),
               ],
             ),
           ),
         ),
       ),
-    );
+    ));
     try {
       final result = await OcrService.recognizeSmart(
         _c.page,
@@ -491,7 +483,7 @@ class _HomeScreenState extends State<HomeScreen> {
           content: SingleChildScrollView(
             child: SelectableText(
               result.text,
-              style: const TextStyle(fontSize: 15),
+              style: context.text.bodyLarge?.copyWith(),
             ),
           ),
           actions: [
@@ -890,9 +882,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
+    showSnack(context, message);
   }
 
   void _onMenuAction(String v) {
@@ -1202,8 +1192,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // -------------------------------------------------------------------------
   // UI
+  /// Al pasar a segundo plano Android puede matar el proceso sin avisar:
+  /// guardar ya lo que quede del debounce.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) unawaited(_controller.flush());
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     // Guardar estadísticas de sesión.
     if (_sessionStart != null) {
       final minutes = DateTime.now().difference(_sessionStart!).inMinutes;
@@ -1600,6 +1598,11 @@ class _HomeScreenState extends State<HomeScreen> {
               onChanged: (v) => _c.setContinuousScroll(v ?? true),
               child: Text(context.l10n.menuContinuousScroll),
             ),
+            CheckboxMenuButton(
+              value: _c.twoFingerUndo,
+              onChanged: (v) => _c.setTwoFingerUndo(v ?? false),
+              child: Text(context.l10n.menuTwoFingerUndo),
+            ),
           ],
           child: Text(context.l10n.menuView),
         ),
@@ -1681,7 +1684,7 @@ class _PageNavPill extends StatelessWidget {
         if (count <= 1 && !bookmarked) return const SizedBox.shrink();
         return Material(
           color: context.colors.surfaceContainerHigh.withValues(alpha: 0.92),
-          elevation: 2,
+          elevation: Elevations.raised,
           borderRadius: const BorderRadius.all(Radius.circular(Radii.pill)),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -1739,7 +1742,7 @@ class _ZoomPill extends StatelessWidget {
       selector: (c) => (c.scale * 100).round(),
       builder: (context, percent) => Material(
         color: context.colors.surfaceContainerHigh.withValues(alpha: 0.92),
-        elevation: 2,
+        elevation: Elevations.raised,
         borderRadius: const BorderRadius.all(Radius.circular(Radii.pill)),
         child: Row(
           mainAxisSize: MainAxisSize.min,

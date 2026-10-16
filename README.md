@@ -139,7 +139,7 @@ lib/
 │   ├── theme/                     # Design system (theme, tokens, colors)
 │   ├── widgets/                   # Shared components
 │   └── *_screen.dart              # Library, settings, trash, reminders…
-└── l10n/                          # Translations (Spanish / English)
+└── l10n/                          # Translations (es, en, pt-BR, fr, de)
 ```
 
 ---
@@ -182,6 +182,15 @@ If you build a fork you need your own Google Cloud project (no Firebase or `goog
 ## 🛠️ Stack
 
 Flutter · Dart · Material 3 · `perfect_freehand` · `pdf` / `printing` · `archive` · `google_sign_in` + `googleapis` · `cryptography` · Google ML Kit (text and digital ink) · `share_plus` · `file_picker` · `shared_preferences` · `intl`
+
+## 🤝 Contributing
+
+Contributions are welcome: code, translations, templates for the marketplace, bug reports.
+
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — setup, workflow, DCO sign-off · [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) · [`SECURITY.md`](SECURITY.md) · [`GOVERNANCE.md`](GOVERNANCE.md)
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) · [`docs/TRANSLATING.md`](docs/TRANSLATING.md) · [`docs/RELEASING.md`](docs/RELEASING.md) · [`ROADMAP.md`](ROADMAP.md)
+
+---
 
 ## 📜 License
 

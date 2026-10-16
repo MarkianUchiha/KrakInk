@@ -7,6 +7,7 @@ import '../services/marketplace/marketplace_service.dart';
 import 'theme/inklus_colors.dart';
 import 'theme/tokens.dart';
 import '../l10n/l10n.dart';
+import 'widgets/dialogs.dart';
 
 /// Marketplace: paquetes gratuitos de la comunidad (plantillas, paletas y
 /// stickers). Todo el contenido es libre (licencias CC) y se verifica antes
@@ -62,9 +63,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
 
   void _snack(String m) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(m)));
+    showSnack(context, m);
   }
 
   /// Cabecera con degradado de marca y el buscador integrado.
@@ -290,7 +289,7 @@ class _PackCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 3),
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
                         Icon(icon, size: 14, color: scheme.primary),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: Spacing.xs),
                         Text(typeLabel, style: context.text.labelSmall),
                       ]),
                     ),

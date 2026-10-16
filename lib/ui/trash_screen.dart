@@ -41,9 +41,7 @@ class _TrashScreenState extends State<TrashScreen> {
   Future<void> _restore(TrashEntry meta) async {
     await widget.storage.restoreFromTrash(meta.id);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.trashRestoredMsg(meta.title))),
-    );
+    showSnack(context, context.l10n.trashRestoredMsg(meta.title));
     await _loadTrash();
   }
 

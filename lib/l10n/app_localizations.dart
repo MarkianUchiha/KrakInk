@@ -5,8 +5,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
+import 'app_localizations_fr.dart';
+import 'app_localizations_pt.dart';
 
 // ignore_for_file: type=lint
 
@@ -94,8 +97,11 @@ abstract class AppLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('de'),
     Locale('en'),
     Locale('es'),
+    Locale('fr'),
+    Locale('pt'),
   ];
 
   /// No description provided for @commonCancel.
@@ -1727,7 +1733,7 @@ abstract class AppLocalizations {
   /// No description provided for @popShapeHoldHint.
   ///
   /// In es, this message translates to:
-  /// **'Deja el lápiz quieto medio segundo al terminar una línea, círculo, triángulo o rectángulo.'**
+  /// **'Deja el lápiz quieto casi un segundo al terminar una línea, círculo, triángulo o rectángulo.'**
   String get popShapeHoldHint;
 
   /// No description provided for @popShapeAlwaysHint.
@@ -3703,6 +3709,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{count, plural, =1{1 página} other{{count} páginas}}'**
   String createFromFilePages(int count);
+
+  /// No description provided for @menuTwoFingerUndo.
+  ///
+  /// In es, this message translates to:
+  /// **'Deshacer con toque de dos dedos'**
+  String get menuTwoFingerUndo;
+
+  /// No description provided for @popEraserAutoRevert.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a la herramienta anterior al borrar'**
+  String get popEraserAutoRevert;
+
+  /// No description provided for @saveFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar la nota. Libera espacio: se reintentará solo.'**
+  String get saveFailed;
+
+  /// No description provided for @tplHalfLetter.
+  ///
+  /// In es, this message translates to:
+  /// **'Media carta'**
+  String get tplHalfLetter;
 }
 
 class _AppLocalizationsDelegate
@@ -3716,7 +3746,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'es'].contains(locale.languageCode);
+      <String>['de', 'en', 'es', 'fr', 'pt'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -3725,10 +3755,16 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'de':
+      return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
     case 'es':
       return AppLocalizationsEs();
+    case 'fr':
+      return AppLocalizationsFr();
+    case 'pt':
+      return AppLocalizationsPt();
   }
 
   throw FlutterError(

@@ -1,0 +1,25 @@
+name: Idea / Feature
+description: Propón una mejora / Propose an improvement
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Inklus es gratis, sin premium y *offline-first*. Las ideas deben respetarlo.
+        Inklus is free, has no premium tier and is offline-first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema o necesidad / Problem
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Propuesta / Proposal
+    validations:
+      required: true
+  - type: textarea
+    id: alt
+    attributes:
+      label: Alternativas / Alternatives considered

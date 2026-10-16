@@ -4,6 +4,7 @@ import '../theme/inklus_colors.dart';
 import '../../logic/canvas_controller.dart';
 import 'color_wheel_picker.dart';
 import '../../l10n/l10n.dart';
+import '../theme/tokens.dart';
 
 /// Diálogo de color personalizado (rueda HSV + hex), compartido por los
 /// popovers de herramienta y la barra de selección.
@@ -58,8 +59,8 @@ Future<void> showCustomColorDialog(
                   Column(
                     children: [
                       Text(context.l10n.colorCurrent,
-                          style: TextStyle(fontSize: 11, color: context.colors.onSurfaceVariant)),
-                      const SizedBox(height: 4),
+                          style: context.text.labelSmall?.copyWith(color: context.colors.onSurfaceVariant)),
+                      const SizedBox(height: Spacing.xs),
                       Container(
                         width: 40,
                         height: 40,
@@ -72,15 +73,15 @@ Future<void> showCustomColorDialog(
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: Spacing.sm),
                     child: Icon(Icons.arrow_forward, size: 16, color: context.colors.onSurfaceVariant),
                   ),
                   // Color nuevo
                   Column(
                     children: [
                       Text(context.l10n.colorNew,
-                          style: TextStyle(fontSize: 11, color: context.colors.onSurfaceVariant)),
-                      const SizedBox(height: 4),
+                          style: context.text.labelSmall?.copyWith(color: context.colors.onSurfaceVariant)),
+                      const SizedBox(height: Spacing.xs),
                       Container(
                         width: 40,
                         height: 40,
@@ -92,17 +93,17 @@ Future<void> showCustomColorDialog(
                       ),
                     ],
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: Spacing.md),
                   // Campo hex
                   Expanded(
                     child: TextField(
                       controller: hexController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Hex',
                         hintText: '#FF0000',
-                        prefixIcon: const Icon(Icons.tag, size: 18),
+                        prefixIcon: Icon(Icons.tag, size: 18),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: Radii.smAll,
                         ),
                         isDense: true,
                       ),
@@ -118,13 +119,13 @@ Future<void> showCustomColorDialog(
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: Spacing.md),
 
               // ---- Toggle: Rueda / Sliders ----
               Container(
                 decoration: BoxDecoration(
                   color: context.colors.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: Radii.smAll,
                 ),
                 child: Row(
                   children: [
@@ -147,7 +148,7 @@ Future<void> showCustomColorDialog(
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: Spacing.md),
 
               // ---- Contenido según modo ----
               if (mode == 0)
@@ -185,7 +186,7 @@ Future<void> showCustomColorDialog(
                         _syncHex(hexController, hsv);
                       }),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: Spacing.xs),
                     _HsvSliderWithGradient(
                       label: context.l10n.colorSaturation,
                       value: hsv.saturation,
@@ -203,7 +204,7 @@ Future<void> showCustomColorDialog(
                         _syncHex(hexController, hsv);
                       }),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: Spacing.xs),
                     _HsvSliderWithGradient(
                       label: context.l10n.colorBrightness,
                       value: hsv.value,
@@ -264,24 +265,21 @@ class _ModeButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
         decoration: BoxDecoration(
           color: selected
               ? Theme.of(context).colorScheme.primary.withAlpha(30)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: Radii.smAll,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 16,
                 color: selected ? context.colors.primary : context.colors.onSurfaceVariant),
-            const SizedBox(width: 4),
+            const SizedBox(width: Spacing.xs),
             Text(label,
-                style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-                    color: selected ? context.colors.primary : context.colors.onSurfaceVariant)),
+                style: context.text.labelMedium?.copyWith(fontWeight: selected ? FontWeight.w600 : FontWeight.normal, color: selected ? context.colors.primary : context.colors.onSurfaceVariant)),
           ],
         ),
       ),
@@ -316,18 +314,18 @@ class _HsvSliderWithGradient extends StatelessWidget {
         Row(
           children: [
             Text(label,
-                style: TextStyle(fontSize: 12, color: context.colors.onSurfaceVariant)),
+                style: context.text.labelSmall?.copyWith(color: context.colors.onSurfaceVariant)),
             const Spacer(),
             Text(valueLabel,
-                style: TextStyle(fontSize: 12, color: context.colors.onSurfaceVariant)),
+                style: context.text.labelSmall?.copyWith(color: context.colors.onSurfaceVariant)),
           ],
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: Spacing.xxs),
         SliderTheme(
-          data: SliderThemeData(
+          data: const SliderThemeData(
             trackHeight: 6,
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
+            thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8),
+            overlayShape: RoundSliderOverlayShape(overlayRadius: 14),
             activeTrackColor: Colors.transparent,
             inactiveTrackColor: Colors.transparent,
           ),

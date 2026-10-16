@@ -1,0 +1,7 @@
+# Los revisores se solicitan automáticamente. Marketplace y formato de datos
+# requieren siempre revisión del mantenedor.
+*                       @Pedroj-64
+/marketplace/           @Pedroj-64
+/lib/services/storage_service.dart  @Pedroj-64
+/lib/services/inklus_format.dart    @Pedroj-64
+/.github/               @Pedroj-64

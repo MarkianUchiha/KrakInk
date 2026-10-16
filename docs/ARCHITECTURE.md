@@ -1,8 +1,8 @@
-# 🤖 Guía técnica para continuar Inklus
+# 🏗️ Arquitectura de Inklus
 
-App de escritura a mano para tablets con stylus (tipo GoodNotes), **Flutter 3.47 / Dart 3.13**, Material 3, UI y comentarios en **español**. Targets: **Android** (principal) + **Linux desktop** (dev).
+Guía técnica para quien vaya a contribuir. Inklus es una app de escritura a mano para tablets con stylus (tipo GoodNotes), **Flutter 3.47 / Dart 3.13**, Material 3, UI y comentarios en **español**. Targets: **Android** (principal) + **Linux desktop** (desarrollo).
 
-> Documentación general: [`README.md`](README.md) · Próximos pasos: [`ROADMAP.md`](ROADMAP.md)
+> Cómo contribuir: [`CONTRIBUTING.md`](../CONTRIBUTING.md) · Sistema de diseño: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) · Traducir: [`TRANSLATING.md`](TRANSLATING.md) · Publicar versiones: [`RELEASING.md`](RELEASING.md) · Próximos pasos: [`ROADMAP.md`](../ROADMAP.md)
 
 ## Comandos
 
@@ -94,22 +94,11 @@ tool/stress/               genera build/inklus_stress.inklus (5.100 trazos + 10 
 marketplace/               plantilla del repo inklus-marketplace (validador + CI + ejemplos)
 ```
 
-## 🎨 Reglas de interfaz (lavado de cara)
+## 🎨 Reglas de interfaz
 
-- **Colores**: solo desde `context.colors` (ColorScheme) o `context.inklus` (InklusColors). Nada de
-  `Colors.white`/`Color(0x…)` sueltos en widgets. Excepción: colores que son **contenido** (paletas de
-  portada `kCoverColors`, etiquetas, líneas de plantilla, selector de color, lienzo). `ThemeColors` ya
-  no se usa en ninguna pantalla.
-- **Pantallas secundarias**: `InklusPage` + `SectionCard`/`SettingsTile`/`EmptyState`; hojas inferiores con
-  `SheetHeader` (el asa la pone el tema: no dibujar otra). Confirmaciones: `showConfirmDialog`.
-- **Medidas**: `Spacing`, `Radii`, `Sizes`, `Motion` de `ui/theme/tokens.dart`; objetivo táctil ≥ 48 dp.
-- **Texto**: roles de `context.text` (la escala está ajustada para tablet); nada por debajo de 12 pt.
-- **Rebuilds**: widgets que dependen del controlador usan `ControllerSelector` con el valor mínimo
-  que muestran (el controlador notifica en cada punto del trazo).
-- **Opciones de herramienta**: en popovers anclados (`showAnchoredPopover`), no en barras fijas.
-- Revisar cambios visuales con `flutter test tool/screenshots/screenshots_test.dart`.
+Resumen en [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md).
 
-## ★ Flujos críticos (no romper)
+## ★ Flujos críticos (no romper sin tests)
 
 ### 1. Stylus y rechazo de palma — `drawing_canvas.dart` + `logic/palm_rejection.dart`
 - Un `Listener` **crudo** recibe TODOS los eventos (no participa en la gesture arena), incluido `onPointerHover` (el hover del lápiz marca "lápiz cerca").
@@ -180,7 +169,7 @@ marketplace/               plantilla del repo inklus-marketplace (validador + CI
 - Salir del editor: `_goBack()`/`PopScope` hacen `await controller.flush()` antes del `pop` (la biblioteca lee el índice ya actualizado); `HomeScreen.dispose` hace `controller.dispose()`.
 - Exportación (menú ⋮ del editor): página PNG/PDF, **cuaderno PDF** (`renderNotebookPdf`) y **copia .inklus** (`InklusFormat.exportBytes` → `FilePicker.saveFile`).
 
-## 🔐 Secretos (no romper)
+## 🔐 Secretos
 
 - Nunca leer/imprimir/escribir contraseñas de `android/key.properties`, ni `client_secret*.json`. Para huellas usar `keytool -list` pasando la contraseña por sustitución de comandos y filtrando solo `SHA1`.
 - Client IDs OAuth y SHA-1 son públicos. El Manifest fija `allowBackup=false` y `usesCleartextTraffic=false` (todo es https). La CI tiene el job `secret-scan` (gitleaks).
@@ -208,7 +197,7 @@ marketplace/               plantilla del repo inklus-marketplace (validador + CI
 - Lienzo infinito: plantillas `blank/ruled/grid/custom+infiniteFill`; hoja finita: `sheet/custom sin relleno` (contenido recortado a la hoja).
 - `fitView` centra la hoja finita o pone zoom 1.0 en infinitas.
 
-## Decisiones de diseño (no re-abrir)
+## Decisiones de diseño (tomadas; abre un issue antes de proponer cambiarlas)
 
 - **Todo gratis, sin premium.** Inklus es open source y no tendrá funciones de pago. Las features premium de GoodNotes/Samsung Notes/Notability se implementan aquí de forma gratuita.
 - **Conflictos de Drive: last-write-wins**. Cuando dos dispositivos editan el mismo cuaderno, el documento con `updatedAt` más reciente gana. Es más simple que merge por página y evita pérdida de contenido no intencionada. El usuario puede ver todas las versiones en Drive (menú ☁️ → "Ver versiones") y restaurar la que quiera.

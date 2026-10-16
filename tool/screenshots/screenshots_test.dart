@@ -4,6 +4,7 @@
 // Útil para revisar el diseño y comparar antes/después.
 //
 //   flutter test tool/screenshots/screenshots_test.dart
+//   flutter test --dart-define=SHOT_LOCALE=de tool/screenshots/screenshots_test.dart
 //
 // Salida: $INKLUS_SHOTS_DIR (por defecto build/screenshots). Está fuera de
 // test/ a propósito: no forma parte de la suite ni de la CI.
@@ -20,7 +21,6 @@ import 'package:inklus/models/page.dart';
 import 'package:inklus/models/note.dart';
 import 'package:flutter/gestures.dart';
 import 'package:inklus/app.dart';
-import 'package:inklus/constants.dart';
 import 'package:inklus/l10n/l10n.dart';
 import 'package:inklus/models/stroke.dart';
 import 'package:inklus/models/template.dart';
@@ -62,6 +62,9 @@ Future<void> loadFonts() async {
     ..addFont(Future.value(ByteData.view(File('$base/MaterialIcons-Regular.otf').readAsBytesSync().buffer)));
   await icons.load();
 }
+
+/// Idioma de las capturas (por defecto el de la app; p. ej. `de` para textos largos).
+const Locale _shotLocale = Locale(String.fromEnvironment('SHOT_LOCALE', defaultValue: 'es'));
 
 Future<void> shot(WidgetTester tester, String name) async {
   await tester.runAsync(() async {
@@ -136,7 +139,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: kAppLocale,
+      locale: _shotLocale,
         debugShowCheckedModeBanner: false,
         theme: dark ? AppTheme.dark() : AppTheme.light(),
         home: HomeScreen(note: note, notebookId: nb.id),
@@ -145,7 +148,8 @@ void main() {
       await shot(tester, 'editor_$tag');
       if (!dark) {
         // Tocar la pluma activa abre su popover de opciones.
-        await tester.tap(find.byTooltip('Bolígrafo 1'));
+        final l10n = AppLocalizations.of(tester.element(find.byType(HomeScreen)));
+        await tester.tap(find.byTooltip(l10n.tbPenSlot(l10n.toolPen, 1)));
         await settle(tester);
         await shot(tester, 'editor_pen_popover');
       }
@@ -161,7 +165,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: kAppLocale,
+      locale: _shotLocale,
         debugShowCheckedModeBanner: false,
         home: Scaffold(body: DrawingCanvas(controller: c, imageService: ImageService())),
       ));
@@ -186,7 +190,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: kAppLocale,
+      locale: _shotLocale,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       home: MarketplaceScreen(service: offline),
@@ -202,7 +206,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: kAppLocale,
+      locale: _shotLocale,
       debugShowCheckedModeBanner: false,
       theme: dark ? AppTheme.dark() : AppTheme.light(),
       home: home,
@@ -279,7 +283,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: kAppLocale,
+      locale: _shotLocale,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       home: HomeScreen(note: note, notebookId: 'nb_stack'),

@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-import 'dart:typed_data';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'theme/inklus_colors.dart';
 import 'widgets/page_scaffold.dart';
 import 'theme/tokens.dart';
@@ -189,12 +190,9 @@ class _NoteListScreenState extends State<NoteListScreen> {
                 const SizedBox(height: 20),
                 Text(
                   context.l10n.createTemplate,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: context.text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: Spacing.sm),
                 _CompactTemplateGrid(
                   selected: selectedTemplate.type,
                   onSelect: (t) => setDialogState(() {
@@ -302,7 +300,10 @@ class _NoteListScreenState extends State<NoteListScreen> {
         return Card(
           clipBehavior: Clip.antiAlias,
           child: InkWell(
-            onTap: () => _openNote(note),
+            onTap: () {
+              unawaited(HapticFeedback.selectionClick());
+              _openNote(note);
+            },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -344,57 +345,37 @@ class _NoteListScreenState extends State<NoteListScreen> {
                       Positioned(
                         top: Spacing.xs,
                         right: Spacing.xs,
-                        child: PopupMenuButton<String>(
-                          tooltip: context.l10n.noteOptions,
-                          style: IconButton.styleFrom(
-                            backgroundColor:
-                                context.colors.surface.withValues(alpha: 0.85),
-                            foregroundColor: context.colors.onSurface,
-                          ),
-                          icon: const Icon(Icons.more_vert),
-                          onSelected: (v) {
-                            switch (v) {
-                              case 'rename':
-                                _renameNote(note);
-                              case 'duplicate':
-                                _duplicateNote(note);
-                              case 'delete':
-                                _deleteNote(note);
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            PopupMenuItem(
-                              value: 'rename',
-                              child: ListTile(
-                                leading: Icon(Icons.edit_outlined),
-                                title: Text(context.l10n.libRename),
-                                dense: true,
-                              ),
+                        child: MenuAnchor(
+                          menuChildren: [
+                            MenuItemButton(
+                              leadingIcon: const Icon(Icons.edit_outlined),
+                              onPressed: () => _renameNote(note),
+                              child: Text(context.l10n.libRename),
                             ),
-                            PopupMenuItem(
-                              value: 'duplicate',
-                              child: ListTile(
-                                leading: Icon(Icons.copy_outlined),
-                                title: Text(context.l10n.libDuplicate),
-                                dense: true,
-                              ),
+                            MenuItemButton(
+                              leadingIcon: const Icon(Icons.copy_outlined),
+                              onPressed: () => _duplicateNote(note),
+                              child: Text(context.l10n.libDuplicate),
                             ),
-                            PopupMenuDivider(),
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: ListTile(
-                                leading: Icon(
-                                  Icons.delete_outline,
-                                  color: context.inklus.danger,
-                                ),
-                                title: Text(
-                                  context.l10n.libDelete,
-                                  style: TextStyle(color: context.inklus.danger),
-                                ),
-                                dense: true,
-                              ),
+                            const Divider(),
+                            MenuItemButton(
+                              leadingIcon: Icon(Icons.delete_outline,
+                                  color: context.inklus.danger),
+                              onPressed: () => _deleteNote(note),
+                              child: Text(context.l10n.libDelete,
+                                  style: TextStyle(color: context.inklus.danger)),
                             ),
                           ],
+                          builder: (context, menu, _) => IconButton(
+                            tooltip: context.l10n.noteOptions,
+                            style: IconButton.styleFrom(
+                              backgroundColor:
+                                  context.colors.surface.withValues(alpha: 0.85),
+                              foregroundColor: context.colors.onSurface,
+                            ),
+                            icon: const Icon(Icons.more_vert),
+                            onPressed: () => menu.isOpen ? menu.close() : menu.open(),
+                          ),
                         ),
                       ),
                     ],
@@ -483,7 +464,7 @@ class _CompactTemplateGrid extends StatelessWidget {
               color: isSelected
                   ? context.colors.primary.withAlpha(20)
                   : context.colors.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: Radii.smAll,
               border: Border.all(
                 color: isSelected
                     ? context.colors.primary
@@ -501,18 +482,14 @@ class _CompactTemplateGrid extends StatelessWidget {
                       ? context.colors.primary
                       : context.colors.onSurfaceVariant,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: Spacing.xs),
                 Text(
                   label,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.normal,
-                    color: isSelected
+                  style: context.text.labelSmall?.copyWith(fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal, color: isSelected
                         ? context.colors.primary
-                        : context.colors.onSurface,
-                  ),
+                        : context.colors.onSurface),
                 ),
               ],
             ),

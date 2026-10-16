@@ -16,6 +16,7 @@ import '../models/page.dart';
 import '../models/stroke.dart';
 import '../models/template.dart';
 import '../models/text_item.dart';
+import '../services/error_log.dart';
 import '../services/storage_service.dart';
 import '../utils/geometry_utils.dart';
 import 'bucket_fill.dart';
@@ -296,6 +297,37 @@ class CanvasController extends _CanvasCore
   @override
   bool get continuousScroll => _continuousScroll;
 
+  static const _prefTwoFingerUndo = 'two_finger_undo';
+  static const _prefEraserAutoRevert = 'eraser_auto_revert';
+  bool _twoFingerUndo = false;
+  bool _eraserAutoRevert = true;
+  ToolType _toolBeforeEraser = ToolType.pen;
+
+  /// Toque rápido con dos dedos = deshacer (apagado por defecto: al
+  /// desplazar la página borraba el último trazo).
+  bool get twoFingerUndo => _twoFingerUndo;
+
+  /// Tras un trazo de borrador se vuelve a la herramienta anterior.
+  bool get eraserAutoRevert => _eraserAutoRevert;
+
+  void setTwoFingerUndo(bool value) {
+    if (value == _twoFingerUndo) return;
+    _twoFingerUndo = value;
+    notifyListeners();
+    SharedPreferences.getInstance()
+        .then((p) => p.setBool(_prefTwoFingerUndo, value))
+        .catchError((_) => false);
+  }
+
+  void setEraserAutoRevert(bool value) {
+    if (value == _eraserAutoRevert) return;
+    _eraserAutoRevert = value;
+    notifyListeners();
+    SharedPreferences.getInstance()
+        .then((p) => p.setBool(_prefEraserAutoRevert, value))
+        .catchError((_) => false);
+  }
+
   void setContinuousScroll(bool value) {
     if (value == _continuousScroll) return;
     _continuousScroll = value;
@@ -427,6 +459,7 @@ class CanvasController extends _CanvasCore
 
   void setTool(ToolType tool) {
     if (_tool == tool) return;
+    if (tool == ToolType.eraser) _toolBeforeEraser = _tool;
     _tool = tool;
     _selectedImageId = null;
     _notifyToolContext();
@@ -485,6 +518,8 @@ class CanvasController extends _CanvasCore
       final prefs = await SharedPreferences.getInstance();
       _fingerDrawingUserSet = prefs.getBool(_prefFingerDrawingUserSet) ?? false;
       _continuousScroll = prefs.getBool(_prefContinuousScroll) ?? true;
+      _twoFingerUndo = prefs.getBool(_prefTwoFingerUndo) ?? false;
+      _eraserAutoRevert = prefs.getBool(_prefEraserAutoRevert) ?? true;
       final saved = prefs.getBool(_prefFingerDrawing);
       if (saved != null && saved != _fingerDrawingEnabled && !_disposed) {
         _fingerDrawingEnabled = saved;
@@ -521,7 +556,11 @@ class CanvasController extends _CanvasCore
   String? _heldShapeType; // figura aplicada al mantener (trazo en curso)
 
   /// Tiempo quieto al final del trazo para enderezar la figura.
-  static const holdToShapeDelay = Duration(milliseconds: 550);
+  static const holdToShapeDelay = Duration(milliseconds: 900);
+
+  /// Longitud mínima (px en pantalla) para poder enderezar: la escritura
+  /// pequeña con una pausa no debe convertirse en figura.
+  static const holdToShapeMinLength = 60.0;
 
   void _trackHold(Offset worldPoint) {
     if (_shapeMode != ShapeMode.hold || _heldShapeType != null) return;
@@ -538,6 +577,7 @@ class CanvasController extends _CanvasCore
     final active = _activeStroke;
     if (!_isDrawing || active == null || _heldShapeType != null) return;
     if (_activePoints.length < 10) return;
+    if (pathLength(_activePoints) * _scale < holdToShapeMinLength) return;
     final shape = ShapeDetector.detect(_activePoints,
         lineOnly: active.tool == ToolType.highlighter);
     if (shape == null) return;
@@ -870,6 +910,10 @@ class CanvasController extends _CanvasCore
       _applyEraser(eraserPath);
     }
     _touch();
+    // Borrador de la barra: tras el trazo se vuelve a la herramienta anterior.
+    if (_eraserAutoRevert && eraserPath.isNotEmpty && _tool == ToolType.eraser) {
+      setTool(_toolBeforeEraser);
+    }
   }
 
   /// Borra con [eraserPath] conservando el orden de los trazos (los
@@ -1440,7 +1484,8 @@ class CanvasController extends _CanvasCore
       await saveNow();
       // Replica a la nube si la UI registró un callback (sesión iniciada).
       // La UI decide con qué frecuencia sube realmente (debounce propio).
-      if (!_disposed) onRemoteSync?.call(_note);
+      final sync = onRemoteSync;
+      if (!_disposed && sync != null) unawaited(sync(_note));
     });
   }
 
@@ -1476,11 +1521,24 @@ class CanvasController extends _CanvasCore
     _dirty = false;
     try {
       await _storage.saveNote(_notebookId, _note);
-    } catch (e) {
+      _saveFailing = false;
+    } catch (e, st) {
       _dirty = true; // se reintentará en el siguiente guardado
       debugPrint('CanvasController.saveNow: $e');
+      // Avisa una sola vez por racha de fallos (no en cada reintento).
+      if (!_saveFailing) {
+        _saveFailing = true;
+        unawaited(ErrorLog.record(e, st, context: 'guardar nota'));
+        if (!_disposed) onSaveError?.call(e);
+      }
     }
   }
+
+  /// Hay una racha de guardados fallidos (ya avisada a la UI).
+  bool _saveFailing = false;
+
+  /// La UI muestra el aviso cuando el guardado local falla (disco lleno…).
+  void Function(Object error)? onSaveError;
 
   /// Cancela el autoguardado pendiente y guarda lo que falte. La UI debe
   /// esperar este Future antes de cerrar el editor.

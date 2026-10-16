@@ -15,7 +15,7 @@ import 'models/stroke.dart';
 
 /// Versión visible de la app (debe coincidir con `version:` de pubspec.yaml;
 /// lo comprueba `test/app_version_test.dart`).
-const String kAppVersion = '1.8.0';
+const String kAppVersion = '1.9.0';
 
 /// Idioma fijo SOLO para las capturas de pantalla (`tool/screenshots`) y los
 /// tests; la app real sigue el idioma del sistema.
@@ -36,9 +36,6 @@ const Color kAccentColor = Color(0xFF3B6FF6);
 
 /// Variante del primario con opacidad reducida (fondos de chips, badges).
 const Color kAccentLight = Color(0xFFEBF0FF);
-
-/// Variante oscura del primario (modo oscuro).
-const Color kAccentDark = Color(0xFF1A3A6B);
 
 /// Color de error/eliminar.
 const Color kErrorColor = Color(0xFFD32F2F);

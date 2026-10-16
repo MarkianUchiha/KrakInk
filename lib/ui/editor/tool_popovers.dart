@@ -57,8 +57,8 @@ class PenPopover extends StatelessWidget {
             const SizedBox(height: Spacing.lg),
             _SectionTitle(context.l10n.popThickness),
             SizePicker(canvas: canvas, onChanged: () => presets.syncFrom(canvas)),
-            SizedBox(height: Spacing.sm),
-            SizedBox(height: Spacing.sm),
+            const SizedBox(height: Spacing.sm),
+            const SizedBox(height: Spacing.sm),
             _SectionTitle(context.l10n.popStraighten),
             SegmentedButton<ShapeMode>(
               showSelectedIcon: false,
@@ -84,7 +84,7 @@ class PenPopover extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
-                  icon: Icon(Icons.tune),
+                  icon: const Icon(Icons.tune),
                   label: Text(context.l10n.popAdvanced),
                   onPressed: () {
                     Navigator.pop(context);
@@ -119,17 +119,17 @@ class EraserPopover extends StatelessWidget {
             segments: [
               ButtonSegment(
                 value: EraserMode.partial,
-                icon: Icon(Icons.content_cut),
+                icon: const Icon(Icons.content_cut),
                 label: Text(context.l10n.popPartial),
               ),
               ButtonSegment(
                 value: EraserMode.stroke,
-                icon: Icon(Icons.gesture),
+                icon: const Icon(Icons.gesture),
                 label: Text(context.l10n.popStroke),
               ),
               ButtonSegment(
                 value: EraserMode.highlighterOnly,
-                icon: Icon(Icons.border_color),
+                icon: const Icon(Icons.border_color),
                 label: Text(context.l10n.popHighlighter),
               ),
             ],
@@ -144,6 +144,12 @@ class EraserPopover extends StatelessWidget {
               EraserMode.highlighterOnly => context.l10n.popEraseHighlighter,
             },
             style: context.text.bodySmall,
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: canvas.eraserAutoRevert,
+            onChanged: canvas.setEraserAutoRevert,
+            title: Text(context.l10n.popEraserAutoRevert),
           ),
           const SizedBox(height: Spacing.lg),
           _SectionTitle(context.l10n.popSize),

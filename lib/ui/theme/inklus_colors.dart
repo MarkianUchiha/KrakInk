@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 class InklusColors extends ThemeExtension<InklusColors> {
   const InklusColors({
     required this.paper,
+    required this.ink,
     required this.desk,
     required this.toolbar,
     required this.toolbarBorder,
@@ -23,6 +24,9 @@ class InklusColors extends ThemeExtension<InklusColors> {
   /// Color del papel. Siempre claro (también en modo oscuro: el contenido
   /// se escribe en tinta oscura; el modo nocturno de escritura es aparte).
   final Color paper;
+
+  /// Tinta sobre [paper] (texto de placas y etiquetas apoyadas en papel).
+  final Color ink;
 
   /// Fondo alrededor de la hoja.
   final Color desk;
@@ -41,6 +45,7 @@ class InklusColors extends ThemeExtension<InklusColors> {
 
   static const light = InklusColors(
     paper: Color(0xFFFEFDF9),
+    ink: Color(0xFF26231F),
     desk: Color(0xFFE4E1DA),
     toolbar: Color(0xFFFFFFFF),
     toolbarBorder: Color(0x14000000),
@@ -53,6 +58,7 @@ class InklusColors extends ThemeExtension<InklusColors> {
 
   static const dark = InklusColors(
     paper: Color(0xFFFEFDF9),
+    ink: Color(0xFF26231F),
     desk: Color(0xFF16171A),
     toolbar: Color(0xFF232428),
     toolbarBorder: Color(0x1FFFFFFF),
@@ -66,6 +72,7 @@ class InklusColors extends ThemeExtension<InklusColors> {
   @override
   InklusColors copyWith({
     Color? paper,
+    Color? ink,
     Color? desk,
     Color? toolbar,
     Color? toolbarBorder,
@@ -77,6 +84,7 @@ class InklusColors extends ThemeExtension<InklusColors> {
   }) =>
       InklusColors(
         paper: paper ?? this.paper,
+        ink: ink ?? this.ink,
         desk: desk ?? this.desk,
         toolbar: toolbar ?? this.toolbar,
         toolbarBorder: toolbarBorder ?? this.toolbarBorder,
@@ -93,6 +101,7 @@ class InklusColors extends ThemeExtension<InklusColors> {
     Color c(Color a, Color b) => Color.lerp(a, b, t)!;
     return InklusColors(
       paper: c(paper, other.paper),
+      ink: c(ink, other.ink),
       desk: c(desk, other.desk),
       toolbar: c(toolbar, other.toolbar),
       toolbarBorder: c(toolbarBorder, other.toolbarBorder),
@@ -117,4 +126,15 @@ extension InklusThemeContext on BuildContext {
   ColorScheme get colors => Theme.of(this).colorScheme;
   TextTheme get text => Theme.of(this).textTheme;
   bool get isDark => Theme.of(this).brightness == Brightness.dark;
+
+  /// Sombra en capas (contacto + difusa) de tarjetas y portadas: más
+  /// natural que una sola sombra grande.
+  List<BoxShadow> get shadowSoft => [
+        BoxShadow(color: inklus.shadow, blurRadius: 3, offset: const Offset(0, 1)),
+        BoxShadow(color: inklus.shadow, blurRadius: 16, offset: const Offset(0, 6)),
+      ];
+
+  /// Sombra corta para botones pequeños flotantes.
+  List<BoxShadow> get shadowRaised =>
+      [BoxShadow(color: inklus.shadow, blurRadius: 4, offset: const Offset(0, 1))];
 }

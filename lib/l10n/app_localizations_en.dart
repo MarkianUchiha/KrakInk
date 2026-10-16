@@ -941,7 +941,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get popShapeHoldHint =>
-      'Hold the pen still for half a second after finishing a line, circle, triangle or rectangle.';
+      'Hold the pen still for almost a second after finishing a line, circle, triangle or rectangle.';
 
   @override
   String get popShapeAlwaysHint =>
@@ -2133,4 +2133,17 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get menuTwoFingerUndo => 'Undo with a two-finger tap';
+
+  @override
+  String get popEraserAutoRevert => 'Return to the previous tool after erasing';
+
+  @override
+  String get saveFailed =>
+      'Couldn\'t save the note. Free up some space: it will retry automatically.';
+
+  @override
+  String get tplHalfLetter => 'Half Letter';
 }

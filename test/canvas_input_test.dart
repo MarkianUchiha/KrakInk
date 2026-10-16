@@ -148,11 +148,28 @@ void main() {
     for (var i = 1; i <= 30; i++) {
       await pen.moveTo(Offset(100 + i * 10.0, 300 + (i.isEven ? 1 : -1)));
     }
-    // Quieto más de medio segundo antes de soltar.
-    await tester.pump(const Duration(milliseconds: 700));
+    // Quieto casi un segundo antes de soltar.
+    await tester.pump(const Duration(milliseconds: 1000));
     await pen.up();
     await tester.pump();
     expect(c.page.strokes.single.shapeType, 'line');
+    await finish(tester);
+  });
+
+  testWidgets('una pausa en escritura corta NO la convierte en figura',
+      (tester) async {
+    await pumpCanvas(tester);
+    c.setShapeMode(ShapeMode.hold);
+    final pen = await tester.startGesture(const Offset(100, 300),
+        kind: PointerDeviceKind.stylus, pointer: 23);
+    // Trazo de ~20 px (una letra) con muchos puntos.
+    for (var i = 1; i <= 20; i++) {
+      await pen.moveTo(Offset(100 + i * 1.0, 300));
+    }
+    await tester.pump(const Duration(milliseconds: 1000));
+    await pen.up();
+    await tester.pump();
+    expect(c.page.strokes.single.shapeType, isNull);
     await finish(tester);
   });
 

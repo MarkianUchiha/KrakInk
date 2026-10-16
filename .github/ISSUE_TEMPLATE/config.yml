@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Vulnerabilidad de seguridad / Security vulnerability
+    url: https://github.com/Pedroj-64/inklus/security/advisories/new
+    about: Reporta en privado, no en un issue público.

@@ -48,7 +48,7 @@ Future<T?> showAnchoredPopover<T>({
               ),
               child: Material(
                 color: scheme.surfaceContainerHigh,
-                elevation: 8,
+                elevation: Elevations.popover,
                 shadowColor: scheme.shadow.withValues(alpha: 0.35),
                 borderRadius: Radii.xlAll,
                 clipBehavior: Clip.antiAlias,

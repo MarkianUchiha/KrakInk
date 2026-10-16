@@ -60,6 +60,25 @@ abstract final class Sizes {
 
   /// Ancho máximo de popovers de herramienta.
   static const double popoverWidth = 340;
+
+  /// Ancho máximo del contenido de listados (biblioteca) en pantallas muy anchas.
+  static const double contentMaxWidth = 1400;
+}
+
+/// Elevaciones de Material (superficies flotantes). Las sombras en capas de
+/// tarjetas y portadas salen de `context.shadowSoft` / `context.shadowRaised`.
+abstract final class Elevations {
+  /// Barra o chip apoyado sobre el lienzo.
+  static const double raised = 2;
+
+  /// Controles que flotan sobre el contenido (barra de formato).
+  static const double floating = 3;
+
+  /// Barras de acción (selección, edición de texto).
+  static const double bar = 6;
+
+  /// Popovers y menús anclados.
+  static const double popover = 8;
 }
 
 /// Puntos de corte de diseño adaptable.

@@ -151,13 +151,11 @@ npm-debug.log*
 NOTES.md
 TODO.md
 HACKING.md
-# (mantener README.md, ROADMAP.md, AGENTS.md)
+# (mantener README.md, ROADMAP.md)
 
 # Binarios de prueba generados localmente (APK, AppImage…)
 /dist/
 
-# Worktrees y datos locales de Claude Code (no versionar)
-/.claude/
 
 # --- Credenciales de Google / Firebase / certificados (nunca al repo) ---
 client_secret*.json

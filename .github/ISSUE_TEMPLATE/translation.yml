@@ -1,0 +1,21 @@
+name: Traducción / Translation
+description: Corrige o añade un idioma / Fix or add a language
+labels: [translation]
+body:
+  - type: markdown
+    attributes:
+      value: Guía en `docs/TRANSLATING.md`. No hace falta saber Dart / No Dart knowledge needed.
+  - type: input
+    id: lang
+    attributes:
+      label: Idioma / Language
+      placeholder: "pt-BR, fr, de, ..."
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: Qué quieres corregir o añadir / What to fix or add
+      description: Clave del ARB y texto actual, o "idioma nuevo, puedo traducirlo yo".
+    validations:
+      required: true

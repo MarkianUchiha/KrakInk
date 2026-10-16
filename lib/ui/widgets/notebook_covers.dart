@@ -35,17 +35,21 @@ class NotebookCoverPainter extends CustomPainter {
   final Color color;
   final bool isDark;
 
+  /// Radio de las esquinas (el de la tarjeta que la recorta).
+  final double radius;
+
   NotebookCoverPainter({
     required this.style,
     required this.color,
     this.isDark = false,
+    this.radius = 12,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
     canvas.save();
-    canvas.clipRRect(RRect.fromRectAndRadius(rect, Radius.circular(size.shortestSide * 0.06)));
+    canvas.clipRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)));
     _body(canvas, size);
     switch (style) {
       case CoverStyle.simple:
@@ -312,7 +316,10 @@ class NotebookCoverPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant NotebookCoverPainter oldDelegate) =>
-      oldDelegate.style != style || oldDelegate.color != color || oldDelegate.isDark != isDark;
+      oldDelegate.style != style ||
+      oldDelegate.color != color ||
+      oldDelegate.isDark != isDark ||
+      oldDelegate.radius != radius;
 }
 
 /// Nombre traducido de un color de portada (`kCoverColors`); `null` = sin color.

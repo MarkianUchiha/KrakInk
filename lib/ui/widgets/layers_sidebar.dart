@@ -2,11 +2,11 @@
 import 'package:flutter/material.dart';
 import '../theme/inklus_colors.dart';
 
-import '../../constants.dart';
 import '../../logic/canvas_controller.dart';
 import '../../models/page.dart';
 import 'dialogs.dart';
 import '../../l10n/l10n.dart';
+import '../theme/tokens.dart';
 
 /// Sidebar docked para gestión de capas.
 ///
@@ -45,18 +45,15 @@ class LayersSidebar extends StatelessWidget {
             children: [
               // Header
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 8, 4, 4),
+                padding: const EdgeInsets.fromLTRB(Spacing.md, Spacing.sm, Spacing.xs, Spacing.xs),
                 child: Row(
                   children: [
                     Icon(Icons.layers, size: 18, color: context.colors.primary),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: Spacing.sm),
                     Expanded(
                       child: Text(
                         context.l10n.tbLayers,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: context.text.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                     ),
                     IconButton(
@@ -76,7 +73,7 @@ class LayersSidebar extends StatelessWidget {
               // Lista de capas
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                  padding: const EdgeInsets.symmetric(vertical: Spacing.xs, horizontal: Spacing.sm),
                   itemCount: layers.length,
                   itemBuilder: (context, i) {
                     final layer = layers[i];
@@ -149,17 +146,11 @@ class _LayerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
-      margin: const EdgeInsets.only(bottom: 4),
+      margin: const EdgeInsets.only(bottom: Spacing.xs),
       decoration: BoxDecoration(
-        color: isActive
-            ? (isDark
-                ? kAccentDark.withAlpha(80)
-                : const Color(0xFFE3EDFF))
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
+        color: isActive ? context.colors.primaryContainer : Colors.transparent,
+        borderRadius: Radii.smAll,
         border: Border.all(
           color: isActive
               ? context.colors.primary
@@ -169,9 +160,9 @@ class _LayerTile extends StatelessWidget {
       child: InkWell(
         onTap: onSelect,
         onLongPress: onRename,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: Radii.smAll,
         child: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(Spacing.sm),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -191,11 +182,7 @@ class _LayerTile extends StatelessWidget {
                     child: Center(
                       child: Text(
                         '${index + 1}',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: isActive ? context.colors.onPrimary : context.colors.onSurfaceVariant,
-                        ),
+                        style: context.text.labelSmall?.copyWith(fontWeight: FontWeight.bold, color: isActive ? context.colors.onPrimary : context.colors.onSurfaceVariant),
                       ),
                     ),
                   ),
@@ -206,10 +193,7 @@ class _LayerTile extends StatelessWidget {
                       layer.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-                      ),
+                      style: context.text.labelMedium?.copyWith(fontWeight: isActive ? FontWeight.bold : FontWeight.w500),
                     ),
                   ),
                   // Visibilidad
@@ -223,7 +207,7 @@ class _LayerTile extends StatelessWidget {
                           : context.colors.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: Spacing.xs),
                   // Bloqueo
                   GestureDetector(
                     onTap: onToggleLocked,
@@ -235,7 +219,7 @@ class _LayerTile extends StatelessWidget {
                   ),
                   // Eliminar
                   if (onDelete != null) ...[
-                    const SizedBox(width: 4),
+                    const SizedBox(width: Spacing.xs),
                     GestureDetector(
                       onTap: onDelete,
                       child: Icon(
@@ -258,7 +242,7 @@ class _LayerTile extends StatelessWidget {
                         size: 14,
                         color: context.colors.onSurfaceVariant,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: Spacing.xs),
                       Expanded(
                         child: SliderTheme(
                           data: SliderTheme.of(context).copyWith(
@@ -282,10 +266,7 @@ class _LayerTile extends StatelessWidget {
                         width: 32,
                         child: Text(
                           '${(layer.opacity * 100).round()}%',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: context.colors.onSurfaceVariant,
-                          ),
+                          style: context.text.labelSmall?.copyWith(color: context.colors.onSurfaceVariant),
                           textAlign: TextAlign.right,
                         ),
                       ),

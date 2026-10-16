@@ -50,8 +50,9 @@ class _InklusAppState extends State<InklusApp> {
       themeMode: themeMode,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      // Sin `locale`: sigue el idioma del sistema (es / en; otro idioma → inglés).
+      // Sin `locale`: sigue el idioma del sistema; si no hay traducción, inglés.
       locale: widget.locale,
+      localeListResolutionCallback: resolveAppLocale,
       home: _showOnboarding
           ? OnboardingScreen(
               onDone: () => setState(() => _showOnboarding = false),
@@ -60,4 +61,15 @@ class _InklusAppState extends State<InklusApp> {
       ),
     );
   }
+}
+
+/// Primer idioma preferido del sistema que Inklus traduce (es, en, pt, fr, de);
+/// si ninguno, inglés (sin esto caería en el primero de la lista: alemán).
+Locale resolveAppLocale(List<Locale>? preferred, Iterable<Locale> supported) {
+  for (final p in preferred ?? const <Locale>[]) {
+    for (final s in supported) {
+      if (s.languageCode == p.languageCode) return s;
+    }
+  }
+  return const Locale('en');
 }

@@ -59,54 +59,72 @@ class EditorToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final compact = width < Breakpoints.expanded;
-    return Material(
-      color: context.inklus.toolbar,
-      child: Container(
-        height: Sizes.editorToolbar,
-        decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: context.inklus.toolbarBorder)),
+    // Barra flotante y redondeada sobre el escritorio (no una franja pegada
+    // al borde): deja respirar la hoja y se lee como una herramienta aparte.
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        Spacing.sm,
+        Spacing.xs,
+        Spacing.sm,
+        Spacing.xs,
+      ),
+      child: Material(
+        color: context.inklus.toolbar,
+        elevation: Elevations.raised,
+        shadowColor: context.inklus.shadow,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: Radii.xlAll,
+          side: BorderSide(color: context.inklus.toolbarBorder),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: Spacing.xs),
-        child: ListenableBuilder(
-          listenable: Listenable.merge([
-            canvas.toolContextNotifier,
-            canvas.bottomBarContextNotifier,
-            presets,
-          ]),
-          builder: (context, _) => Row(
-            children: [
-              IconButton(
-                tooltip: context.l10n.tbBackToLibrary,
-                icon: const Icon(Icons.arrow_back),
-                onPressed: onBack,
-              ),
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: compact ? 140 : 260),
-                child: _TitleButton(canvas: canvas, onTap: onEditTitle),
-              ),
-              const _Divider(),
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(children: _tools(context)),
+        child: Container(
+          height: Sizes.editorToolbar,
+          padding: const EdgeInsets.symmetric(horizontal: Spacing.xs),
+          child: ListenableBuilder(
+            listenable: Listenable.merge([
+              canvas.toolContextNotifier,
+              canvas.bottomBarContextNotifier,
+              presets,
+            ]),
+            builder: (context, _) => Row(
+              children: [
+                IconButton(
+                  tooltip: context.l10n.tbBackToLibrary,
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: onBack,
                 ),
-              ),
-              const _Divider(),
-              _UndoRedo(canvas: canvas),
-              _ToolbarButton(
-                icon: Icons.view_sidebar_outlined,
-                label: pagesOpen ? context.l10n.tbHidePages : context.l10n.tbPages,
-                selected: pagesOpen,
-                onTap: onTogglePages,
-              ),
-              _ToolbarButton(
-                icon: layersOpen ? Icons.layers : Icons.layers_outlined,
-                label: layersOpen ? context.l10n.tbHideLayers : context.l10n.tbLayers,
-                selected: layersOpen,
-                onTap: onToggleLayers,
-              ),
-              ...trailing,
-            ],
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: compact ? 140 : 260),
+                  child: _TitleButton(canvas: canvas, onTap: onEditTitle),
+                ),
+                const _Divider(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(children: _tools(context)),
+                  ),
+                ),
+                const _Divider(),
+                _UndoRedo(canvas: canvas),
+                _ToolbarButton(
+                  icon: Icons.view_sidebar_outlined,
+                  label: pagesOpen
+                      ? context.l10n.tbHidePages
+                      : context.l10n.tbPages,
+                  selected: pagesOpen,
+                  onTap: onTogglePages,
+                ),
+                _ToolbarButton(
+                  icon: layersOpen ? Icons.layers : Icons.layers_outlined,
+                  label: layersOpen
+                      ? context.l10n.tbHideLayers
+                      : context.l10n.tbLayers,
+                  selected: layersOpen,
+                  onTap: onToggleLayers,
+                ),
+                ...trailing,
+              ],
+            ),
           ),
         ),
       ),
@@ -147,8 +165,8 @@ class EditorToolbar extends StatelessWidget {
         label: !canvas.rulerEnabled
             ? context.l10n.tbRuler
             : canvas.rulerType == RulerType.straight
-                ? context.l10n.tbRulerNext
-                : context.l10n.tbProtractorNext,
+            ? context.l10n.tbRulerNext
+            : context.l10n.tbProtractorNext,
         selected: canvas.rulerEnabled,
         onTap: canvas.cycleRuler,
       ),
@@ -170,9 +188,13 @@ class EditorToolbar extends StatelessWidget {
         icon: ToolVisuals.icon(preset.tool),
         label: slot == PenPresetsController.highlighterSlot
             ? context.l10n.popHighlighter
-            : context.l10n.tbPenSlot(ToolVisuals.label(context, preset.tool), slot + 1),
+            : context.l10n.tbPenSlot(
+                ToolVisuals.label(context, preset.tool),
+                slot + 1,
+              ),
         selected: showing,
         inkColor: preset.color,
+        inkSize: preset.size,
         onTap: () {
           if (showing) {
             showAnchoredPopover<void>(
@@ -232,7 +254,8 @@ class _MoreToolsButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final extraSelected = canvas.tool == ToolType.select ||
+    final extraSelected =
+        canvas.tool == ToolType.select ||
         canvas.tool == ToolType.bucket ||
         canvas.laserMode ||
         canvas.magnifierEnabled;
@@ -249,14 +272,24 @@ class _MoreToolsButton extends StatelessWidget {
           child: Text(context.l10n.tbFill),
         ),
         MenuItemButton(
-          leadingIcon: Icon(canvas.magnifierEnabled ? Icons.search_off : Icons.search),
+          leadingIcon: Icon(
+            canvas.magnifierEnabled ? Icons.search_off : Icons.search,
+          ),
           onPressed: canvas.toggleMagnifier,
-          child: Text(canvas.magnifierEnabled ? context.l10n.tbHideMagnifier : context.l10n.tbMagnifier),
+          child: Text(
+            canvas.magnifierEnabled
+                ? context.l10n.tbHideMagnifier
+                : context.l10n.tbMagnifier,
+          ),
         ),
         MenuItemButton(
-          leadingIcon: Icon(canvas.laserMode ? Icons.flashlight_off : Icons.flashlight_on),
+          leadingIcon: Icon(
+            canvas.laserMode ? Icons.flashlight_off : Icons.flashlight_on,
+          ),
           onPressed: canvas.toggleLaser,
-          child: Text(canvas.laserMode ? context.l10n.tbLaserOff : context.l10n.tbLaser),
+          child: Text(
+            canvas.laserMode ? context.l10n.tbLaserOff : context.l10n.tbLaser,
+          ),
         ),
         MenuItemButton(
           leadingIcon: const Icon(Icons.emoji_emotions_outlined),
@@ -287,32 +320,35 @@ class _TitleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => InkWell(
-        onTap: onTap,
-        borderRadius: Radii.smAll,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: Spacing.xs),
-          child: ControllerSelector<CanvasController, (String, int, int)>(
-            listenable: canvas,
-            selector: (c) => (c.note.title, c.pageIndex, c.pageCount),
-            builder: (context, state) => Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  displayTitle(context.l10n, state.$1),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.text.titleMedium,
-                ),
-                Text(
-                  context.l10n.tbPageOf(state.$2 + 1, state.$3),
-                  style: context.text.bodySmall,
-                ),
-              ],
+    onTap: onTap,
+    borderRadius: Radii.smAll,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.sm,
+        vertical: Spacing.xs,
+      ),
+      child: ControllerSelector<CanvasController, (String, int, int)>(
+        listenable: canvas,
+        selector: (c) => (c.note.title, c.pageIndex, c.pageCount),
+        builder: (context, state) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              displayTitle(context.l10n, state.$1),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.text.titleMedium,
             ),
-          ),
+            Text(
+              context.l10n.tbPageOf(state.$2 + 1, state.$3),
+              style: context.text.bodySmall,
+            ),
+          ],
         ),
-      );
+      ),
+    ),
+  );
 }
 
 class _UndoRedo extends StatelessWidget {
@@ -352,6 +388,7 @@ class _ToolbarButton extends StatelessWidget {
     required this.onTap,
     this.selected = false,
     this.inkColor,
+    this.inkSize,
   });
 
   final IconData icon;
@@ -359,6 +396,9 @@ class _ToolbarButton extends StatelessWidget {
   final VoidCallback onTap;
   final bool selected;
   final Color? inkColor;
+
+  /// Grosor del trazo: el indicador de tinta crece con él (3–7 dp).
+  final double? inkSize;
 
   @override
   Widget build(BuildContext context) {
@@ -379,7 +419,7 @@ class _ToolbarButton extends StatelessWidget {
             child: AnimatedContainer(
               duration: Motion.fast,
               width: Sizes.minTouch,
-              height: 44,
+              height: Sizes.minTouch,
               decoration: BoxDecoration(
                 color: selected ? scheme.primaryContainer : Colors.transparent,
                 borderRadius: Radii.mdAll,
@@ -390,14 +430,20 @@ class _ToolbarButton extends StatelessWidget {
                   Icon(icon, size: Sizes.toolIcon, color: fg),
                   if (inkColor != null)
                     Positioned(
-                      bottom: 5,
+                      bottom: 3,
                       child: Container(
                         width: 20,
-                        height: 4,
+                        height: (inkSize == null ? 4.0 : 2.0 + inkSize! * 0.35)
+                            .clamp(3.0, 7.0),
                         decoration: BoxDecoration(
                           color: inkColor,
-                          borderRadius: const BorderRadius.all(Radius.circular(Radii.pill)),
-                          border: Border.all(color: scheme.outlineVariant, width: 0.5),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(Radii.pill),
+                          ),
+                          border: Border.all(
+                            color: scheme.outlineVariant,
+                            width: 0.5,
+                          ),
                         ),
                       ),
                     ),
@@ -416,9 +462,9 @@ class _Divider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: 1,
-        height: 28,
-        margin: const EdgeInsets.symmetric(horizontal: Spacing.xs),
-        color: context.colors.outlineVariant,
-      );
+    width: 1,
+    height: 28,
+    margin: const EdgeInsets.symmetric(horizontal: Spacing.xs),
+    color: context.colors.outlineVariant,
+  );
 }

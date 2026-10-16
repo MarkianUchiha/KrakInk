@@ -4,6 +4,40 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); v
 
 Cada versión se escribe en español y en inglés (sección `### English`): el workflow de release copia la sección completa a las notas de GitHub.
 
+## [1.9.0] — 2026-10-15
+
+### Añadido
+- **Portugués (Brasil), francés y alemán**: la app se traduce a cinco idiomas y sigue el del sistema (otro idioma → inglés).
+- **Borrador temporal**: tras borrar con la herramienta de la barra se vuelve a la herramienta anterior (ajustable en el popover del borrador).
+- Portadas con placa de título legible sobre cualquier color, barra del editor flotante, indicador de grosor en las plumas y respuesta táctil en las tarjetas.
+- Archivos de comunidad: guía de contribución, código de conducta, seguridad y plantillas de issues/PR.
+
+### Cambiado
+- Enderezar figuras al mantener exige casi un segundo y un trazo largo: una pausa al escribir ya no se convierte en figura.
+- Deshacer con toque de dos dedos está apagado por defecto (menú ⋮ → Ver).
+- Interfaz sobre tokens de diseño (espaciados, radios, texto, sombras); objetivos táctiles de 48 dp y texto mínimo de 12 pt.
+
+### Corregido
+- Los últimos trazos ya no se pierden si la app pasa a segundo plano (se guarda al instante) y se avisa si el guardado falla (p. ej. disco lleno).
+- Las notas guardan una versión de esquema (`schemaVersion`) para futuras migraciones.
+
+### English
+
+**Added**
+- **Brazilian Portuguese, French and German**: the app is translated into five languages and follows the system language (anything else falls back to English).
+- **Temporary eraser**: after erasing with the toolbar tool you go back to the previous tool (configurable in the eraser popover).
+- Cover title plates readable on any color, a floating editor toolbar, a thickness indicator on pens and touch feedback on cards.
+- Community files: contribution guide, code of conduct, security policy and issue/PR templates.
+
+**Changed**
+- Shape straightening on hold needs almost a second and a long stroke: pausing while writing no longer turns it into a shape.
+- Two-finger-tap undo is off by default (⋮ menu → View).
+- UI built on design tokens (spacing, radii, text, shadows); 48 dp touch targets and a 12 pt minimum text size.
+
+**Fixed**
+- The latest strokes are no longer lost if the app goes to the background (saved immediately), and a warning shows when saving fails (e.g. disk full).
+- Notes now store a schema version (`schemaVersion`) for future migrations.
+
 ## [1.8.0] — 2026-10-01
 
 ### Añadido

@@ -8,6 +8,10 @@ import 'id.dart';
 /// y estado de edición. Se serializa como JSON individual en
 /// `<appSupport>/inklus/notes/<id>.json`.
 class Note {
+  /// Versión del esquema de la nota en disco. Subirla al cambiar el JSON de
+  /// forma incompatible y migrar en [Note.fromJson] según `schemaVersion`.
+  static const currentSchema = 1;
+
   final String id;
   String title;
   DateTime createdAt;
@@ -53,6 +57,7 @@ class Note {
       Note.fromJson(docJson);
 
   Map<String, dynamic> toJson() => {
+        'schemaVersion': currentSchema,
         'id': id,
         'title': title,
         'createdAt': createdAt.toIso8601String(),

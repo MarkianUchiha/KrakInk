@@ -10,9 +10,11 @@ import '../../logic/canvas_controller.dart';
 import '../../models/template.dart';
 import '../../services/image_service.dart';
 import '../../services/template_library_service.dart';
-import 'dialogs.dart';
 import '../../services/marketplace/marketplace_service.dart';
 import '../../l10n/l10n.dart';
+import '../theme/tokens.dart';
+import 'dialogs.dart';
+import 'page_scaffold.dart';
 
 /// Selector de plantillas de la página actual.
 ///
@@ -89,54 +91,24 @@ class _TemplateSheetState extends State<_TemplateSheet> {
 
     return Padding(
       padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+        left: Spacing.lg,
+        right: Spacing.lg,
+        bottom: MediaQuery.of(context).viewInsets.bottom + Spacing.lg,
       ),
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Encabezado mejorado
-            Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: context.colors.primary.withAlpha(20),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.dashboard_customize_outlined,
-                    size: 20,
-                    color: context.colors.primary,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        context.l10n.marketTemplates,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        context.l10n.tplInfiniteHint,
-                        style: TextStyle(fontSize: 12, color: context.colors.onSurfaceVariant),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            SheetHeader(
+              icon: Icons.dashboard_customize_outlined,
+              title: context.l10n.marketTemplates,
+              subtitle: context.l10n.tplInfiniteHint,
             ),
-            const SizedBox(height: 16),
 
             // ---- Sección: Plantillas infinitas ----
             _SectionLabel(label: context.l10n.createInfinite),
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.sm),
 
             // --- Tiles de plantillas infinitas ---
             Wrap(
@@ -189,9 +161,9 @@ class _TemplateSheetState extends State<_TemplateSheet> {
             ),
 
             // --- Sección: Hoja fija ---
-            const SizedBox(height: 16),
+            const SizedBox(height: Spacing.lg),
             _SectionLabel(label: context.l10n.noteTplSheet),
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.sm),
             Wrap(
               spacing: 10,
               runSpacing: 10,
@@ -223,9 +195,9 @@ class _TemplateSheetState extends State<_TemplateSheet> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 16),
+                    const SizedBox(height: Spacing.lg),
                     _SectionLabel(label: context.l10n.tplFromMarket),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: Spacing.sm),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -245,14 +217,14 @@ class _TemplateSheetState extends State<_TemplateSheet> {
 
             // --- Mis plantillas guardadas ---
             if (widget.templateLibrary.entries.isNotEmpty) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: Spacing.lg),
               const Divider(),
-              const SizedBox(height: 8),
+              const SizedBox(height: Spacing.sm),
               Row(
                 children: [
                   Text(
                     context.l10n.tplMine,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    style: context.text.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const Spacer(),
                   TextButton.icon(
@@ -262,13 +234,13 @@ class _TemplateSheetState extends State<_TemplateSheet> {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: Spacing.sm),
               SizedBox(
                 height: 90,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: widget.templateLibrary.entries.length,
-                  separatorBuilder: (_, _) => const SizedBox(width: 8),
+                  separatorBuilder: (_, _) => const SizedBox(width: Spacing.sm),
                   itemBuilder: (context, i) {
                     final entry = widget.templateLibrary.entries[i];
                     final isCurrent = current.type == TemplateType.custom &&
@@ -289,23 +261,23 @@ class _TemplateSheetState extends State<_TemplateSheet> {
 
             // --- Opciones de personalización ---
             if (hasLines || isFiniteSheet) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: Spacing.lg),
               const Divider(),
-              const SizedBox(height: 8),
+              const SizedBox(height: Spacing.sm),
               Text(
                 context.l10n.tplCustomize,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                style: context.text.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
 
             // Color de línea (para rayas, cuadrícula y hoja normal)
             if (hasLines || current.type == TemplateType.sheet) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: Spacing.md),
               Row(
                 children: [
                   Text(
                     context.l10n.tplLineColor,
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    style: context.text.labelMedium?.copyWith(fontWeight: FontWeight.w600),
                   ),
                   const Spacer(),
                   GestureDetector(
@@ -326,12 +298,12 @@ class _TemplateSheetState extends State<_TemplateSheet> {
 
             // Separación (rayas / cuadrícula)
             if (hasLines) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: Spacing.sm),
               Row(
                 children: [
                   Text(
                     context.l10n.tplSpacing,
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    style: context.text.labelMedium?.copyWith(fontWeight: FontWeight.w600),
                   ),
                   Expanded(
                     child: Slider(
@@ -351,8 +323,7 @@ class _TemplateSheetState extends State<_TemplateSheet> {
                     child: Text(
                       '${_spacing.round()}',
                       textAlign: TextAlign.right,
-                      style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w600),
+                      style: context.text.labelSmall?.copyWith(fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
@@ -361,17 +332,17 @@ class _TemplateSheetState extends State<_TemplateSheet> {
 
             // B6: Toggle Lienzo infinito (para plantillas que lo soportan)
             if (supportsInfiniteToggle) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: Spacing.sm),
               SwitchListTile(
                 title: Text(
                   context.l10n.createInfinite,
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  style: context.text.labelMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
                   _infiniteFill
                       ? context.l10n.createInfiniteOn
                       : context.l10n.tplFixedSheet,
-                  style: const TextStyle(fontSize: 11),
+                  style: context.text.labelSmall?.copyWith(),
                 ),
                 value: _infiniteFill,
                 onChanged: (v) {
@@ -385,12 +356,12 @@ class _TemplateSheetState extends State<_TemplateSheet> {
 
             // Tamaño de hoja (para hoja normal)
             if (isFiniteSheet && current.type != TemplateType.custom) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: Spacing.sm),
               Text(
                 context.l10n.tplSheetSize,
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                style: context.text.labelMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: Spacing.xs),
               Row(
                 children: [
                   // Presets de tamaño
@@ -401,7 +372,7 @@ class _TemplateSheetState extends State<_TemplateSheet> {
                     isActive: _sheetWidth == 1191 && _sheetHeight == 1684,
                     onTap: () => _applySheetSize(1191, 1684),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: Spacing.sm),
                   _SizePreset(
                     label: context.l10n.tplLetter,
                     width: 1275,
@@ -409,7 +380,7 @@ class _TemplateSheetState extends State<_TemplateSheet> {
                     isActive: _sheetWidth == 1275 && _sheetHeight == 1650,
                     onTap: () => _applySheetSize(1275, 1650),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: Spacing.sm),
                   _SizePreset(
                     label: 'B5',
                     width: 1031,
@@ -417,9 +388,9 @@ class _TemplateSheetState extends State<_TemplateSheet> {
                     isActive: _sheetWidth == 1031 && _sheetHeight == 1457,
                     onTap: () => _applySheetSize(1031, 1457),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: Spacing.sm),
                   _SizePreset(
-                    label: 'Half Ltr',
+                    label: context.l10n.tplHalfLetter,
                     width: 638,
                     height: 986,
                     isActive: _sheetWidth == 638 && _sheetHeight == 986,
@@ -429,7 +400,7 @@ class _TemplateSheetState extends State<_TemplateSheet> {
               ),
             ],
 
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.sm),
           ],
         ),
       ),
@@ -492,13 +463,7 @@ class _TemplateSheetState extends State<_TemplateSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                context.l10n.tplLineColor,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
+            SheetHeader(icon: Icons.palette_outlined, title: context.l10n.tplLineColor),
             Wrap(
               spacing: 10,
               runSpacing: 10,
@@ -557,7 +522,7 @@ class _TemplateSheetState extends State<_TemplateSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: Spacing.lg),
           ],
         ),
       ),
@@ -616,9 +581,7 @@ class _TemplateSheetState extends State<_TemplateSheet> {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.tplImageLoadFailed('$e'))),
-        );
+        showSnack(context, context.l10n.tplImageLoadFailed('$e'));
       }
     }
   }
@@ -627,9 +590,7 @@ class _TemplateSheetState extends State<_TemplateSheet> {
   Future<void> _saveCurrentAsTemplate() async {
     final t = widget.controller.page.template;
     if (t.type != TemplateType.custom || t.imagePath == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.tplOnlyImage)),
-      );
+      showSnack(context, context.l10n.tplOnlyImage);
       return;
     }
     final name = await showTextPrompt(
@@ -651,15 +612,11 @@ class _TemplateSheetState extends State<_TemplateSheet> {
       );
       if (mounted) {
         setState(() {});
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.tplSaved)),
-        );
+        showSnack(context, context.l10n.tplSaved);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.tplSaveFailed('$e'))),
-        );
+        showSnack(context, context.l10n.tplSaveFailed('$e'));
       }
     }
   }
@@ -739,7 +696,7 @@ class _TemplateTile extends StatelessWidget {
                 color: selected
                     ? context.colors.primary.withAlpha(20)
                     : context.colors.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: Radii.mdAll,
               ),
               child: Icon(
                 icon,
@@ -747,15 +704,11 @@ class _TemplateTile extends StatelessWidget {
                 color: selected ? context.colors.primary : context.colors.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.sm),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                color: selected ? context.colors.primary : context.colors.onSurfaceVariant,
-              ),
+              style: context.text.labelSmall?.copyWith(fontWeight: selected ? FontWeight.w600 : FontWeight.w500, color: selected ? context.colors.primary : context.colors.onSurfaceVariant),
             ),
           ],
         ),
@@ -830,12 +783,12 @@ class _SizePreset extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: Radii.smAll,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.sm),
         decoration: BoxDecoration(
           color: isActive ? context.colors.secondaryContainer : context.colors.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: Radii.smAll,
           border: Border.all(
             color: isActive ? context.colors.primary : Colors.transparent,
             width: 1.5,
@@ -843,11 +796,7 @@ class _SizePreset extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-            color: isActive ? context.colors.primary : context.colors.onSurfaceVariant,
-          ),
+          style: context.text.labelSmall?.copyWith(fontWeight: isActive ? FontWeight.bold : FontWeight.w500, color: isActive ? context.colors.primary : context.colors.onSurfaceVariant),
         ),
       ),
     );
@@ -877,7 +826,7 @@ class _SavedTemplateTile extends StatelessWidget {
         width: 80,
         decoration: BoxDecoration(
           color: selected ? context.colors.secondaryContainer : context.colors.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: Radii.mdAll,
           border: Border.all(
             color: selected ? context.colors.primary : Colors.transparent,
             width: 2,
@@ -900,14 +849,10 @@ class _SavedTemplateTile extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.only(bottom: Spacing.xs),
               child: Text(
                 entry.name,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: selected ? FontWeight.bold : FontWeight.w500,
-                  color: selected ? context.colors.primary : context.colors.onSurfaceVariant,
-                ),
+                style: context.text.labelSmall?.copyWith(fontWeight: selected ? FontWeight.bold : FontWeight.w500, color: selected ? context.colors.primary : context.colors.onSurfaceVariant),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
@@ -929,11 +874,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        color: context.colors.onSurfaceVariant,
-      ),
+      style: context.text.labelMedium?.copyWith(fontWeight: FontWeight.w600, color: context.colors.onSurfaceVariant),
     );
   }
 }

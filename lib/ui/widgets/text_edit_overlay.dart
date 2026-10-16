@@ -265,7 +265,7 @@ class _TextEditOverlayState extends State<TextEditOverlay> {
               width: width + 2 * _pad,
               child: Material(
                 color: context.inklus.paper.withValues(alpha: 0.94),
-                elevation: 3,
+                elevation: Elevations.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: Radii.smAll,
                   side: BorderSide(color: context.colors.primary, width: 1.5),
@@ -364,7 +364,7 @@ class _TextEditOverlayState extends State<TextEditOverlay> {
       constraints: BoxConstraints(maxWidth: maxWidth),
       child: Material(
         color: scheme.surfaceContainerHigh,
-        elevation: 6,
+        elevation: Elevations.bar,
         borderRadius: Radii.xlAll,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -546,7 +546,7 @@ class _TextEditOverlayState extends State<TextEditOverlay> {
       constraints: const BoxConstraints(maxWidth: 300, maxHeight: 280),
       child: Material(
         color: scheme.surfaceContainerHigh,
-        elevation: 6,
+        elevation: Elevations.bar,
         borderRadius: Radii.lgAll,
         child: Padding(
           padding: const EdgeInsets.all(Spacing.md),
@@ -709,7 +709,7 @@ class _Handle extends StatelessWidget {
               decoration: BoxDecoration(
                 color: context.colors.primary,
                 shape: BoxShape.circle,
-                boxShadow: const [BoxShadow(blurRadius: 4, color: Colors.black26)],
+                boxShadow: context.shadowRaised,
               ),
               child: Icon(icon, size: 16, color: context.colors.onPrimary),
             ),

@@ -39,9 +39,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
 
   Future<void> _createReminder() async {
     if (_notebooks.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.remNoNotebooks)),
-      );
+      showSnack(context, context.l10n.remNoNotebooks);
       return;
     }
 
@@ -118,9 +116,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
       message: message,
     );
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.remCreated)),
-      );
+      showSnack(context, context.l10n.remCreated);
       await _load();
     }
   }

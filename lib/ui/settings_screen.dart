@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../constants.dart';
+import '../models/note.dart';
 import '../services/drive_sync_service.dart';
 import '../services/app_errors.dart';
 import '../services/error_log.dart';
@@ -233,12 +234,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 showSelectedIcon: false,
                 segments: [
                   ButtonSegment(
-                      value: ThemeMode.light, icon: Icon(Icons.light_mode_outlined), label: Text(context.l10n.settingsThemeLight)),
+                      value: ThemeMode.light, icon: const Icon(Icons.light_mode_outlined), label: Text(context.l10n.settingsThemeLight)),
                   ButtonSegment(
-                      value: ThemeMode.dark, icon: Icon(Icons.dark_mode_outlined), label: Text(context.l10n.settingsThemeDark)),
+                      value: ThemeMode.dark, icon: const Icon(Icons.dark_mode_outlined), label: Text(context.l10n.settingsThemeDark)),
                   ButtonSegment(
                       value: ThemeMode.system,
-                      icon: Icon(Icons.brightness_auto_outlined),
+                      icon: const Icon(Icons.brightness_auto_outlined),
                       label: Text(context.l10n.settingsThemeSystem)),
                 ],
                 selected: {mode},
@@ -287,11 +288,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _snack(l10n.driveConnectedAs(_sync.email ?? ''));
       return;
     }
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        content: Text(l10n.driveSignInIncomplete),
-        action: SnackBarAction(
+    showSnack(
+      context,
+      l10n.driveSignInIncomplete,
+      action: SnackBarAction(
           label: l10n.driveDetails,
           onPressed: () => showDialog<void>(
             context: context,
@@ -310,7 +310,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
         ),
-      ));
+    );
   }
 
   void _showConfigErrorDialog(String message) {
@@ -352,7 +352,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         for (final meta in await _storage.loadIndex()) {
           if (!meta.isSyncEnabled) continue;
           final nb = await _storage.loadNotebook(meta.id);
-          for (final note in nb?.notes ?? const []) {
+          for (final note in nb?.notes ?? const <Note>[]) {
             await _sync.backupNote(
               note,
               notebookId: meta.id,
@@ -465,9 +465,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _snack(String msg) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(msg)));
+    showSnack(context, msg);
   }
 }
 
@@ -504,7 +502,7 @@ class _SyncNotebooksCardState extends State<_SyncNotebooksCard> {
     // Primera subida del cuaderno recién activado (silenciosa: si falta
     // consentimiento no hace nada; ya hay copia local).
     final nb = await widget.storage.loadNotebook(meta.id);
-    for (final note in nb?.notes ?? const []) {
+    for (final note in nb?.notes ?? const <Note>[]) {
       try {
         await widget.sync.backupNote(note, notebookId: meta.id, notebookTitle: meta.title);
       } catch (e) {

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -115,7 +116,7 @@ class ImageService {
       } catch (e) {
         debugPrint('ImageService.ensureCached: $e');
       } finally {
-        _pending.remove(path);
+        unawaited(_pending.remove(path));
       }
     });
   }

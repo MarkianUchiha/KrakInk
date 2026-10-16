@@ -54,7 +54,7 @@ class SelectionBar extends StatelessWidget {
               : Material(
                   key: ValueKey(pasteOnly),
                   color: context.colors.surfaceContainerHigh,
-                  elevation: 6,
+                  elevation: Elevations.bar,
                   borderRadius: const BorderRadius.all(
                     Radius.circular(Radii.pill),
                   ),

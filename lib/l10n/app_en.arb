@@ -468,7 +468,7 @@
   "popOnHold": "On hold",
   "popAlways": "Always",
   "popShapeOffHint": "Strokes stay as drawn.",
-  "popShapeHoldHint": "Hold the pen still for half a second after finishing a line, circle, triangle or rectangle.",
+  "popShapeHoldHint": "Hold the pen still for almost a second after finishing a line, circle, triangle or rectangle.",
   "popShapeAlwaysHint": "Every recognizable shape is straightened when you lift the pen.",
   "popAdvanced": "Advanced stroke settings",
   "popMode": "Mode",
@@ -1178,5 +1178,9 @@
         "type": "int"
       }
     }
-  }
+  },
+  "menuTwoFingerUndo": "Undo with a two-finger tap",
+  "popEraserAutoRevert": "Return to the previous tool after erasing",
+  "saveFailed": "Couldn't save the note. Free up some space: it will retry automatically.",
+  "tplHalfLetter": "Half Letter"
 }

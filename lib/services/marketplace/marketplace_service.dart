@@ -297,7 +297,7 @@ class MarketplaceService extends ChangeNotifier {
   // -------------------------------------------------------------------------
 
   static final List<MarketplacePack> builtInCatalog = [
-    MarketplacePack(
+    const MarketplacePack(
       id: 'cuadernos-clasicos',
       name: 'Cuadernos clásicos',
       description: 'Rayado ancho y estrecho, cuadrícula de 5 mm, puntos y pentagrama.',
@@ -306,7 +306,7 @@ class MarketplaceService extends ChangeNotifier {
       license: 'CC0-1.0',
       version: '1.0.0',
       tags: ['estudio', 'básicos'],
-      templates: const [
+      templates: [
         PackTemplate(name: 'Rayado ancho', params: {'type': 'ruled', 'spacing': 64}),
         PackTemplate(name: 'Rayado estrecho', params: {'type': 'ruled', 'spacing': 40}),
         PackTemplate(name: 'Cuadrícula 5 mm', params: {'type': 'grid', 'spacing': 28}),
@@ -314,7 +314,7 @@ class MarketplaceService extends ChangeNotifier {
         PackTemplate(name: 'Pentagrama', params: {'type': 'music', 'spacing': 60}),
       ],
     ),
-    MarketplacePack(
+    const MarketplacePack(
       id: 'papel-tecnico',
       name: 'Papel técnico',
       description: 'Cuadrícula fina tipo milimetrado y agenda por columnas, en tonos suaves.',
@@ -323,7 +323,7 @@ class MarketplaceService extends ChangeNotifier {
       license: 'CC0-1.0',
       version: '1.0.0',
       tags: ['ingeniería'],
-      templates: const [
+      templates: [
         PackTemplate(name: 'Milimetrado', params: {'type': 'grid', 'spacing': 12, 'lineColor': '#C8D8E8'}),
         PackTemplate(name: 'Agenda por columnas', params: {'type': 'planner', 'spacing': 44}),
       ],

@@ -1,6 +1,6 @@
 # 🗺️ Hoja de ruta — Inklus
 
-> Estado del proyecto y próximos pasos. **Próximo trabajo planificado: [`docs/REWORK.md`](docs/REWORK.md)** (gobernanza, UI premium, multilingüe); el manual de usuario/instalación en [`README.md`](README.md).
+> Estado del proyecto y próximos pasos. **Rework (gobernanza, datos seguros, UI premium, 5 idiomas): ejecutado, ver [`docs/REWORK.md`](docs/REWORK.md)** (queda su «Ronda 2» y los pendientes que lista). Camino a 2.0 más abajo; manual de usuario en [`README.md`](README.md).
 
 ## 🧭 Cómo leer esta hoja de ruta (para colaboradores)
 
@@ -13,7 +13,7 @@
 
 ## ✅ Lo que la app ofrece hoy
 
-> Verificado contra el código fuente (~27,600 líneas Dart en `lib/`, ~231 tests; versión 1.8.0).
+> Verificado contra el código fuente (~27,800 líneas Dart en `lib/`, ~250 tests; versión 1.9.0).
 
 ### ✨ UX y Onboarding
 - **Onboarding tutorial**: 4 páginas ilustradas skippable al primer inicio; persiste con `SharedPreferences`.
@@ -117,7 +117,7 @@
 - **Ctrl+V**: pegar.
 
 ### 🧪 Calidad y DevOps
-- **~231 tests** (modelos, storage, backup, cifrado, migración, CRUD, formatos, lógica del lienzo, historial).
+- **~250 tests** (modelos, storage, backup, cifrado, migración, CRUD, formatos, lógica del lienzo, historial).
 - **CI (GitHub Actions)**: `flutter analyze` + `flutter test --coverage` + APK debug + build Linux; en tags `v*` genera APK/AAB **firmados** (secretos `ANDROID_KEYSTORE_*`) y los publica en la release.
 - **Firma de release** desde `android/key.properties` (no versionado); sin él, release usa la clave debug.
 - **Tema oscuro** adaptado (scaffold, top bar, bottom bar, tool rail, biblioteca).
@@ -164,6 +164,13 @@
 - Texto enriquecido por tramos (negrita/cursiva/subrayado/alineación) con 8 fuentes empaquetadas, idéntico en lienzo, editor y exportación.
 - Abrir `.inklus` desde Drive/Archivos/Compartir (Android). App completa en es/en según el idioma del sistema; errores unificados (`AppError`).
 - Figuras con ajuste a ejes; rediseño de creación de cuadernos, portadas, Marketplace y hoja de plantillas.
+
+### ✅ v1.9.0 — Base sana, UI premium y 5 idiomas (hecho)
+- **Datos seguros**: guardado inmediato al pasar a segundo plano, aviso y registro si falla el guardado, `schemaVersion` por nota, análisis estricto (`strict-casts`, `unawaited_futures`…).
+- **UI premium**: tokens de espaciado/radio/texto/elevación en toda la UI, barra del editor flotante, portadas con placa de título, tarjetas con respuesta táctil, `EmptyState`/`SheetHeader`/`showSnack` únicos, 48 dp y 12 pt mínimos.
+- **Idiomas**: es, en, **pt-BR, fr, de** (test de paridad en los cinco; otro idioma → inglés).
+- **Comunidad**: CONTRIBUTING, código de conducta, seguridad, gobernanza, plantillas de issue/PR, `docs/{ARCHITECTURE,DESIGN_SYSTEM,TRANSLATING,RELEASING}.md`.
+- Borrador temporal (vuelve a la herramienta anterior), enderezar figuras más conservador, deshacer con dos dedos opcional.
 
 ### 🎯 Plan por fases (histórico, ya ejecutado) (revisado contra el código, 2026-09-27)
 > Prioridades: **1) no perder datos, 2) fluidez con notas grandes, 3) interfaz consistente, 4) distribución pública.** Cada fase es una versión publicable.
@@ -212,7 +219,7 @@
 - ✅ **R5** `integration_test/app_test.dart` (también en CI con Xvfb) + guion manual `docs/testing.md`.
 - ✅ **R6** sustituido por un **registro de errores local** (`ErrorLog`) que el usuario comparte a mano: coherente con "sin analítica ni terceros".
 - ✅ **P3** desplazamiento continuo entre hojas fijas (+ deshacer por página).
-- ✅ **P2** i18n (2026-10): todas las pantallas y avisos en `lib/l10n/app_{es,en}.arb`; la app sigue el idioma del sistema (es/en; otro → inglés). Errores con código (`AppError`/`userError`), resultados con `message(l10n)`. Quedan en español por diseño: contenido guardado en datos (títulos por defecto, nombres de páginas/capas; se traducen al mostrarse con `displayTitle`), catálogo remoto del marketplace y diagnósticos técnicos (`validatePack`, logs).
+- ✅ **P2** i18n (2026-10): todas las pantallas y avisos en `lib/l10n/app_{es,en,pt,fr,de}.arb`; la app sigue el idioma del sistema (otro → inglés). Errores con código (`AppError`/`userError`), resultados con `message(l10n)`. Quedan en español por diseño: contenido guardado en datos (títulos por defecto, nombres de páginas/capas; se traducen al mostrarse con `displayTitle`), catálogo remoto del marketplace y diagnósticos técnicos (`validatePack`, logs).
 - **v2.0** = P2 terminado + R3 hecho + guion de `docs/testing.md` superado en una tablet.
 
 #### Aparcado (poco valor ahora o coste alto)
@@ -279,8 +286,8 @@ Contenido inicial sugerido: agenda semanal/mensual real (con días y cabeceras, 
 | Métrica | Valor |
 |---|---|
 | Archivos Dart (lib/) | ~96 |
-| Líneas de código | ~27,600 |
-| Tests | ~231 (22 archivos en `test/`) + integración + capturas |
+| Líneas de código | ~27,800 |
+| Tests | ~250 (23 archivos en `test/`) + integración + capturas |
 | Modelos | 9 (`document`, `note`, `notebook`, `page`, `stroke`, `template`, `image_item`, `text_item`, `id`) |
 | Servicios | 17 (+ `file_utils`) |
 | Herramientas de escritura | 10 (pen, pencil, highlighter, calligraphy, brush, eraser, select, lasso, bucket, text) |

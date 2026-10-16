@@ -46,6 +46,37 @@ void main() {
 
   List<String> ids() => c.page.strokes.map((s) => s.id).toList();
 
+  group('Borrador temporal', () {
+    void erase() {
+      c.beginStroke(const Offset(0, 0), 0.5, tool: ToolType.eraser);
+      c.addStrokePoint(const Offset(50, 0), 0.5);
+      c.endStroke();
+    }
+
+    test('vuelve a la herramienta anterior tras borrar', () {
+      c.setTool(ToolType.highlighter);
+      c.setTool(ToolType.eraser);
+      erase();
+      expect(c.tool, ToolType.highlighter);
+    });
+
+    test('se queda si el ajuste está apagado', () {
+      c.setEraserAutoRevert(false);
+      c.setTool(ToolType.eraser);
+      erase();
+      expect(c.tool, ToolType.eraser);
+    });
+
+    test('la goma física no cambia la herramienta', () {
+      erase();
+      expect(c.tool, ToolType.pen);
+    });
+  });
+
+  test('deshacer con dos dedos está apagado por defecto', () {
+    expect(c.twoFingerUndo, isFalse);
+  });
+
   group('Capas', () {
     setUp(() {
       c.addLayer(); // capa 1 activa

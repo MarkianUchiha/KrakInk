@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import '../constants.dart';
+import '../models/note.dart';
 import '../models/page.dart' as models;
 
 import 'dart:io';
@@ -13,6 +14,8 @@ import '../services/storage_service.dart';
 import '../utils/date_utils.dart' as date_util;
 import 'note_list_screen.dart';
 import 'trash_screen.dart';
+import 'widgets/page_scaffold.dart';
+import 'widgets/pressable_scale.dart';
 import 'widgets/smart_folders_sheet.dart';
 import 'widgets/tag_editor_sheet.dart';
 import 'create_notebook_screen.dart';
@@ -22,13 +25,16 @@ import 'widgets/dialogs.dart';
 import '../theme_controller.dart';
 import 'home_screen.dart';
 import 'widgets/search_sheet.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'theme/inklus_colors.dart';
 import 'theme/tokens.dart';
 import 'widgets/inklus_logo.dart';
 import 'marketplace_screen.dart';
 import '../l10n/l10n.dart';
 import '../services/app_errors.dart';
+import '../models/text_layout.dart';
 
 /// Biblioteca de cuadernos (pantalla de inicio).
 ///
@@ -92,19 +98,22 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
     await _storage.setSyncEnabled(meta.id, enable);
     await _reload();
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-          content: Text(enable
-              ? context.l10n.libSyncWillSync(meta.title)
-              : context.l10n.libSyncStopped(meta.title))));
+    showSnack(
+      context,
+      enable
+          ? context.l10n.libSyncWillSync(meta.title)
+          : context.l10n.libSyncStopped(meta.title),
+    );
     if (!enable || !DriveSyncService.instance.isSignedIn) return;
     // Primera subida (silenciosa) del cuaderno recién activado.
     final nb = await _storage.loadNotebook(meta.id);
-    for (final note in nb?.notes ?? const []) {
+    for (final note in nb?.notes ?? const <Note>[]) {
       try {
-        await DriveSyncService.instance
-            .backupNote(note, notebookId: meta.id, notebookTitle: meta.title);
+        await DriveSyncService.instance.backupNote(
+          note,
+          notebookId: meta.id,
+          notebookTitle: meta.title,
+        );
       } catch (_) {
         break;
       }
@@ -121,7 +130,9 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
     // Archivos .inklus abiertos desde fuera (Drive, Archivos…), Android.
     if (Platform.isAndroid) {
       _openChannel.setMethodCallHandler((call) async {
-        if (call.method == 'file') await _importIncoming(call.arguments as String);
+        if (call.method == 'file') {
+          await _importIncoming(call.arguments as String);
+        }
       });
       _openChannel.invokeMethod<String>('take').then((p) {
         if (p != null) _importIncoming(p);
@@ -137,11 +148,16 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
     try {
       final bytes = await File(path).readAsBytes();
       if (!mounted) return;
-      final result = await runWithLoading(context, () => ImportService.importBytes(bytes));
+      final result = await runWithLoading(
+        context,
+        () => ImportService.importBytes(bytes),
+      );
       await _reload();
       _snack(result.message(l10n));
     } catch (e) {
-      _snack(e is FormatException ? userError(l10n, e) : l10n.libImportError('$e'));
+      _snack(
+        e is FormatException ? userError(l10n, e) : l10n.libImportError('$e'),
+      );
     }
   }
 
@@ -190,10 +206,14 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
           ..sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
       case _SortBy.titleAsc:
         list = List.of(list)
-          ..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+          ..sort(
+            (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+          );
       case _SortBy.titleDesc:
         list = List.of(list)
-          ..sort((a, b) => b.title.toLowerCase().compareTo(a.title.toLowerCase()));
+          ..sort(
+            (a, b) => b.title.toLowerCase().compareTo(a.title.toLowerCase()),
+          );
     }
     return list;
   }
@@ -205,9 +225,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
   void _openSettings() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => SettingsScreen(
-          onToggleTheme: widget.onToggleTheme,
-        ),
+        builder: (_) => SettingsScreen(onToggleTheme: widget.onToggleTheme),
       ),
     );
   }
@@ -246,7 +264,6 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
     await _reload();
     await _openNotebookById(nb.id);
   }
-
 
   Future<void> _renameNotebook(NotebookMeta meta) async {
     final name = await _promptText(
@@ -296,12 +313,9 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                context.l10n.libCoverColor,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+            SheetHeader(
+              icon: Icons.palette_outlined,
+              title: context.l10n.libCoverColor,
             ),
             Wrap(
               spacing: 12,
@@ -309,31 +323,46 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
               alignment: WrapAlignment.center,
               children: colors.map((c) {
                 final isSelected = c.$2 == meta.colorValue;
-                return GestureDetector(
-                  onTap: () => Navigator.pop(context, c.$2),
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: c.$2 != null ? Color(c.$2!) : context.colors.surfaceContainerHighest,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: isSelected
-                            ? context.colors.onSurface
-                            : context.colors.outline,
-                        width: isSelected ? 3 : 1,
+                return Semantics(
+                  button: true,
+                  selected: isSelected,
+                  label: coverColorName(context.l10n, c.$2),
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context, c.$2),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: c.$2 != null
+                            ? Color(c.$2!)
+                            : context.colors.surfaceContainerHighest,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSelected
+                              ? context.colors.onSurface
+                              : context.colors.outline,
+                          width: isSelected ? 3 : 1,
+                        ),
                       ),
+                      child: c.$2 == null
+                          ? Icon(
+                              Icons.close,
+                              size: 20,
+                              color: context.colors.onSurfaceVariant,
+                            )
+                          : isSelected
+                          ? const Icon(
+                              Icons.check,
+                              size: 20,
+                              color: Colors.white,
+                            )
+                          : null,
                     ),
-                    child: c.$2 == null
-                        ? Icon(Icons.close, size: 20, color: context.colors.onSurfaceVariant)
-                        : isSelected
-                            ? const Icon(Icons.check, size: 20, color: Colors.white)
-                            : null,
                   ),
                 );
               }).toList(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: Spacing.lg),
           ],
         ),
       ),
@@ -350,11 +379,16 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
     try {
       final bytes = await ImportService.pickFile();
       if (bytes == null || !mounted) return;
-      final result = await runWithLoading(context, () => ImportService.importBytes(bytes));
+      final result = await runWithLoading(
+        context,
+        () => ImportService.importBytes(bytes),
+      );
       await _reload();
       _snack(result.message(l10n));
     } catch (e) {
-      _snack(e is FormatException ? userError(l10n, e) : l10n.libImportError('$e'));
+      _snack(
+        e is FormatException ? userError(l10n, e) : l10n.libImportError('$e'),
+      );
     }
   }
 
@@ -362,9 +396,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
     final nb = await _storage.loadNotebook(id);
     if (!mounted || nb == null) return;
     await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => NoteListScreen(notebook: nb),
-      ),
+      MaterialPageRoute<void>(builder: (_) => NoteListScreen(notebook: nb)),
     );
     // No limpiar _thumbs: la caché versionada se invalida
     // automáticamente si el notebook fue modificado (updatedAt).
@@ -379,13 +411,15 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
       onOpen: (result, match) async {
         final note = await _storage.loadNote(result.noteId);
         if (note == null || !mounted) return;
-        await Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => HomeScreen(
-            note: note,
-            notebookId: result.notebookId,
-            initialPage: match.pageIndex < 0 ? 0 : match.pageIndex,
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => HomeScreen(
+              note: note,
+              notebookId: result.notebookId,
+              initialPage: match.pageIndex < 0 ? 0 : match.pageIndex,
+            ),
           ),
-        ));
+        );
         await _reload();
       },
     );
@@ -393,9 +427,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
 
   Future<void> _openTrash() async {
     await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => TrashScreen(storage: _storage),
-      ),
+      MaterialPageRoute<void>(builder: (_) => TrashScreen(storage: _storage)),
     );
     await _reload();
   }
@@ -418,9 +450,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
+    showSnack(context, message);
   }
 
   Future<void> _showSmartFolders() async {
@@ -458,13 +488,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                context.l10n.libSortTitle,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
+            SheetHeader(icon: Icons.sort, title: context.l10n.libSortTitle),
             _SortOption(
               icon: Icons.access_time,
               label: context.l10n.libSortNewestFirst,
@@ -489,7 +513,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
               selected: _sortBy == _SortBy.titleDesc,
               onTap: () => Navigator.pop(context, _SortBy.titleDesc),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.sm),
           ],
         ),
       ),
@@ -508,21 +532,21 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
     final wide = MediaQuery.sizeOf(context).width >= Breakpoints.compact + 240;
     final content = metas == null
         ? const Center(child: CircularProgressIndicator())
-        : CustomScrollView(
+        : _MaxWidth(
+            child: CustomScrollView(
             slivers: [
               SliverToBoxAdapter(child: _buildHeader(metas.length)),
               ..._buildContentSlivers(),
               const SliverToBoxAdapter(child: SizedBox(height: 96)),
             ],
-          );
+          ));
     return Scaffold(
       appBar: wide
           ? null
-          : AppBar(
-              title: const _Brand(),
-              actions: [_moreMenu()],
-            ),
-      drawer: wide ? null : Drawer(child: SafeArea(child: _navList(inDrawer: true))),
+          : AppBar(title: const _Brand(), actions: [_moreMenu()]),
+      drawer: wide
+          ? null
+          : Drawer(child: SafeArea(child: _navList(inDrawer: true))),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _createNotebook,
         icon: const Icon(Icons.add),
@@ -533,7 +557,10 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
             ? Row(
                 children: [
                   SizedBox(width: 248, child: _navList(inDrawer: false)),
-                  VerticalDivider(width: 1, color: context.colors.outlineVariant),
+                  VerticalDivider(
+                    width: 1,
+                    color: context.colors.outlineVariant,
+                  ),
                   Expanded(child: content),
                 ],
               )
@@ -544,27 +571,37 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
 
   /// Navegación: secciones, carpetas inteligentes, papelera y ajustes.
   Widget _navList({required bool inDrawer}) {
-    Widget tile(IconData icon, String label, bool selected, VoidCallback onTap, {int? count}) =>
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.xxs),
-          child: ListTile(
-            leading: Icon(icon),
-            title: Text(label),
-            trailing: count == null ? null : Text('$count', style: context.text.labelMedium),
-            selected: selected,
-            selectedTileColor: context.colors.secondaryContainer,
-            shape: const StadiumBorder(),
-            onTap: () {
-              if (inDrawer) Navigator.pop(context);
-              onTap();
-            },
-          ),
-        );
+    Widget tile(
+      IconData icon,
+      String label,
+      bool selected,
+      VoidCallback onTap, {
+      int? count,
+    }) => Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.md,
+        vertical: Spacing.xxs,
+      ),
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(label),
+        trailing: count == null
+            ? null
+            : Text('$count', style: context.text.labelMedium),
+        selected: selected,
+        selectedTileColor: context.colors.secondaryContainer,
+        shape: const StadiumBorder(),
+        onTap: () {
+          if (inDrawer) Navigator.pop(context);
+          onTap();
+        },
+      ),
+    );
     final all = _metas ?? const <NotebookMeta>[];
     void go(_Section s) => setState(() {
-          _section = s;
-          _activeFolder = null;
-        });
+      _section = s;
+      _activeFolder = null;
+    });
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: Spacing.lg),
       children: [
@@ -572,51 +609,82 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
           padding: EdgeInsets.fromLTRB(Spacing.xl, 0, Spacing.lg, Spacing.lg),
           child: _Brand(),
         ),
-        tile(Icons.auto_stories_outlined, context.l10n.libNavAll,
-            _section == _Section.all && _activeFolder == null, () => go(_Section.all),
-            count: all.length),
-        tile(Icons.schedule, context.l10n.libNavRecent, _section == _Section.recent, () => go(_Section.recent)),
-        tile(Icons.star_outline, context.l10n.libNavFavorites, _section == _Section.favorites,
-            () => go(_Section.favorites),
-            count: all.where((m) => m.favorite).length),
-        tile(Icons.folder_special_outlined, context.l10n.libNavFolders, _activeFolder != null,
-            _showSmartFolders),
+        tile(
+          Icons.auto_stories_outlined,
+          context.l10n.libNavAll,
+          _section == _Section.all && _activeFolder == null,
+          () => go(_Section.all),
+          count: all.length,
+        ),
+        tile(
+          Icons.schedule,
+          context.l10n.libNavRecent,
+          _section == _Section.recent,
+          () => go(_Section.recent),
+        ),
+        tile(
+          Icons.star_outline,
+          context.l10n.libNavFavorites,
+          _section == _Section.favorites,
+          () => go(_Section.favorites),
+          count: all.where((m) => m.favorite).length,
+        ),
+        tile(
+          Icons.folder_special_outlined,
+          context.l10n.libNavFolders,
+          _activeFolder != null,
+          _showSmartFolders,
+        ),
         tile(Icons.storefront_outlined, context.l10n.marketTitle, false, () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const MarketplaceScreen()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const MarketplaceScreen()));
         }),
         const Divider(indent: Spacing.xl, endIndent: Spacing.xl),
-        tile(Icons.file_download_outlined, context.l10n.libImport, false, _importInklus),
+        tile(
+          Icons.file_download_outlined,
+          context.l10n.libImport,
+          false,
+          _importInklus,
+        ),
         tile(Icons.delete_outline, context.l10n.libTrash, false, _openTrash),
-        tile(Icons.settings_outlined, context.l10n.settingsTitle, false, _openSettings),
+        tile(
+          Icons.settings_outlined,
+          context.l10n.settingsTitle,
+          false,
+          _openSettings,
+        ),
       ],
     );
   }
 
   /// Menú ⋮ (solo en pantallas estrechas; en tablet todo está en el lateral).
   Widget _moreMenu() => MenuAnchor(
-        menuChildren: [
-          MenuItemButton(
-            leadingIcon: Icon(context.isDark ? Icons.light_mode : Icons.dark_mode),
-            onPressed: () =>
-                (widget.onToggleTheme ?? () => ThemeModeController.toggle(context))(),
-            child: Text(context.isDark ? context.l10n.libLightMode : context.l10n.libDarkMode),
-          ),
-          MenuItemButton(
-            leadingIcon: const Icon(Icons.settings_outlined),
-            onPressed: _openSettings,
-            child: Text(context.l10n.settingsTitle),
-          ),
-        ],
-        builder: (context, menu, _) => IconButton(
-          tooltip: context.l10n.libMoreOptions,
-          icon: const Icon(Icons.more_vert),
-          onPressed: () => menu.isOpen ? menu.close() : menu.open(),
+    menuChildren: [
+      MenuItemButton(
+        leadingIcon: Icon(context.isDark ? Icons.light_mode : Icons.dark_mode),
+        onPressed: () =>
+            (widget.onToggleTheme ??
+            () => ThemeModeController.toggle(context))(),
+        child: Text(
+          context.isDark ? context.l10n.libLightMode : context.l10n.libDarkMode,
         ),
-      );
+      ),
+      MenuItemButton(
+        leadingIcon: const Icon(Icons.settings_outlined),
+        onPressed: _openSettings,
+        child: Text(context.l10n.settingsTitle),
+      ),
+    ],
+    builder: (context, menu, _) => IconButton(
+      tooltip: context.l10n.libMoreOptions,
+      icon: const Icon(Icons.more_vert),
+      onPressed: () => menu.isOpen ? menu.close() : menu.open(),
+    ),
+  );
 
-  String get _sectionTitle => _activeFolder?.displayName(context.l10n) ??
+  String get _sectionTitle =>
+      _activeFolder?.displayName(context.l10n) ??
       switch (_section) {
         _Section.all => context.l10n.libMyNotebooks,
         _Section.recent => context.l10n.libNavRecent,
@@ -627,7 +695,12 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
   Widget _buildHeader(int total) {
     final shown = _filteredMetas.length;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(Spacing.xl, Spacing.xl, Spacing.xl, Spacing.sm),
+      padding: const EdgeInsets.fromLTRB(
+        Spacing.xl,
+        Spacing.xl,
+        Spacing.xl,
+        Spacing.sm,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -647,15 +720,21 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
           ),
           const SizedBox(height: Spacing.xs),
           Text(
-            shown == total ? context.l10n.libCountAll(total) : context.l10n.libCountOf(shown, total),
-            style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+            shown == total
+                ? context.l10n.libCountAll(total)
+                : context.l10n.libCountOf(shown, total),
+            style: context.text.bodyMedium?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: Spacing.lg),
           SearchBar(
             hintText: context.l10n.libSearchHint,
             leading: const Icon(Icons.search),
             elevation: const WidgetStatePropertyAll(0),
-            backgroundColor: WidgetStatePropertyAll(context.colors.surfaceContainerHigh),
+            backgroundColor: WidgetStatePropertyAll(
+              context.colors.surfaceContainerHigh,
+            ),
             padding: const WidgetStatePropertyAll(
               EdgeInsets.symmetric(horizontal: Spacing.lg),
             ),
@@ -684,12 +763,20 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
                 }),
                 onPressed: _showSortSheet,
               ),
-              Spacer(),
+              const Spacer(),
               SegmentedButton<bool>(
                 showSelectedIcon: false,
                 segments: [
-                  ButtonSegment(value: false, icon: Icon(Icons.grid_view), tooltip: context.l10n.libGrid),
-                  ButtonSegment(value: true, icon: Icon(Icons.view_list), tooltip: context.l10n.libList),
+                  ButtonSegment(
+                    value: false,
+                    icon: const Icon(Icons.grid_view),
+                    tooltip: context.l10n.libGrid,
+                  ),
+                  ButtonSegment(
+                    value: true,
+                    icon: const Icon(Icons.view_list),
+                    tooltip: context.l10n.libList,
+                  ),
                 ],
                 selected: {_listView},
                 onSelectionChanged: (v) => _setListView(v.first),
@@ -704,20 +791,22 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
   List<Widget> _buildContentSlivers() {
     final metas = _filteredMetas;
     if (metas.isEmpty) {
-      return [SliverFillRemaining(hasScrollBody: false, child: _buildEmptyState())];
+      return [
+        SliverFillRemaining(hasScrollBody: false, child: _buildEmptyState()),
+      ];
     }
     Widget card(NotebookMeta meta) => _NotebookCard(
-          meta: meta,
-          compact: _listView,
-          onTap: () => _openNotebook(meta),
-          onRename: () => _renameNotebook(meta),
-          onDuplicate: () => _duplicateNotebook(meta),
-          onDelete: () => _deleteNotebook(meta),
-          onSetColor: () => _setNotebookColor(meta),
-          onEditTags: () => _editTags(meta),
-          onToggleFavorite: () => _toggleFavorite(meta),
-          onToggleSync: () => _toggleSync(meta),
-        );
+      meta: meta,
+      compact: _listView,
+      onTap: () => _openNotebook(meta),
+      onRename: () => _renameNotebook(meta),
+      onDuplicate: () => _duplicateNotebook(meta),
+      onDelete: () => _deleteNotebook(meta),
+      onSetColor: () => _setNotebookColor(meta),
+      onEditTags: () => _editTags(meta),
+      onToggleFavorite: () => _toggleFavorite(meta),
+      onToggleSync: () => _toggleSync(meta),
+    );
     if (_listView) {
       return [
         SliverPadding(
@@ -734,9 +823,12 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
       SliverPadding(
         padding: const EdgeInsets.all(Spacing.xl),
         sliver: SliverGrid.builder(
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 220,
-            mainAxisExtent: 300,
+            // Portada (~220) + bloque de texto, que crece con textScaler.
+            mainAxisExtent:
+                220 +
+                80 * MediaQuery.textScalerOf(context).scale(1).clamp(1, 1.6),
             crossAxisSpacing: Spacing.xl,
             mainAxisSpacing: Spacing.xl,
           ),
@@ -749,74 +841,26 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
 
   Widget _buildEmptyState() {
     final hasSearch = _searchQuery.isNotEmpty;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Ilustración del estado vacío
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: context.colors.primary.withAlpha(20),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                hasSearch ? Icons.search_off : Icons.menu_book_outlined,
-                size: 48,
-                color: context.colors.primary.withAlpha(150),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              hasSearch
-                  ? context.l10n.libNoResults
-                  : context.l10n.libEmptyTitle,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              hasSearch
-                  ? context.l10n.libNoResultsHint
-                  : context.l10n.libEmptyHint,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: context.colors.onSurfaceVariant,
-                height: 1.4,
-              ),
-            ),
-            if (!hasSearch) ...[
-              const SizedBox(height: 28),
-              // Acción primaria: crear cuaderno
+    return EmptyState(
+      icon: hasSearch ? Icons.search_off : Icons.menu_book_outlined,
+      title: hasSearch ? context.l10n.libNoResults : context.l10n.libEmptyTitle,
+      message: hasSearch
+          ? context.l10n.libNoResultsHint
+          : context.l10n.libEmptyHint,
+      actions: hasSearch
+          ? const []
+          : [
               FilledButton.icon(
                 onPressed: _createNotebook,
                 icon: const Icon(Icons.add),
                 label: Text(context.l10n.createAction),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                  textStyle: const TextStyle(fontSize: 15),
-                  minimumSize: const Size(200, 48),
-                ),
               ),
-              const SizedBox(height: 12),
-              // Acción secundaria: importar
               OutlinedButton.icon(
                 onPressed: _importInklus,
                 icon: const Icon(Icons.file_download_outlined, size: 18),
                 label: Text(context.l10n.libImport),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(200, 48),
-                  side: BorderSide(
-                    color: context.colors.outline,
-                  ),
-                ),
               ),
             ],
-          ],
-        ),
-      ),
     );
   }
 }
@@ -833,13 +877,16 @@ class _Brand extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const InklusLogo(size: 32),
-          const SizedBox(width: Spacing.md),
-          Text('Inklus', style: context.text.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const InklusLogo(size: 32),
+      const SizedBox(width: Spacing.md),
+      Text(
+        'Inklus',
+        style: context.text.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+      ),
+    ],
+  );
 }
 
 /// Tarjeta de un cuaderno. En cuadrícula: portada grande + título, fecha,
@@ -870,36 +917,67 @@ class _NotebookCard extends StatelessWidget {
   final VoidCallback onToggleSync;
 
   Widget _menu(BuildContext context) => MenuAnchor(
-        menuChildren: [
-          MenuItemButton(
-            leadingIcon: Icon(meta.favorite ? Icons.star : Icons.star_outline),
-            onPressed: onToggleFavorite,
-            child: Text(meta.favorite ? context.l10n.libUnfavorite : context.l10n.libFavorite),
-          ),
-          MenuItemButton(leadingIcon: const Icon(Icons.edit_outlined), onPressed: onRename, child: Text(context.l10n.libRename)),
-          MenuItemButton(leadingIcon: const Icon(Icons.copy_outlined), onPressed: onDuplicate, child: Text(context.l10n.libDuplicate)),
-          MenuItemButton(leadingIcon: const Icon(Icons.palette_outlined), onPressed: onSetColor, child: Text(context.l10n.libCoverAndColor)),
-          MenuItemButton(leadingIcon: const Icon(Icons.label_outline), onPressed: onEditTags, child: Text(context.l10n.libTags)),
-          MenuItemButton(
-            leadingIcon: Icon(meta.isSyncEnabled ? Icons.cloud_done_outlined : Icons.cloud_off_outlined),
-            onPressed: onToggleSync,
-            child: Text(meta.isSyncEnabled ? context.l10n.libSyncOff : context.l10n.driveSyncMenu),
-          ),
-          const Divider(),
-          MenuItemButton(
-            leadingIcon: Icon(Icons.delete_outline, color: context.inklus.danger),
-            onPressed: onDelete,
-            child: Text(context.l10n.libMoveToTrash, style: TextStyle(color: context.inklus.danger)),
-          ),
-        ],
-        builder: (context, menu, _) => IconButton(
-          tooltip: context.l10n.libNotebookOptions,
-          icon: const Icon(Icons.more_vert),
-          onPressed: () => menu.isOpen ? menu.close() : menu.open(),
+    menuChildren: [
+      MenuItemButton(
+        leadingIcon: Icon(meta.favorite ? Icons.star : Icons.star_outline),
+        onPressed: onToggleFavorite,
+        child: Text(
+          meta.favorite ? context.l10n.libUnfavorite : context.l10n.libFavorite,
         ),
-      );
+      ),
+      MenuItemButton(
+        leadingIcon: const Icon(Icons.edit_outlined),
+        onPressed: onRename,
+        child: Text(context.l10n.libRename),
+      ),
+      MenuItemButton(
+        leadingIcon: const Icon(Icons.copy_outlined),
+        onPressed: onDuplicate,
+        child: Text(context.l10n.libDuplicate),
+      ),
+      MenuItemButton(
+        leadingIcon: const Icon(Icons.palette_outlined),
+        onPressed: onSetColor,
+        child: Text(context.l10n.libCoverAndColor),
+      ),
+      MenuItemButton(
+        leadingIcon: const Icon(Icons.label_outline),
+        onPressed: onEditTags,
+        child: Text(context.l10n.libTags),
+      ),
+      MenuItemButton(
+        leadingIcon: Icon(
+          meta.isSyncEnabled
+              ? Icons.cloud_done_outlined
+              : Icons.cloud_off_outlined,
+        ),
+        onPressed: onToggleSync,
+        child: Text(
+          meta.isSyncEnabled
+              ? context.l10n.libSyncOff
+              : context.l10n.driveSyncMenu,
+        ),
+      ),
+      const Divider(),
+      MenuItemButton(
+        leadingIcon: Icon(Icons.delete_outline, color: context.inklus.danger),
+        onPressed: onDelete,
+        child: Text(
+          context.l10n.libMoveToTrash,
+          style: TextStyle(color: context.inklus.danger),
+        ),
+      ),
+    ],
+    builder: (context, menu, _) => IconButton(
+      tooltip: context.l10n.libNotebookOptions,
+      icon: const Icon(Icons.more_vert),
+      onPressed: () => menu.isOpen ? menu.close() : menu.open(),
+    ),
+  );
 
-  Widget _cover(BuildContext context) => _NotebookCover(
+  Widget _cover(BuildContext context, [BorderRadius radius = Radii.mdAll]) =>
+      _NotebookCover(
+        radius: radius,
         color: meta.colorValue != null ? Color(meta.colorValue!) : null,
         title: displayTitle(context.l10n, meta.title),
         isDark: context.isDark,
@@ -915,17 +993,29 @@ class _NotebookCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: ListTile(
           onTap: onTap,
-          contentPadding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.xs),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: Spacing.md,
+            vertical: Spacing.xs,
+          ),
           leading: ClipRRect(
             borderRadius: Radii.smAll,
-            child: SizedBox(width: 40, height: 52, child: _cover(context)),
+            child: SizedBox(
+              width: 40,
+              height: 52,
+              child: _cover(context, Radii.smAll),
+            ),
           ),
-          title: Text(displayTitle(context.l10n, meta.title), maxLines: 1, overflow: TextOverflow.ellipsis),
+          title: Text(
+            displayTitle(context.l10n, meta.title),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           subtitle: Text([subtitle, ...meta.tags.take(3)].join(' · ')),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (meta.favorite) Icon(Icons.star, color: context.inklus.warning),
+              if (meta.favorite)
+                Icon(Icons.star, color: context.inklus.warning),
               _SyncIcon(notebookId: meta.id, syncEnabled: meta.isSyncEnabled),
               _menu(context),
             ],
@@ -936,9 +1026,8 @@ class _NotebookCard extends StatelessWidget {
     return Semantics(
       button: true,
       label: context.l10n.libNotebookSemantics(meta.title, subtitle),
-      child: InkWell(
+      child: PressableScale(
         onTap: onTap,
-        borderRadius: Radii.lgAll,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -950,23 +1039,24 @@ class _NotebookCard extends StatelessWidget {
                   DecoratedBox(
                     decoration: BoxDecoration(
                       borderRadius: Radii.mdAll,
-                      boxShadow: [
-                        BoxShadow(
-                          color: context.inklus.shadow,
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      boxShadow: context.shadowSoft,
                     ),
-                    child: ClipRRect(borderRadius: Radii.mdAll, child: _cover(context)),
+                    child: ClipRRect(
+                      borderRadius: Radii.mdAll,
+                      child: _cover(context),
+                    ),
                   ),
                   if (meta.favorite)
                     Positioned(
                       top: Spacing.sm,
                       left: Spacing.sm,
-                      child: Icon(Icons.star, color: context.inklus.warning, shadows: const [
-                        Shadow(color: Colors.black38, blurRadius: 4),
-                      ]),
+                      child: Icon(
+                        Icons.star,
+                        color: context.inklus.warning,
+                        shadows: const [
+                          Shadow(color: Colors.black38, blurRadius: 4),
+                        ],
+                      ),
                     ),
                 ],
               ),
@@ -983,7 +1073,11 @@ class _NotebookCard extends StatelessWidget {
                   ),
                 ),
                 _SyncIcon(notebookId: meta.id, syncEnabled: meta.isSyncEnabled),
-                SizedBox(width: 36, height: 36, child: _menu(context)),
+                SizedBox(
+                  width: Sizes.minTouch,
+                  height: Sizes.minTouch,
+                  child: _menu(context),
+                ),
               ],
             ),
             Text(subtitle, style: context.text.bodySmall),
@@ -994,7 +1088,9 @@ class _NotebookCard extends StatelessWidget {
                   meta.tags.take(3).map((t) => '#$t').join('  '),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: context.text.labelSmall?.copyWith(color: context.colors.primary),
+                  style: context.text.labelSmall?.copyWith(
+                    color: context.colors.primary,
+                  ),
                 ),
               ),
           ],
@@ -1015,11 +1111,7 @@ class _SyncIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!syncEnabled) {
-      return Icon(
-        Icons.cloud_off,
-        size: 16,
-        color: context.colors.outline,
-      );
+      return Icon(Icons.cloud_off, size: 16, color: context.colors.outline);
     }
     return ListenableBuilder(
       listenable: DriveSyncService.instance,
@@ -1033,11 +1125,7 @@ class _SyncIcon extends StatelessWidget {
   Widget _buildIcon(BuildContext context, SyncStatus status) {
     switch (status) {
       case SyncStatus.synced:
-        return Icon(
-          Icons.cloud_done,
-          size: 16,
-          color: context.colors.primary,
-        );
+        return Icon(Icons.cloud_done, size: 16, color: context.colors.primary);
       case SyncStatus.syncing:
         return const SizedBox(
           width: 14,
@@ -1045,17 +1133,9 @@ class _SyncIcon extends StatelessWidget {
           child: CircularProgressIndicator(strokeWidth: 1.5),
         );
       case SyncStatus.error:
-        return Icon(
-          Icons.sync_problem,
-          size: 16,
-          color: context.inklus.danger,
-        );
+        return Icon(Icons.sync_problem, size: 16, color: context.inklus.danger);
       case SyncStatus.disabled:
-        return Icon(
-          Icons.cloud_off,
-          size: 16,
-          color: context.colors.outline,
-        );
+        return Icon(Icons.cloud_off, size: 16, color: context.colors.outline);
       case SyncStatus.pending:
         return Icon(
           Icons.cloud_upload_outlined,
@@ -1085,7 +1165,9 @@ class _SortOption extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon,
-        color: selected ? context.colors.primary : context.colors.onSurfaceVariant,
+        color: selected
+            ? context.colors.primary
+            : context.colors.onSurfaceVariant,
       ),
       title: Text(
         label,
@@ -1111,80 +1193,82 @@ class _NotebookCover extends StatelessWidget {
   final String coverStyle;
   final String? coverImagePath;
 
+  /// Radio de la esquina: el de la tarjeta que la contiene.
+  final BorderRadius radius;
+
   const _NotebookCover({
     required this.color,
     required this.title,
     required this.isDark,
     this.coverStyle = 'simple',
     this.coverImagePath,
+    this.radius = Radii.mdAll,
   });
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = color ?? (isDark
-        ? kAccentDark
-        : context.colors.primary);
-
-    // Convierte el string coverStyle a CoverStyle enum.
+    final baseColor =
+        color ??
+        (isDark ? context.colors.primaryContainer : context.colors.primary);
     final style = CoverStyle.values.firstWhere(
       (s) => s.name == coverStyle,
       orElse: () => CoverStyle.simple,
     );
-
-    // Si es estilo custom con imagen, mostrar la imagen.
+    final painted = CustomPaint(
+      painter: NotebookCoverPainter(
+        style: style == CoverStyle.custom ? CoverStyle.simple : style,
+        color: baseColor,
+        isDark: isDark,
+        radius: radius.topLeft.x,
+      ),
+      child: Center(child: _TitlePlate(title)),
+    );
     if (style == CoverStyle.custom && coverImagePath != null) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: radius,
         child: Image.file(
           File(coverImagePath!),
           fit: BoxFit.cover,
           gaplessPlayback: true,
-          errorBuilder: (_, _, _) => CustomPaint(
-            painter: NotebookCoverPainter(
-              style: CoverStyle.simple,
-              color: baseColor,
-              isDark: isDark,
-            ),
-            child: Center(
-              child: Text(
-                title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                  shadows: [Shadow(blurRadius: 4, color: context.colors.outline)],
-                ),
-              ),
-            ),
-          ),
+          errorBuilder: (_, _, _) => painted,
         ),
       );
     }
+    return painted;
+  }
+}
 
-    return CustomPaint(
-      painter: NotebookCoverPainter(
-        style: style,
-        color: baseColor,
-        isDark: isDark,
-      ),
-      child: Center(
+/// Placa de papel con el título: contraste garantizado sobre cualquier
+/// color o imagen de portada (tinta oscura sobre papel claro).
+class _TitlePlate extends StatelessWidget {
+  const _TitlePlate(this.title);
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final inklus = context.inklus;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: inklus.paper.withAlpha(232),
+          borderRadius: Radii.smAll,
+          border: Border.all(color: inklus.ink.withAlpha(40)),
+        ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: Spacing.sm,
+            vertical: Spacing.xs,
+          ),
           child: Text(
             title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-              shadows: [
-                Shadow(blurRadius: 4, color: context.colors.outline),
-              ],
+            style: context.text.labelMedium?.copyWith(
+              fontFamily: textFontFamily('lora'),
+              fontWeight: FontWeight.w700,
+              color: inklus.ink,
             ),
           ),
         ),
@@ -1193,3 +1277,18 @@ class _NotebookCover extends StatelessWidget {
   }
 }
 
+/// Limita el ancho del contenido en pantallas muy anchas (la rejilla de
+/// cuadernos no se estira indefinidamente) y lo centra.
+class _MaxWidth extends StatelessWidget {
+  const _MaxWidth({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: Sizes.contentMaxWidth),
+          child: child,
+        ),
+      );
+}

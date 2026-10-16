@@ -1,6 +1,6 @@
 # Inklus — Plan de rework (base, comunidad y UI premium)
 
-> Estado: **planificado, sin ejecutar** (auditoría del 2026-10-14). Documento de traspaso: quien retome el trabajo puede empezar aquí. Contexto técnico en `ROADMAP.md`; arquitectura en `docs/ARCHITECTURE.md` (Fase A la crea a partir de la guía técnica actual).
+> Estado (2026-10-15): **Fases A–D ejecutadas**; queda la *Ronda 2* y lo marcado «pendiente» abajo. Auditoría del 2026-10-14. Documento de traspaso: quien retome el trabajo puede empezar aquí. Contexto técnico en `ROADMAP.md`; arquitectura en `docs/ARCHITECTURE.md` (Fase A la crea a partir de la guía técnica actual).
 
 ## Objetivo
 Dejar Inklus listo para colaboradores y hacer que biblioteca, portadas y barra del editor se sientan como un producto premium (nivel GoodNotes/Notability), manteniendo: gratis, offline-first, GPL-3.0-or-later, multilingüe.
@@ -11,6 +11,8 @@ Dejar Inklus listo para colaboradores y hacer que biblioteca, portadas y barra d
 - Nunca versionar secretos (`key.properties`, `*.jks`, `client_secret*.json`).
 - Idiomas objetivo: es, en, pt-BR, fr, de. Texto nuevo siempre por ARB (`context.l10n`).
 - Historial de git: no reescribir (decisión tomada).
+
+> **Pendiente de las fases A–D:** `Hero` tarjeta→editor (no se hizo: el editor es un lienzo pesado, no tiene un elemento destino equivalente); revisión nativa de pt/fr/de; READMEs pt/fr/de (se deja es/en); títulos por defecto guardados en datos ('Sin título'); una pasada de `dart format` (el repo no está formateado y hacerlo ensuciaría el historial).
 
 ## Fase A — Limpieza y gobernanza (sin tocar código de la app)
 1. **Limpiar el árbol**: `ROADMAP.md` (líneas 3 y 5, "para la IA" → "para colaboradores"); `.gitignore` (bloque de asistentes, L154-187: dejar reglas neutras; lo local va al ignore global del desarrollador); borrar `.github/modernize/`; `AGENTS.md` sale del repo y su contenido pasa a `docs/ARCHITECTURE.md` redactado como guía para contribuidores.
@@ -57,7 +59,7 @@ Latencia de tinta (`getCoalescedEvents`, puntos predichos, trazo activo incremen
 - Existen: `LICENSE` (GPL-3.0), `CHANGELOG.md`, `ROADMAP.md`, `docs/{privacy,testing}.md`, `third_party_licenses/` (8 OFL), `marketplace/`, CI en `.github/workflows/ci.yml`.
 - Faltan: CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT, GOVERNANCE, CODEOWNERS, plantillas de issue/PR, dependabot.
 - Siete commits antiguos (v1.1–1.3) llevan trailers automáticos de una herramienta externa; se dejan como están (no reescribir historia).
-- i18n: solo es/en, 603 claves cada uno, paridad exigida por `test/l10n_test.dart`.
+- i18n (al auditar): solo es/en, 603 claves cada uno; ahora son 5 idiomas con paridad exigida por `test/l10n_test.dart`.
 
 ## Código y lienzo
 1. Sin flush de autoguardado al pausar la app → se pueden perder los últimos trazos (<600 ms).

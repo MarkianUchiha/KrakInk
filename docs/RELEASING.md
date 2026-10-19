@@ -4,7 +4,7 @@ Distribución sin Google Play: **GitHub Releases** (APK/AAB firmados por la CI e
 
 ## Antes de etiquetar
 
-1. `flutter analyze` (0 issues), `flutter test`, `flutter test integration_test -d linux`.
+1. `flutter analyze` (0 issues), `flutter test`, `flutter test integration_test -d <android>`.
 2. Prueba en tablet con el guion de [`testing.md`](testing.md).
 3. Sube la versión en **`pubspec.yaml`** (`version: X.Y.Z+N`, `N` siempre creciente) y en **`lib/constants.dart`** (`kAppVersion`). `test/app_version_test.dart` comprueba que coincidan.
 4. Añade la sección `## [X.Y.Z] — AAAA-MM-DD` a `CHANGELOG.md`, **en español y en inglés** (sección `### English`): el workflow copia esa sección completa a las notas de la release.

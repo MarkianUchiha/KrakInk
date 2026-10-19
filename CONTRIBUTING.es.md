@@ -10,8 +10,8 @@
 flutter pub get
 flutter analyze                        # debe quedar en 0 issues
 flutter test                           # tests unitarios y de widgets
-flutter test integration_test -d linux # flujos de punta a punta
-flutter run -d linux                   # desarrollo en escritorio
+flutter test integration_test -d <android> # flujos de punta a punta (dispositivo o emulador)
+flutter run -d <android>                   # desarrollo en dispositivo o emulador
 ```
 
 Flutter 3.47 / Dart 3.13. Antes de tocar el lienzo lee [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): la sección «Flujos críticos» lista lo que no debe romperse (entrada con stylus y rechazo de palma, capas de pintado, deshacer/rehacer, exportación).

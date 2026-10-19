@@ -6,7 +6,7 @@
 
 - [ ] `flutter analyze` sin issues
 - [ ] `flutter test` en verde (tests nuevos o actualizados si hay lógica)
-- [ ] Probado a mano (dispositivo / `flutter run -d linux`)
+- [ ] Probado a mano (dispositivo / emulador Android)
 
 ## Checklist
 

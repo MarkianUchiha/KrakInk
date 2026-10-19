@@ -12,7 +12,7 @@ App de escritura a mano para tablets con **stylus**, al estilo de GoodNotes o Sa
 
 **Gratis, sin anuncios, sin cuentas y sin analítica.** Todo vive en tu dispositivo.
 
-**Plataforma principal:** Android (tablets) · **Secundaria:** Linux desktop.
+**Plataforma:** Android (tablets).
 
 > 📚 [`CHANGELOG.md`](CHANGELOG.md) · [Privacidad](docs/privacy.md) · [Pruebas en dispositivo](docs/testing.md) · [Marketplace](marketplace/README.md)
 
@@ -165,7 +165,6 @@ Requiere **Flutter 3.47** (stable).
 
 ```bash
 flutter pub get
-flutter run -d linux        # escritorio
 flutter run -d <tablet>     # Android (modo desarrollador / USB)
 ```
 

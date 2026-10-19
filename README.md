@@ -12,7 +12,7 @@ Handwriting app for **stylus** tablets, in the spirit of GoodNotes or Samsung No
 
 **Free, ad-free, no accounts and no analytics.** Everything lives on your device.
 
-**Main platform:** Android (tablets) · **Secondary:** Linux desktop.
+**Platform:** Android (tablets).
 
 > 📚 [`CHANGELOG.md`](CHANGELOG.md) · [Privacy](docs/privacy.md) · [On-device testing](docs/testing.md) · [Marketplace](marketplace/README.md)
 
@@ -165,7 +165,6 @@ Requires **Flutter 3.47** (stable).
 
 ```bash
 flutter pub get
-flutter run -d linux        # desktop
 flutter run -d <tablet>     # Android (developer mode / USB)
 ```
 

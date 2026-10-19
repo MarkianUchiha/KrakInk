@@ -118,7 +118,7 @@
 
 ### 🧪 Calidad y DevOps
 - **~250 tests** (modelos, storage, backup, cifrado, migración, CRUD, formatos, lógica del lienzo, historial).
-- **CI (GitHub Actions)**: `flutter analyze` + `flutter test --coverage` + APK debug + build Linux; en tags `v*` genera APK/AAB **firmados** (secretos `ANDROID_KEYSTORE_*`) y los publica en la release.
+- **CI (GitHub Actions)**: `flutter analyze` + `flutter test --coverage` + APK debug; en tags `v*` genera APK/AAB **firmados** (secretos `ANDROID_KEYSTORE_*`) y los publica en la release.
 - **Firma de release** desde `android/key.properties` (no versionado); sin él, release usa la clave debug.
 - **Tema oscuro** adaptado (scaffold, top bar, bottom bar, tool rail, biblioteca).
 - **Animaciones de transición** suaves.
@@ -244,7 +244,6 @@ P4 audio sincronizado, P5 ventana de zoom, R7 plugin nativo de latencia (solo si
 | 1.5 | **Medir rendimiento** | `flutter run --profile` con `build/inklus_stress.inklus`; decide R7 y "páginas en archivos". |
 | 0.4 | **Keystore de release** (manual) | Secretos `ANDROID_KEYSTORE_*` en GitHub antes de repartir APKs. |
 
-| R3b | **Icono de escritorio** | `linux/` no tiene icono (la ventana sale sin él): copiar `docs/assets/icon.png` y fijarlo con `gtk_window_set_icon_from_file` en `my_application.cc`. |
 | A1 | **Accesibilidad** | TalkBack/`Semantics` en biblioteca y barra, escala de texto del sistema (hoy solo hay tooltips). |
 | L1 | **Latencia de tinta** («Ronda 2» del rework) | `getCoalescedEvents`, puntos predichos, curva de presión; solo si 1.5 la muestra alta. |
 | Q1 | **Tests de lienzo** | Borrador, lazo, deshacer y painters con goldens (pendiente de la Ronda 2). |
@@ -317,7 +316,7 @@ Contenido inicial sugerido: agenda semanal/mensual real (con días y cabeceras, 
 - La app es **offline-first**: nunca romper el flujo local por una dependencia de red/cuenta.
 - Todo es **gratis y open source**: no crear funciones premium ni dependencias de pago.
 - Iconos: `dart run flutter_launcher_icons` (fuente en `assets/icon/`). Release: `flutter build apk --release --split-per-abi`.
-- CI: `flutter analyze` + `flutter test --coverage` + APK debug + Linux; release firmado en tags `v*`.
+- CI: `flutter analyze` + `flutter test --coverage` + APK debug; release firmado en tags `v*`.
 - Onboarding: se guarda en `SharedPreferences('onboarding_seen')` = false tras completar.
 - **ToolType** tiene 10 valores: `pen`, `pencil`, `highlighter`, `calligraphy`, `brush`, `eraser`, `select`, `lasso`, `bucket`, `text`.
 - **Stroke.shapeType** persiste la forma detectada (`line`, `arrow`, `rectangle`, `circle`).

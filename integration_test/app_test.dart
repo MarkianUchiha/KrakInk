@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Flujos críticos de punta a punta sobre la app real (R5 del roadmap).
 //
-//   flutter test integration_test -d <tablet|emulador|linux>
+//   flutter test integration_test -d <tablet|emulador>
 //
 // Usa una carpeta de datos temporal: no toca las notas del dispositivo.
 import 'dart:io';

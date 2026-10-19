@@ -156,7 +156,6 @@ HACKING.md
 # Binarios de prueba generados localmente (APK, AppImage…)
 /dist/
 
-
 # --- Credenciales de Google / Firebase / certificados (nunca al repo) ---
 client_secret*.json
 **/client_secret*.json
@@ -169,3 +168,9 @@ client_secret*.json
 
 # graphify (salida local, cachés con mtimes que gitleaks toma por claves)
 graphify-out/
+
+# --- Archivos locales de trabajo (no se versionan) ---
+*.local.*
+
+# FVM Version Cache
+.fvm/

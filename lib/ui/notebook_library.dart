@@ -35,6 +35,7 @@ import 'marketplace_screen.dart';
 import '../l10n/l10n.dart';
 import '../services/app_errors.dart';
 import '../models/text_layout.dart';
+import '../brand.dart';
 
 /// Biblioteca de cuadernos (pantalla de inicio).
 ///
@@ -140,7 +141,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
     }
   }
 
-  static const _openChannel = MethodChannel('inklus/open');
+  static const _openChannel = MethodChannel(Brand.openChannel);
 
   Future<void> _importIncoming(String path) async {
     if (!mounted) return;
@@ -882,7 +883,7 @@ class _Brand extends StatelessWidget {
       const InklusLogo(size: 32),
       const SizedBox(width: Spacing.md),
       Text(
-        'Inklus',
+        Brand.appName,
         style: context.text.titleLarge?.copyWith(fontWeight: FontWeight.w700),
       ),
     ],

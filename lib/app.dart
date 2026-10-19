@@ -7,6 +7,7 @@ import 'theme_controller.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/notebook_library.dart';
 import 'ui/onboarding_screen.dart';
+import 'brand.dart';
 
 /// Widget raíz de Inklus.
 ///
@@ -43,7 +44,7 @@ class _InklusAppState extends State<InklusApp> {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeModeController.mode,
       builder: (context, themeMode, _) => MaterialApp(
-      title: 'Inklus',
+      title: Brand.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),

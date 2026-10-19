@@ -15,6 +15,7 @@ import '../models/notebook.dart';
 import 'inklus_format.dart';
 import 'backup_crypto.dart';
 import 'storage_service.dart';
+import '../brand.dart';
 
 /// Avisos de Drive que la UI traduce y muestra.
 enum SyncNotice { fileUploaded, noteSynced }
@@ -85,9 +86,9 @@ class DriveSyncService extends ChangeNotifier {
   static final DriveSyncService instance = DriveSyncService._();
 
   static const _driveScope = 'https://www.googleapis.com/auth/drive.file';
-  static const _folderName = 'Inklus';
+  static const _folderName = Brand.driveFolder;
   static const _folderMimeType = 'application/vnd.google-apps.folder';
-  static const _inklusMimeType = 'application/x-inklus';
+  static const _inklusMimeType = Brand.mimeType;
 
   /// Cliente OAuth **web** del proyecto de Google Cloud (el mismo que
   /// `default_web_client_id` en `android/app/src/main/res/values/strings.xml`).
@@ -406,7 +407,7 @@ class DriveSyncService extends ChangeNotifier {
     );
     final hit = (result.files ?? const <drive.File>[]).firstOrNull;
     if (hit != null) return hit;
-    return _findFile(api, rootId, '$noteId.inklus');
+    return _findFile(api, rootId, '$noteId.${Brand.fileExtension}');
   }
 
   // -------------------------------------------------------------------------
@@ -459,7 +460,7 @@ class DriveSyncService extends ChangeNotifier {
             ? rootId
             : await _ensureNotebookFolder(
                 api, rootId, notebookId, notebookTitle ?? 'Cuaderno');
-        final name = '${_cleanName(note.title, fallback: 'Nota')}.inklus';
+        final name = '${_cleanName(note.title, fallback: 'Nota')}.${Brand.fileExtension}';
         final existing = await _findNoteFile(api, rootId, note.id);
         final media = commons.Media(
           Stream<List<int>>.value(bytes),

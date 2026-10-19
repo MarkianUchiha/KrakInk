@@ -1,4 +1,4 @@
-package com.inklus.inklus
+package com.markidev.krakink
 
 import android.content.Intent
 import android.net.Uri
@@ -7,7 +7,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 
-/// Recibe archivos `.inklus` (Drive, Archivos, compartir…): copia el contenido a la
+/// Recibe archivos `.krakink` (Drive, Archivos, compartir…): copia el contenido a la
 /// caché y se lo da a Dart, que lo importa con ImportService.
 class MainActivity : FlutterActivity() {
     private var channel: MethodChannel? = null
@@ -16,7 +16,7 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         pending = copyIncoming(intent)
-        channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "inklus/open").apply {
+        channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "krakink/open").apply {
             setMethodCallHandler { call, result ->
                 if (call.method == "take") {
                     result.success(pending)
@@ -40,7 +40,7 @@ class MainActivity : FlutterActivity() {
             else -> null
         } ?: return null
         return try {
-            val out = File(cacheDir, "incoming.inklus")
+            val out = File(cacheDir, "incoming.krakink")
             contentResolver.openInputStream(uri)?.use { i -> out.outputStream().use { i.copyTo(it) } }
                 ?: return null
             out.path

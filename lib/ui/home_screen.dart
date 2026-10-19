@@ -50,6 +50,7 @@ import 'marketplace_screen.dart';
 import '../services/app_paths.dart';
 import '../l10n/l10n.dart';
 import '../services/app_errors.dart';
+import '../brand.dart';
 
 /// Editor de un cuaderno (pantalla principal de escritura).
 ///
@@ -383,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           imageCache: await _exportImages(_c.page, opts.maxDimension),
           options: opts,
         ),
-        'inklus_pagina_${_c.pageIndex + 1}.png',
+        '${Brand.filePrefix}_pagina_${_c.pageIndex + 1}.png',
         showStrokesOnly: true,
       );
 
@@ -394,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           imageCache: await _exportImages(_c.page, opts.maxDimension),
           options: opts,
         ),
-        'inklus_pagina_${_c.pageIndex + 1}.pdf',
+        '${Brand.filePrefix}_pagina_${_c.pageIndex + 1}.pdf',
         showStrokesOnly: true,
       );
 
@@ -416,7 +417,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           // Fallback: exportar solo el note actual.
           return InklusFormat.exportNoteBytes(_c.note);
         },
-        '${_safeName(_c.note.title)}.inklus',
+        '${_safeName(_c.note.title)}.${Brand.fileExtension}',
       );
 
   /// Exporta la página actual a SVG (solo trazos).
@@ -424,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     try {
       final svgString = ExportService.renderPageSvg(_c.page);
       final bytes = Uint8List.fromList(utf8.encode(svgString));
-      final name = 'inklus_pagina_${_c.pageIndex + 1}.svg';
+      final name = '${Brand.filePrefix}_pagina_${_c.pageIndex + 1}.svg';
       await _saveBytes(bytes, name);
     } catch (e) {
       _snack(_l10n.expSvgFailed('$e'));
@@ -515,7 +516,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         .replaceAll(RegExp(r'[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ _-]'), '')
         .trim()
         .replaceAll(RegExp(r'\s+'), '_');
-    return clean.isEmpty ? 'inklus_cuaderno' : clean;
+    return clean.isEmpty ? '${Brand.filePrefix}_cuaderno' : clean;
   }
 
   Future<void> _export(
@@ -598,7 +599,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         imageCache: await _exportImages(_c.page),
       );
       final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/inklus_pagina_${_c.pageIndex + 1}.png');
+      final file = File('${dir.path}/${Brand.filePrefix}_pagina_${_c.pageIndex + 1}.png');
       await file.writeAsBytes(bytes);
       await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], text: _l10n.shareTextPage));
     } catch (e) {
@@ -614,7 +615,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         imageCache: await _exportImages(_c.page),
       );
       final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/inklus_pagina_${_c.pageIndex + 1}.pdf');
+      final file = File('${dir.path}/${Brand.filePrefix}_pagina_${_c.pageIndex + 1}.pdf');
       await file.writeAsBytes(bytes);
       await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], text: _l10n.shareTextPage));
     } catch (e) {
@@ -626,7 +627,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     try {
       final bytes = await InklusFormat.exportNoteBytes(_c.note);
       final dir = await getTemporaryDirectory();
-      final name = '${_safeName(_c.note.title)}.inklus';
+      final name = '${_safeName(_c.note.title)}.${Brand.fileExtension}';
       final file = File('${dir.path}/$name');
       await file.writeAsBytes(bytes);
       await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], text: _l10n.shareTextNotebook));
@@ -827,7 +828,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         return;
       }
       // Android puede haberlo renombrado a .zip: en Drive siempre .inklus.
-      final name = file.name.replaceFirst(RegExp(r'(\.inklus)?\.zip$'), '.inklus');
+      final name = file.name.replaceFirst(
+        RegExp('(\\.${Brand.fileExtension})?\\.zip\$'),
+        '.${Brand.fileExtension}',
+      );
       setState(() => _syncing = true);
       await _syncService.uploadInklusFile(bytes, name, promptForConsent: true);
       if (mounted) _snack(_l10n.edFileUploaded(name));
@@ -1166,7 +1170,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       if (!mounted) return;
       final bytes = await runWithLoading(context, _storage.exportFullBackup);
       if (!mounted) return;
-      await _saveBytes(bytes, 'inklus_respaldo_completo.zip');
+      await _saveBytes(bytes, '${Brand.filePrefix}_respaldo_completo.zip');
     } catch (e) {
       _snack(_l10n.backupFailed('$e'));
     }

@@ -14,6 +14,7 @@ import 'inklus_format.dart';
 import 'storage_service.dart';
 import 'app_errors.dart';
 import '../l10n/l10n.dart';
+import '../brand.dart';
 
 /// Qué contiene un archivo que el usuario quiere importar.
 enum ImportKind {
@@ -67,7 +68,7 @@ abstract final class ImportService {
         ? await FilePicker.pickFiles(type: FileType.any)
         : await FilePicker.pickFiles(
             type: FileType.custom,
-            allowedExtensions: const ['inklus', 'zip'],
+            allowedExtensions: const [Brand.fileExtension, 'zip'],
           );
     return files.isEmpty ? null : files.first;
   }

@@ -25,7 +25,7 @@ void main() {
     });
 
     test('encode deja intactos los marcadores con esquema', () {
-      expect(codec.encode('inklus://images/a.png'), 'inklus://images/a.png');
+      expect(codec.encode('krakink://images/a.png'), 'krakink://images/a.png');
     });
 
     test('decode une una ruta relativa a la base', () {
@@ -40,7 +40,7 @@ void main() {
         codec.decode('/otra/base/images/a.png'),
         '/otra/base/images/a.png',
       );
-      expect(codec.decode('inklus://images/a.png'), 'inklus://images/a.png');
+      expect(codec.decode('krakink://images/a.png'), 'krakink://images/a.png');
     });
 
     test('encode y decode son inversos dentro de la base', () {

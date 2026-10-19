@@ -23,7 +23,7 @@ if (hasReleaseKey) {
 }
 
 android {
-    namespace = "com.inklus.inklus"
+    namespace = "com.markidev.krakink"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -34,8 +34,8 @@ android {
 
     defaultConfig {
         // No cambiar: el cliente OAuth de Google Sign-In está ligado a este
-        // paquete (+ SHA-1 de la firma).
-        applicationId = "com.inklus.inklus"
+        // paquete (+ SHA-1 de la firma), y Play no permite cambiarlo nunca.
+        applicationId = "com.markidev.krakink"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

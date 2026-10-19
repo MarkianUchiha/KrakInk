@@ -1,4 +1,4 @@
-name: CI — Inklus
+name: CI — KrakInk
 
 on:
   push:
@@ -150,7 +150,7 @@ jobs:
 
       - uses: softprops/action-gh-release@v2
         with:
-          name: Inklus ${{ github.ref_name }}
+          name: KrakInk ${{ github.ref_name }}
           body_path: release_notes.md
           files: |
             build/app/outputs/flutter-apk/*-release.apk

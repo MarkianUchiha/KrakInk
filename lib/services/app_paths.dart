@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import '../brand.dart';
 
 /// Rutas de datos de la app. **Única fuente** de `<appSupport>/inklus` y de
 /// sus subcarpetas: ningún servicio vuelve a construirlas a mano.
@@ -26,7 +27,7 @@ abstract final class AppPaths {
     final override = _rootOverride;
     if (override != null) return override;
     final support = await getApplicationSupportDirectory();
-    final dir = Directory('${support.path}/inklus');
+    final dir = Directory('${support.path}/${Brand.dataDir}');
     if (!await dir.exists()) await dir.create(recursive: true);
     return dir;
   }

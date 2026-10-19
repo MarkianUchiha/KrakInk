@@ -16,6 +16,7 @@ import '../models/template.dart';
 import 'file_utils.dart';
 import 'app_paths.dart';
 import 'app_errors.dart';
+import '../brand.dart';
 
 /// Formato propietario **.inklus v2**: contenedor autocontenido de un cuaderno.
 ///
@@ -44,7 +45,7 @@ class InklusFormat {
   static const _notebookEntry = 'notebook.json'; // v2
   static const _notesPrefix = 'notes/';
   static const _imagesPrefix = 'images/';
-  static const scheme = 'inklus://';
+  static const scheme = Brand.imageScheme;
 
   static const _currentVersion = 2;
 

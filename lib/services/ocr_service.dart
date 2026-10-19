@@ -14,6 +14,7 @@ import '../models/page.dart';
 import '../models/stroke.dart';
 import 'export_service.dart';
 import 'image_service.dart';
+import '../brand.dart';
 
 /// Resultado del reconocimiento de texto de una página.
 class OcrResult {
@@ -232,7 +233,7 @@ class OcrService {
 
     // 2) Guardar en archivo temporal.
     final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/inklus_ocr_temp.png');
+    final file = File('${dir.path}/${Brand.filePrefix}_ocr_temp.png');
     await file.writeAsBytes(pngBytes);
 
     // 3) Ejecutar ML Kit text recognition (bitmap).

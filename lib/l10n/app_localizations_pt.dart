@@ -34,7 +34,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settingsSubtitle(String version) {
-    return 'Inklus $version · suas notas ficam neste dispositivo';
+    return 'KrakInk $version · suas notas ficam neste dispositivo';
   }
 
   @override
@@ -53,11 +53,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsSectionAbout => 'Sobre';
 
   @override
-  String get settingsImportTitle => 'Importar .inklus ou backup';
+  String get settingsImportTitle => 'Importar .krakink ou backup';
 
   @override
   String get settingsImportSubtitle =>
-      'Um caderno (.inklus) ou um backup completo (.zip); detectado automaticamente';
+      'Um caderno (.krakink) ou um backup completo (.zip); detectado automaticamente';
 
   @override
   String get settingsExportTitle => 'Exportar backup completo';
@@ -148,7 +148,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settingsErrorLogSubject(String version) {
-    return 'Registro de erros do Inklus $version';
+    return 'Registro de erros do KrakInk $version';
   }
 
   @override
@@ -248,7 +248,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'As notas deste dispositivo só são substituídas se a cópia do Drive for mais recente. As notas que faltam aqui voltam ao seu caderno (ou a um novo caderno “Recuperado do Drive”).';
 
   @override
-  String get backupSaveTitle => 'Salvar backup do Inklus';
+  String get backupSaveTitle => 'Salvar backup do KrakInk';
 
   @override
   String get backupSaved => 'Backup salvo';
@@ -264,7 +264,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String driveSignInHelpBody(String details) {
-    return 'Se você acabou de fechar o seletor de contas, não há nenhum problema. Se escolheu uma conta e ela não conectou, quase sempre é porque a chave de assinatura do app (SHA-1) não está registrada no Google Cloud para com.inklus.inklus.\n\nDetalhe técnico:\n$details';
+    return 'Se você acabou de fechar o seletor de contas, não há nenhum problema. Se escolheu uma conta e ela não conectou, quase sempre é porque a chave de assinatura do app (SHA-1) não está registrada no Google Cloud para com.markidev.krakink.\n\nDetalhe técnico:\n$details';
   }
 
   @override
@@ -272,7 +272,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get driveNotebooksSubtitle =>
-      'Cada caderno é salvo no Drive → Inklus → sua própria pasta. Escolha quais.';
+      'Cada caderno é salvo no Drive → KrakInk → sua própria pasta. Escolha quais.';
 
   @override
   String get driveNotebooksEmpty => 'Ainda não há cadernos.';
@@ -551,7 +551,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get libNavFolders => 'Pastas';
 
   @override
-  String get libImport => 'Importar .inklus';
+  String get libImport => 'Importar .krakink';
 
   @override
   String get libTrash => 'Lixeira';
@@ -1335,7 +1335,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get edDriveVersions => 'Ver versões no Drive';
 
   @override
-  String get edUploadInklus => 'Enviar arquivo .inklus';
+  String get edUploadInklus => 'Enviar arquivo .krakink';
 
   @override
   String get edSyncOnForNotebook => 'Sincronização: ativada neste caderno';
@@ -1364,7 +1364,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get edIsFullBackup =>
-      'Esse arquivo é um backup completo, não um caderno .inklus';
+      'Esse arquivo é um backup completo, não um caderno .krakink';
 
   @override
   String get edNoPassword => 'Sem senha';
@@ -1447,7 +1447,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get menuPptx => 'Apresentação (PowerPoint)';
 
   @override
-  String get menuInklusCopy => 'Copiar como .inklus';
+  String get menuInklusCopy => 'Copiar como .krakink';
 
   @override
   String get menuShareImage => 'Compartilhar imagem';
@@ -1456,7 +1456,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get menuSharePdf => 'Compartilhar PDF';
 
   @override
-  String get menuShareInklus => 'Compartilhar .inklus';
+  String get menuShareInklus => 'Compartilhar .krakink';
 
   @override
   String get menuExportShare => 'Exportar e compartilhar';
@@ -1523,7 +1523,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get menuBackup => 'Exportar backup completo';
 
   @override
-  String get menuRestoreBackup => 'Importar .inklus ou backup';
+  String get menuRestoreBackup => 'Importar .krakink ou backup';
 
   @override
   String get menuData => 'Dados';
@@ -1554,10 +1554,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get zoomIn => 'Aumentar zoom';
 
   @override
-  String get shareTextPage => 'Página do Inklus';
+  String get shareTextPage => 'Página do KrakInk';
 
   @override
-  String get shareTextNotebook => 'Caderno do Inklus';
+  String get shareTextNotebook => 'Caderno do KrakInk';
 
   @override
   String edInsertImageFailed(String error) {
@@ -1860,7 +1860,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get onb1Body =>
-      'Apoie a mão sem preocupação: o Inklus reconhece a caneta e ignora a palma. A ponta-borracha da caneta ou o botão lateral apaga.';
+      'Apoie a mão sem preocupação: o KrakInk reconhece a caneta e ignora a palma. A ponta-borracha da caneta ou o botão lateral apaga.';
 
   @override
   String get onb2Body =>
@@ -1946,13 +1946,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get errNotInklus =>
-      'O arquivo não é um caderno .inklus nem um backup do Inklus.';
+      'O arquivo não é um caderno .krakink nem um backup do KrakInk.';
 
   @override
-  String get errNotInklusFile => 'Não é um caderno .inklus válido';
+  String get errNotInklusFile => 'Não é um caderno .krakink válido';
 
   @override
-  String get errNotInklusV2 => 'Não é um caderno .inklus v2 válido';
+  String get errNotInklusV2 => 'Não é um caderno .krakink v2 válido';
 
   @override
   String get errCatalogTooLarge => 'O catálogo é grande demais';
@@ -1975,7 +1975,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String driveConfigBody(String details) {
-    return 'Erro de configuração do Google (clientConfigurationError).\\n\\nCausa provável: o SHA-1 de assinatura deste app não está registrado no Google Cloud Console para o pacote com.inklus.inklus.\\n\\nSolução:\\n1. Vá a Google Cloud Console → APIs e serviços → Credenciais\\n2. Crie ou edite o ID de cliente OAuth do Android com o pacote com.inklus.inklus e o seu SHA-1 de assinatura\\n3. Ative o Google Sign-In na tela de consentimento\\n\\nErro original: $details';
+    return 'Erro de configuração do Google (clientConfigurationError).\\n\\nCausa provável: o SHA-1 de assinatura deste app não está registrado no Google Cloud Console para o pacote com.markidev.krakink.\\n\\nSolução:\\n1. Vá a Google Cloud Console → APIs e serviços → Credenciais\\n2. Crie ou edite o ID de cliente OAuth do Android com o pacote com.markidev.krakink e o seu SHA-1 de assinatura\\n3. Ative o Google Sign-In na tela de consentimento\\n\\nErro original: $details';
   }
 
   @override
@@ -2016,7 +2016,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get driveRestoreNone => 'Não há cópias do Inklus no seu Google Drive';
+  String get driveRestoreNone => 'Não há cópias do KrakInk no seu Google Drive';
 
   @override
   String get driveRestoreUpToDate => 'Tudo está em dia: nada para restaurar';

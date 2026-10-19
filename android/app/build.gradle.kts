@@ -12,8 +12,9 @@ plugins {
 //   keyPassword=...
 //   keyAlias=upload
 //   storeFile=/ruta/a/upload-keystore.jks
-// En CI se genera a partir de secretos. Sin ese archivo, release se firma con
-// la clave debug (útil para `flutter run --release` local; no publicable).
+// En CI se genera a partir de secretos. Sin ese archivo, cualquier build de
+// release falla: un binario firmado con la clave debug no se puede publicar ni
+// actualizar después, y es fácil repartirlo sin darse cuenta.
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
 val hasReleaseKey = keystorePropertiesFile.exists()
@@ -60,10 +61,8 @@ android {
 
     buildTypes {
         release {
-            signingConfig = if (hasReleaseKey) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
+            if (hasReleaseKey) {
+                signingConfig = signingConfigs.getByName("release")
             }
             isMinifyEnabled = true
             isShrinkResources = true
@@ -73,6 +72,24 @@ android {
             )
         }
     }
+}
+
+// Se comprueba al ejecutar tareas de release, no al configurar: Gradle
+// configura la variante release también en `flutter run` y builds debug, que
+// no deben exigir la llave.
+val checkReleaseSigning by tasks.registering {
+    val hasKey = hasReleaseKey
+    doLast {
+        if (!hasKey) {
+            throw GradleException(
+                "Falta android/key.properties: no se construye release sin la " +
+                    "llave de firma. Ver docs/RELEASING.md."
+            )
+        }
+    }
+}
+tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+    dependsOn(checkReleaseSigning)
 }
 
 kotlin {

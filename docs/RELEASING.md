@@ -23,7 +23,7 @@ La CI (`.github/workflows/ci.yml`, job `release`) comprueba que el tag coincida 
 
 - Genera un keystore **y guárdalo a buen recaudo**: si cambia la clave, los usuarios deben desinstalar para actualizar.
 - Secretos del repositorio (Settings → Secrets → Actions): `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
-- Para builds locales firmados usa `android/key.properties` (**nunca versionado**) con las mismas cuatro claves; sin él, release firma con la clave de debug.
+- Para builds locales firmados usa `android/key.properties` (**nunca versionado**) con las mismas cuatro claves; sin él, cualquier build de release falla a propósito (`checkReleaseSigning`).
 - Para huellas SHA-1 (registro de Google Sign-In) usa `keytool -list`; son públicas, las contraseñas no.
 - **Nunca** subas `key.properties`, `*.jks` ni `client_secret*.json`; la CI ejecuta gitleaks.
 

@@ -18,7 +18,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Versión de Inklus / Inklus version
+      label: Versión de KrakInk / KrakInk version
       placeholder: "1.8.0"
     validations:
       required: true

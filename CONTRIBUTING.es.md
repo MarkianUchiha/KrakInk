@@ -1,8 +1,8 @@
-# Contribuir a Inklus
+# Contribuir a KrakInk
 
 *[Read in English](CONTRIBUTING.md)*
 
-¡Gracias por ayudar! Inklus es una app de escritura a mano para tablets con stylus: gratuita, de código abierto (GPL-3.0-or-later) y *offline-first*. Todo sigue siendo gratis: sin funciones premium ni dependencias de pago.
+¡Gracias por ayudar! KrakInk es una app de escritura a mano para tablets con stylus: gratuita, de código abierto (GPL-3.0-or-later) y *offline-first*. Todo sigue siendo gratis: sin funciones premium ni dependencias de pago.
 
 ## Primeros pasos
 

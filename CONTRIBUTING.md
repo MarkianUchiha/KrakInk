@@ -1,8 +1,8 @@
-# Contributing to Inklus
+# Contributing to KrakInk
 
 *[Leer en español](CONTRIBUTING.es.md)*
 
-Thanks for helping! Inklus is a free, open-source (GPL-3.0-or-later), offline-first handwriting app for stylus tablets. Everything stays free: no premium features, no paid dependencies.
+Thanks for helping! KrakInk is a free, open-source (GPL-3.0-or-later), offline-first handwriting app for stylus tablets. Everything stays free: no premium features, no paid dependencies.
 
 ## Quick start
 

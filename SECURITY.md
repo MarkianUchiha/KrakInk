@@ -3,7 +3,7 @@
 ## Reporting a vulnerability / Reportar una vulnerabilidad
 
 **Please do not open a public issue.** Use GitHub's private reporting:
-[Security → Report a vulnerability](https://github.com/Pedroj-64/inklus/security/advisories/new).
+[Security → Report a vulnerability](https://github.com/MarkianUchiha/KrakInk/security/advisories/new).
 
 **No abras un issue público.** Usa el reporte privado de GitHub (enlace arriba).
 
@@ -15,7 +15,7 @@ You can expect an acknowledgement within about a week; this is a volunteer proje
 
 In scope: local storage, backup/import (zip handling, encryption), Google Drive sync, marketplace package installation. / Dentro del alcance: almacenamiento local, respaldo e importación (ZIP, cifrado), sincronización con Drive, instalación de paquetes del marketplace.
 
-Inklus has no analytics and no server of its own; see [`docs/privacy.md`](docs/privacy.md). / Inklus no tiene analítica ni servidor propio; ver `docs/privacy.md`.
+KrakInk has no analytics and no server of its own; see [`docs/privacy.md`](docs/privacy.md). / KrakInk no tiene analítica ni servidor propio; ver `docs/privacy.md`.
 
 ## Supported versions / Versiones soportadas
 

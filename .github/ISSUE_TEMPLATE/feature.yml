@@ -5,8 +5,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Inklus es gratis, sin premium y *offline-first*. Las ideas deben respetarlo.
-        Inklus is free, has no premium tier and is offline-first.
+        KrakInk es gratis, sin premium y *offline-first*. Las ideas deben respetarlo.
+        KrakInk is free, has no premium tier and is offline-first.
   - type: textarea
     id: problem
     attributes:

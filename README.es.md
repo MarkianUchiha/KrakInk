@@ -1,12 +1,14 @@
 <p align="center">
-  <img src="docs/assets/icon-animated.svg" width="168" alt="Inklus">
+  <img src="docs/assets/icon-animated.svg" width="168" alt="KrakInk">
 </p>
 
-<h1 align="center">Inklus</h1>
+<h1 align="center">KrakInk</h1>
 
 <p align="center"><b>Escritura a mano para tablets con stylus. Gratis, offline-first, código abierto.</b></p>
 
 🌐 [English](README.md) · **Español**
+
+> KrakInk es un fork de [Inklus](https://github.com/Pedroj-64/inklus), de Pedro ([@Pedroj-64](https://github.com/Pedroj-64)).
 
 App de escritura a mano para tablets con **stylus**, al estilo de GoodNotes o Samsung Notes, construida con **Flutter**. Presión real, rechazo de palma, cuadernos con plantillas, lazo, reconocimiento de escritura, importación de PDF y respaldo opcional en Google Drive.
 
@@ -29,7 +31,7 @@ App de escritura a mano para tablets con **stylus**, al estilo de GoodNotes o Sa
 
 ## 📲 Instalar (Android)
 
-Inklus se distribuye como APK en [**GitHub Releases**](https://github.com/Pedroj-64/inklus/releases) (no está en Google Play).
+KrakInk se distribuye como APK en [**GitHub Releases**](https://github.com/MarkianUchiha/KrakInk/releases) (no está en Google Play).
 
 1. En la última release, descarga el APK de tu tablet. Casi todas las tablets actuales usan **`app-arm64-v8a-release.apk`**; si no se instala, prueba `app-armeabi-v7a-release.apk`.
 2. Ábrelo. Android pedirá permiso para **instalar apps de origen desconocido** para tu navegador o gestor de archivos: concédelo solo para esta instalación.
@@ -80,14 +82,14 @@ Inklus se distribuye como APK en [**GitHub Releases**](https://github.com/Pedroj
 ### 💾 Importar, exportar y respaldar
 - **Importar PDF** para anotarlo (una página de la nota por página del PDF).
 - **Exportar** página o cuaderno completo a **PNG, PDF, SVG o PPTX** (render fuera de pantalla, independiente del zoom).
-- **Formato propio `.inklus`**: un único archivo por cuaderno con el documento y sus imágenes: compartible y reimportable.
+- **Formato propio `.krakink`**: un único archivo por cuaderno con el documento y sus imágenes: compartible y reimportable.
 - **Guardado instantáneo** de cada cambio e **historial de versiones** local.
 - **Respaldo completo** en `.zip`, con **cifrado opcional AES-256-GCM** (clave derivada con PBKDF2).
 - **Marketplace** de paquetes gratuitos (plantillas, paletas, stickers) con verificación sha256.
 
 ### ☁️ Google Drive (opcional)
 La app es **offline-first**: funciona al 100 % sin cuenta ni red. Si inicias sesión con Google:
-- Cada cuaderno se replica a una carpeta **Inklus** de tu Drive como `.inklus`, siempre en el mismo archivo.
+- Cada cuaderno se replica a una carpeta **KrakInk** de tu Drive como `.krakink`, siempre en el mismo archivo.
 - Usa el permiso **`drive.file`**: la app solo ve los archivos que ella misma crea.
 - **Restaurar desde Drive** trae la versión más reciente de cada nota, y el historial de versiones muestra también las revisiones guardadas en Drive.
 
@@ -95,7 +97,7 @@ La app es **offline-first**: funciona al 100 % sin cuenta ni red. Si inicias ses
 
 ## 🔒 Privacidad
 
-No hay servidores de Inklus, analítica ni anuncios. Los errores se registran **solo en el dispositivo** y tú decides si compartirlos (Configuración → Registro de errores). Detalles en [`docs/privacy.md`](docs/privacy.md).
+No hay servidores de KrakInk, analítica ni anuncios. Los errores se registran **solo en el dispositivo** y tú decides si compartirlos (Configuración → Registro de errores). Detalles en [`docs/privacy.md`](docs/privacy.md).
 
 ### Secretos (para quien contribuya o publique)
 
@@ -138,9 +140,9 @@ lib/
 │   └── undo_stack.dart            # Deshacer/rehacer por página
 ├── services/
 │   ├── storage_service.dart       # Persistencia local (escrituras atómicas)
-│   ├── inklus_format.dart         # Formato .inklus
+│   ├── inklus_format.dart         # Formato .krakink
 │   ├── export_service.dart        # PNG / PDF / SVG (+ pptx_builder.dart)
-│   ├── import_service.dart        # .inklus y respaldos
+│   ├── import_service.dart        # .krakink y respaldos
 │   ├── pdf_import_service.dart    # PDF → páginas anotables
 │   ├── drive_sync_service.dart    # Respaldo en Google Drive
 │   ├── backup_crypto.dart         # AES-256-GCM + PBKDF2
@@ -216,11 +218,13 @@ Se agradecen contribuciones: código, traducciones, plantillas para el marketpla
 
 ## 📜 Licencia
 
-Inklus es software libre: puedes redistribuirlo y/o modificarlo bajo los términos de la
+KrakInk es software libre: puedes redistribuirlo y/o modificarlo bajo los términos de la
 **GNU General Public License v3.0 o posterior** (GPL-3.0-or-later), publicada por la Free
 Software Foundation. Consulta el archivo [`LICENSE`](LICENSE).
 
 Copyright © 2026 Pedro ([@Pedroj-64](https://github.com/Pedroj-64)) y contribuidores de Inklus.
+
+Copyright © 2026 MarkiDev.
 
 Cada archivo fuente lleva la cabecera `// SPDX-License-Identifier: GPL-3.0-or-later`.
 Cualquier versión modificada que se distribuya debe publicarse también bajo GPL-3.0 con su código fuente.

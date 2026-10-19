@@ -1,4 +1,4 @@
-# 🌍 Traducir Inklus
+# 🌍 Traducir KrakInk
 
 La app sigue el idioma del sistema. Idiomas: **es** (fuente), **en**, **pt** (portugués de Brasil, `app_pt.arb`), **fr** y **de**; cualquier otro cae en inglés (`resolveAppLocale` en `lib/app.dart`). Las traducciones pt/fr/de son un primer borrador: las correcciones de hablantes nativos son muy bienvenidas. No hace falta saber Dart: solo editar un archivo `.arb` (JSON).
 

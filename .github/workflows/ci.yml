@@ -70,6 +70,41 @@ jobs:
       - name: Build APK (debug)
         run: flutter build apk --debug
 
+  # Flujos críticos de punta a punta (bienvenida → cuaderno → lápiz →
+  # guardado) en un emulador Android, la única plataforma de la app.
+  e2e-android:
+    name: Integration tests (emulador Android)
+    needs: analyze-and-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      # Sin KVM el emulador no tiene aceleración y no arranca a tiempo.
+      - name: Habilitar KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Integration tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          script: flutter test integration_test -d emulator-5554
+
   release:
     name: Release firmado (tags v*)
     if: startsWith(github.ref, 'refs/tags/v')

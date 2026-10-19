@@ -15,6 +15,7 @@ import '../models/template.dart';
 import '../models/id.dart';
 import 'file_utils.dart';
 import 'app_paths.dart';
+import 'path_codec.dart';
 
 /// Metadatos de un cuaderno para el índice (sin páginas/trazos).
 class NotebookMeta {
@@ -146,6 +147,29 @@ class StorageService {
 
   /// Carpeta raíz de datos (`<appSupport>/inklus`, o la de tests).
   Future<Directory> baseDirectory() => _baseDir();
+
+  /// JSON de [note] tal como se guarda en disco: rutas de imagen relativas a
+  /// [base] (ver [PathCodec]).
+  static Map<String, dynamic> _noteToDisk(Directory base, Note note) {
+    final json = note.toJson();
+    PathCodec(base.path).encodeNoteJson(json);
+    return json;
+  }
+
+  /// Inverso de [_noteToDisk]. Modifica [json].
+  static Note _noteFromDisk(Directory base, Map<String, dynamic> json) {
+    PathCodec(base.path).decodeNoteJson(json);
+    return Note.fromJson(json);
+  }
+
+  /// Igual que el guardado de notas, para quien escribe notas fuera de este
+  /// servicio (historial de versiones).
+  Future<Map<String, dynamic>> noteToStoredJson(Note note) async =>
+      _noteToDisk(await _baseDir(), note);
+
+  /// Inverso de [noteToStoredJson].
+  Future<Note> noteFromStoredJson(Map<String, dynamic> json) async =>
+      _noteFromDisk(await _baseDir(), json);
 
   Future<Directory> _docsDir(Directory base) async {
     final folder = Directory('${base.path}/$_documentsFolder');
@@ -365,7 +389,7 @@ class StorageService {
       pages: doc.pages,
     );
     final noteFile = File('${notesDir.path}/$noteId.json');
-    await writeAtomic(noteFile, jsonEncode(note.toJson()));
+    await writeAtomic(noteFile, jsonEncode(_noteToDisk(base, note)));
 
     // 2. Crear Notebook con colorValue y tags del Document
     final notebook = Notebook(
@@ -681,7 +705,7 @@ class StorageService {
     // página mientras se escribe.
     await writeJsonAtomic(
       file,
-      note.toJson(),
+      _noteToDisk(base, note),
       background: _pointCount(note) > kBackgroundSavePoints,
     );
   }
@@ -891,7 +915,10 @@ class StorageService {
       if (!await file.exists()) return null;
       final raw = await file.readAsString();
       if (raw.trim().isEmpty) return null;
-      return Note.fromJson(await decodeJsonAsync(raw) as Map<String, dynamic>);
+      return _noteFromDisk(
+        base,
+        await decodeJsonAsync(raw) as Map<String, dynamic>,
+      );
     } catch (e) {
       debugPrint('StorageService.loadNote: $e');
       return null;
@@ -1190,7 +1217,7 @@ class StorageService {
         });
       }
     } else if (marker?['notebookId'] != null || id.startsWith('note')) {
-      final note = Note.fromJson(json);
+      final note = _noteFromDisk(base, json);
       final notebookId = marker?['notebookId'] as String?;
       var restored = false;
       if (notebookId != null) {
@@ -1256,7 +1283,8 @@ class StorageService {
   // -------------------------------------------------------------------------
 
   static const _backupManifest = 'backup.json';
-  static const _backupVersion = 2;
+  // v3: las notas guardan rutas de imagen relativas a la carpeta de datos.
+  static const _backupVersion = 3;
 
   /// Carpetas incluidas en el respaldo completo.
   static const _backupFolders = [
@@ -1281,8 +1309,8 @@ class StorageService {
   /// Exporta todos los cuadernos + imágenes en un único ZIP.
   ///
   /// Estructura del ZIP:
-  /// - `backup.json` — manifiesto (versión + ruta base original, para
-  ///   re-mapear rutas absolutas de imágenes al restaurar en otro equipo).
+  /// - `backup.json` — manifiesto (versión y fecha). Las notas guardan rutas
+  ///   de imagen relativas, así que se restauran en cualquier carpeta base.
   /// - `index.json` — índice de todos los cuadernos.
   /// - `notebooks/<id>.json`, `notes/<id>.json` — contenido actual.
   /// - `documents/<id>.json` — formato legacy (si queda alguno).
@@ -1294,7 +1322,6 @@ class StorageService {
 
     final manifest = utf8.encode(jsonEncode({
       'backupVersion': _backupVersion,
-      'basePath': base.path,
       'createdAt': DateTime.now().toIso8601String(),
     }));
     files[_backupManifest] = Uint8List.fromList(manifest);
@@ -1314,7 +1341,11 @@ class StorageService {
       if (!await dir.exists()) continue;
       await for (final entity in dir.list(recursive: true)) {
         if (entity is! File || entity.path.contains('.tmp-')) continue;
-        final relative = entity.path.substring(base.path.length + 1);
+        // Las entradas de un ZIP usan '/'; en Windows `list()` devuelve '\'
+        // y el import las descartaría por no reconocer la carpeta.
+        final relative = entity.path
+            .substring(base.path.length + 1)
+            .replaceAll(r'\', '/');
         files[relative] = await entity.readAsBytes();
       }
     }
@@ -1346,32 +1377,6 @@ class StorageService {
     });
     final base = await _baseDir();
 
-    // Ruta base del equipo de origen (para re-mapear rutas de imágenes).
-    String? oldBase;
-    final manifestBytes = entries[_backupManifest];
-    if (manifestBytes != null) {
-      try {
-        final m = jsonDecode(utf8.decode(manifestBytes)) as Map<String, dynamic>;
-        oldBase = m['basePath'] as String?;
-      } catch (e) {
-        debugPrint('StorageService.importFullBackup: manifiesto inválido: $e');
-      }
-    }
-
-    Uint8List remap(Uint8List data) {
-      if (oldBase == null || oldBase == base.path) return data;
-      // Las rutas se guardan como strings JSON: se reemplaza el prefijo
-      // tanto en su forma literal como escapada (`\/`).
-      final text = utf8
-          .decode(data)
-          .replaceAll(oldBase, base.path)
-          .replaceAll(
-            oldBase.replaceAll('/', r'\/'),
-            base.path.replaceAll('/', r'\/'),
-          );
-      return Uint8List.fromList(utf8.encode(text));
-    }
-
     final legacyDocIds = <String>[];
     for (final entry in entries.entries) {
       final name = entry.key;
@@ -1385,11 +1390,7 @@ class StorageService {
         debugPrint('StorageService.importFullBackup: ruta insegura ignorada: $name');
         continue;
       }
-      final isJson = name.endsWith('.json') &&
-          top != 'images' &&
-          top != 'restored' &&
-          top != 'pdf_imports';
-      await writeAtomic(File(outPath), isJson ? remap(entry.value) : entry.value);
+      await writeAtomic(File(outPath), entry.value);
       if (top == _documentsFolder && name.endsWith('.json')) {
         legacyDocIds.add(name.split('/').last.replaceAll('.json', ''));
       }
@@ -1401,8 +1402,8 @@ class StorageService {
     var isLegacyIndex = indexBytes == null;
     if (indexBytes != null) {
       try {
-        final json = jsonDecode(utf8.decode(remap(indexBytes)))
-            as Map<String, dynamic>;
+        final json =
+            jsonDecode(utf8.decode(indexBytes)) as Map<String, dynamic>;
         if (json['formatVersion'] == _formatVersion) {
           restored.addAll((json['notebooks'] as List? ?? [])
               .map((m) => NotebookMeta.fromJson(m as Map<String, dynamic>)));
@@ -1475,7 +1476,7 @@ class StorageService {
           // Intentar como Note
           final noteJson = jsonDecode(raw);
           if (noteJson is Map<String, dynamic> && noteJson.containsKey('pages')) {
-            final note = Note.fromJson(noteJson);
+            final note = _noteFromDisk(base, noteJson);
             _extractImagePaths(note, referenced);
           }
         } catch (e) {
@@ -1493,7 +1494,7 @@ class StorageService {
           final raw = utf8.decode(gzip.decode(await entity.readAsBytes()));
           final json = jsonDecode(raw);
           if (json is Map<String, dynamic>) {
-            _extractImagePaths(Note.fromJson(json), referenced);
+            _extractImagePaths(_noteFromDisk(base, json), referenced);
           }
         } catch (e) {
           debugPrint('StorageService._collectReferencedImagePaths: $e');
@@ -1532,13 +1533,19 @@ class StorageService {
       final imagesDir = Directory('${base.path}/images');
       if (!await imagesDir.exists()) return;
 
-      final referenced = await _collectReferencedImagePaths();
+      // Se comparan rutas relativas: la ruta que devuelve `list()` puede
+      // diferir en separadores de la guardada en la nota aunque sea el mismo
+      // archivo, y borrar por esa diferencia pierde imágenes en uso.
+      final codec = PathCodec(base.path);
+      final referenced = {
+        for (final p in await _collectReferencedImagePaths()) codec.encode(p),
+      };
       final now = DateTime.now();
       var deleted = 0;
 
       await for (final entity in imagesDir.list(recursive: true)) {
         if (entity is! File) continue;
-        if (referenced.contains(entity.path)) continue;
+        if (referenced.contains(codec.encode(entity.path))) continue;
         try {
           if (now.difference(await entity.lastModified()) < minAge) continue;
           await entity.delete();

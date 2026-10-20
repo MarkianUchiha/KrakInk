@@ -63,7 +63,18 @@ void main() {
         .whereType<String>()
         .take(40)
         .join(' | ');
-    throw TestFailure('No apareció: $finder\nEn pantalla: $visible');
+    throw TestFailure(
+      'No apareció: ${finder.describeMatch(Plurality.one)}\n'
+      'En pantalla: $visible',
+    );
+  }
+
+  /// En pantallas de teléfono los botones del asistente quedan debajo del
+  /// pliegue; sin scroll el tap cae fuera de la ventana y no hace nada.
+  Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+    await tester.ensureVisible(finder);
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(finder);
   }
 
   testWidgets('bienvenida → crear cuaderno → escribir con lápiz → se guarda',
@@ -78,11 +89,11 @@ void main() {
     // 2. Crear un cuaderno con los valores por defecto ("Cuaderno 1").
     await tester.tap(find.text('Nuevo cuaderno'));
     await waitFor(tester, find.text('Siguiente'));
-    await tester.tap(find.text('Siguiente'));
+    await tapVisible(tester, find.text('Siguiente'));
     // .last: la biblioteca vacía (debajo) tiene otro botón "Crear cuaderno".
     final create = find.widgetWithText(FilledButton, 'Crear cuaderno').last;
     await waitFor(tester, create);
-    await tester.tap(create);
+    await tapVisible(tester, create);
 
     // 3. Se abre la lista de notas; abrir la primera.
     await waitFor(tester, find.text('Sin título'));

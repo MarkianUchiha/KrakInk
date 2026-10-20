@@ -31,7 +31,7 @@ Maintainers are responsible for clarifying and enforcing our standards and will 
 This Code of Conduct applies within all community spaces (repository, issues, pull requests, discussions) and also when an individual is officially representing the community in public spaces.
 
 ### Reporting
-Instances of abusive, harassing or otherwise unacceptable behavior may be reported **privately** to the maintainers through [GitHub's private reporting](https://github.com/Pedroj-64/inklus/security/advisories/new) (choose "conduct" in the title) or by contacting [@Pedroj-64](https://github.com/Pedroj-64) via the contact options on their GitHub profile. All complaints will be reviewed and investigated promptly and fairly, and the privacy and security of the reporter will be respected.
+Instances of abusive, harassing or otherwise unacceptable behavior may be reported **privately** to the maintainers through [GitHub's private reporting](https://github.com/MarkianUchiha/KrakInk/security/advisories/new) (choose "conduct" in the title) or by contacting [@MarkianUchiha](https://github.com/MarkianUchiha) via the contact options on their GitHub profile. All complaints will be reviewed and investigated promptly and fairly, and the privacy and security of the reporter will be respected.
 
 ### Enforcement guidelines
 Maintainers follow these guidelines in determining consequences:
@@ -71,7 +71,7 @@ Los mantenedores aclaran y aplican estos estándares y tomarán medidas correcti
 Aplica en todos los espacios de la comunidad (repositorio, issues, pull requests, discusiones) y cuando alguien representa oficialmente a la comunidad en espacios públicos.
 
 ### Reportes
-Las conductas abusivas, de acoso o inaceptables pueden reportarse **en privado** mediante el [reporte privado de GitHub](https://github.com/Pedroj-64/inklus/security/advisories/new) (pon «conducta» en el título) o contactando a [@Pedroj-64](https://github.com/Pedroj-64) por los medios de su perfil. Toda queja se revisará con prontitud y justicia, respetando la privacidad y seguridad de quien reporta.
+Las conductas abusivas, de acoso o inaceptables pueden reportarse **en privado** mediante el [reporte privado de GitHub](https://github.com/MarkianUchiha/KrakInk/security/advisories/new) (pon «conducta» en el título) o contactando a [@MarkianUchiha](https://github.com/MarkianUchiha) por los medios de su perfil. Toda queja se revisará con prontitud y justicia, respetando la privacidad y seguridad de quien reporta.
 
 ### Pautas de aplicación
 1. **Corrección** — advertencia privada por escrito y aclaración de la falta.

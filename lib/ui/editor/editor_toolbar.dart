@@ -86,26 +86,12 @@ class EditorToolbar extends StatelessWidget {
               canvas.bottomBarContextNotifier,
               presets,
             ]),
-            builder: (context, _) => Row(
-              children: [
-                IconButton(
-                  tooltip: context.l10n.tbBackToLibrary,
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: onBack,
-                ),
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: compact ? 140 : 260),
-                  child: _TitleButton(canvas: canvas, onTap: onEditTitle),
-                ),
-                const _Divider(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(children: _tools(context)),
-                  ),
-                ),
-                const _Divider(),
-                _UndoRedo(canvas: canvas),
+            builder: (context, _) {
+              final title = ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: compact ? 140 : 260),
+                child: _TitleButton(canvas: canvas, onTap: onEditTitle),
+              );
+              final panels = [
                 _ToolbarButton(
                   icon: Icons.view_sidebar_outlined,
                   label: pagesOpen
@@ -122,9 +108,58 @@ class EditorToolbar extends StatelessWidget {
                   selected: layersOpen,
                   onTap: onToggleLayers,
                 ),
-                ...trailing,
-              ],
-            ),
+              ];
+              final back = IconButton(
+                tooltip: context.l10n.tbBackToLibrary,
+                icon: const Icon(Icons.arrow_back),
+                onPressed: onBack,
+              );
+
+              // En teléfono no caben juntos el título, los paneles y las
+              // acciones fijas: pasan a la zona con scroll y fuera solo
+              // quedan volver, deshacer/rehacer y las acciones de la nota.
+              if (width < Breakpoints.compact) {
+                return Row(
+                  children: [
+                    back,
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            title,
+                            const _Divider(),
+                            ..._tools(context),
+                            const _Divider(),
+                            ...panels,
+                          ],
+                        ),
+                      ),
+                    ),
+                    _UndoRedo(canvas: canvas),
+                    ...trailing,
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  back,
+                  title,
+                  const _Divider(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(children: _tools(context)),
+                    ),
+                  ),
+                  const _Divider(),
+                  _UndoRedo(canvas: canvas),
+                  ...panels,
+                  ...trailing,
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -340,8 +375,12 @@ class _TitleButton extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: context.text.titleMedium,
             ),
+            // Una sola línea: en teléfono el título mide 140 y "Seite 10 von
+            // 120" ya no cabe; partirlo desborda la barra hacia abajo.
             Text(
               context.l10n.tbPageOf(state.$2 + 1, state.$3),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: context.text.bodySmall,
             ),
           ],

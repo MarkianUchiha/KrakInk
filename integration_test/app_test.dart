@@ -32,13 +32,24 @@ void main() {
     if (data.existsSync()) data.deleteSync(recursive: true);
   });
 
+  /// Un finder con `.last` lanza StateError mientras no hay coincidencias en
+  /// lugar de devolver vacío; en un emulador lento eso pasa antes de que
+  /// termine la transición.
+  bool found(Finder finder) {
+    try {
+      return finder.evaluate().isNotEmpty;
+    } on StateError {
+      return false;
+    }
+  }
+
   /// Espera a que aparezca [finder] (animaciones, E/S real).
   Future<void> waitFor(WidgetTester tester, Finder finder,
       {Duration timeout = const Duration(seconds: 15)}) async {
     final end = DateTime.now().add(timeout);
     while (DateTime.now().isBefore(end)) {
       await tester.pump(const Duration(milliseconds: 100));
-      if (finder.evaluate().isNotEmpty) {
+      if (found(finder)) {
         // Deja terminar la transición: en CI (lento) el widget ya existe
         // pero aún se está moviendo, y el tap caería fuera de él.
         await tester.pump(const Duration(milliseconds: 600));

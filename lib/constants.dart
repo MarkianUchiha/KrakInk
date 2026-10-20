@@ -2,6 +2,7 @@
 import 'dart:ui';
 
 import 'models/stroke.dart';
+import 'brand.dart';
 // NOTA: Colors.black54, etc. están en package:flutter/material.dart.
 // Para evitar importar Flutter aquí, usamos los valores hex equivalentes.
 
@@ -23,9 +24,8 @@ const Locale kAppLocale = Locale('es');
 
 /// Repositorio del proyecto y política de privacidad (enlazada desde
 /// Configuración y necesaria para la pantalla de consentimiento de Google).
-const String kSourceCodeUrl = 'https://github.com/Pedroj-64/inklus';
-const String kPrivacyPolicyUrl =
-    'https://github.com/Pedroj-64/inklus/blob/main/docs/privacy.md';
+const String kSourceCodeUrl = Brand.repoUrl;
+const String kPrivacyPolicyUrl = '${Brand.repoUrl}/blob/main/docs/privacy.md';
 
 // ---------------------------------------------------------------------------
 // Tema / Colores de acento

@@ -149,7 +149,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSubtitle.
   ///
   /// In es, this message translates to:
-  /// **'Inklus {version} · tus notas se guardan en este dispositivo'**
+  /// **'KrakInk {version} · tus notas se guardan en este dispositivo'**
   String settingsSubtitle(String version);
 
   /// No description provided for @settingsSectionDrive.
@@ -185,13 +185,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsImportTitle.
   ///
   /// In es, this message translates to:
-  /// **'Importar .inklus o respaldo'**
+  /// **'Importar .krakink o respaldo'**
   String get settingsImportTitle;
 
   /// No description provided for @settingsImportSubtitle.
   ///
   /// In es, this message translates to:
-  /// **'Un cuaderno (.inklus) o un respaldo completo (.zip); se reconoce solo'**
+  /// **'Un cuaderno (.krakink) o un respaldo completo (.zip); se reconoce solo'**
   String get settingsImportSubtitle;
 
   /// No description provided for @settingsExportTitle.
@@ -341,7 +341,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsErrorLogSubject.
   ///
   /// In es, this message translates to:
-  /// **'Registro de errores de Inklus {version}'**
+  /// **'Registro de errores de KrakInk {version}'**
   String settingsErrorLogSubject(String version);
 
   /// No description provided for @settingsOpenFailed.
@@ -503,7 +503,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupSaveTitle.
   ///
   /// In es, this message translates to:
-  /// **'Guardar respaldo de Inklus'**
+  /// **'Guardar respaldo de KrakInk'**
   String get backupSaveTitle;
 
   /// No description provided for @backupSaved.
@@ -533,7 +533,7 @@ abstract class AppLocalizations {
   /// No description provided for @driveSignInHelpBody.
   ///
   /// In es, this message translates to:
-  /// **'Si cerraste el selector de cuentas, no pasa nada. Si elegiste una cuenta y no se conectó, casi siempre es que la firma de esta app (SHA-1) no está registrada en Google Cloud para com.inklus.inklus.\n\nDetalle técnico:\n{details}'**
+  /// **'Si cerraste el selector de cuentas, no pasa nada. Si elegiste una cuenta y no se conectó, casi siempre es que la firma de esta app (SHA-1) no está registrada en Google Cloud para com.markidev.krakink.\n\nDetalle técnico:\n{details}'**
   String driveSignInHelpBody(String details);
 
   /// No description provided for @driveNotebooksTitle.
@@ -545,7 +545,7 @@ abstract class AppLocalizations {
   /// No description provided for @driveNotebooksSubtitle.
   ///
   /// In es, this message translates to:
-  /// **'Cada cuaderno se guarda en Drive → Inklus → su carpeta. Elige cuáles.'**
+  /// **'Cada cuaderno se guarda en Drive → KrakInk → su carpeta. Elige cuáles.'**
   String get driveNotebooksSubtitle;
 
   /// No description provided for @driveNotebooksEmpty.
@@ -1073,7 +1073,7 @@ abstract class AppLocalizations {
   /// No description provided for @libImport.
   ///
   /// In es, this message translates to:
-  /// **'Importar .inklus'**
+  /// **'Importar .krakink'**
   String get libImport;
 
   /// No description provided for @libTrash.
@@ -2423,7 +2423,7 @@ abstract class AppLocalizations {
   /// No description provided for @edUploadInklus.
   ///
   /// In es, this message translates to:
-  /// **'Subir archivo .inklus'**
+  /// **'Subir archivo .krakink'**
   String get edUploadInklus;
 
   /// No description provided for @edSyncOnForNotebook.
@@ -2477,7 +2477,7 @@ abstract class AppLocalizations {
   /// No description provided for @edIsFullBackup.
   ///
   /// In es, this message translates to:
-  /// **'Ese archivo es un respaldo completo, no un cuaderno .inklus'**
+  /// **'Ese archivo es un respaldo completo, no un cuaderno .krakink'**
   String get edIsFullBackup;
 
   /// No description provided for @edNoPassword.
@@ -2639,7 +2639,7 @@ abstract class AppLocalizations {
   /// No description provided for @menuInklusCopy.
   ///
   /// In es, this message translates to:
-  /// **'Copia .inklus'**
+  /// **'Copia .krakink'**
   String get menuInklusCopy;
 
   /// No description provided for @menuShareImage.
@@ -2657,7 +2657,7 @@ abstract class AppLocalizations {
   /// No description provided for @menuShareInklus.
   ///
   /// In es, this message translates to:
-  /// **'Compartir .inklus'**
+  /// **'Compartir .krakink'**
   String get menuShareInklus;
 
   /// No description provided for @menuExportShare.
@@ -2789,7 +2789,7 @@ abstract class AppLocalizations {
   /// No description provided for @menuRestoreBackup.
   ///
   /// In es, this message translates to:
-  /// **'Importar .inklus o respaldo'**
+  /// **'Importar .krakink o respaldo'**
   String get menuRestoreBackup;
 
   /// No description provided for @menuData.
@@ -2849,13 +2849,13 @@ abstract class AppLocalizations {
   /// No description provided for @shareTextPage.
   ///
   /// In es, this message translates to:
-  /// **'Página de Inklus'**
+  /// **'Página de KrakInk'**
   String get shareTextPage;
 
   /// No description provided for @shareTextNotebook.
   ///
   /// In es, this message translates to:
-  /// **'Cuaderno de Inklus'**
+  /// **'Cuaderno de KrakInk'**
   String get shareTextNotebook;
 
   /// No description provided for @edInsertImageFailed.
@@ -3323,7 +3323,7 @@ abstract class AppLocalizations {
   /// No description provided for @onb1Body.
   ///
   /// In es, this message translates to:
-  /// **'Apoya la mano sin miedo: Inklus reconoce el lápiz y descarta la palma. La goma del lápiz o el botón lateral borran.'**
+  /// **'Apoya la mano sin miedo: KrakInk reconoce el lápiz y descarta la palma. La goma del lápiz o el botón lateral borran.'**
   String get onb1Body;
 
   /// No description provided for @onb2Body.
@@ -3437,19 +3437,19 @@ abstract class AppLocalizations {
   /// No description provided for @errNotInklus.
   ///
   /// In es, this message translates to:
-  /// **'El archivo no es un cuaderno .inklus ni un respaldo de Inklus.'**
+  /// **'El archivo no es un cuaderno .krakink ni un respaldo de KrakInk.'**
   String get errNotInklus;
 
   /// No description provided for @errNotInklusFile.
   ///
   /// In es, this message translates to:
-  /// **'No es un cuaderno .inklus válido'**
+  /// **'No es un cuaderno .krakink válido'**
   String get errNotInklusFile;
 
   /// No description provided for @errNotInklusV2.
   ///
   /// In es, this message translates to:
-  /// **'No es un cuaderno .inklus v2 válido'**
+  /// **'No es un cuaderno .krakink v2 válido'**
   String get errNotInklusV2;
 
   /// No description provided for @errCatalogTooLarge.
@@ -3485,7 +3485,7 @@ abstract class AppLocalizations {
   /// No description provided for @driveConfigBody.
   ///
   /// In es, this message translates to:
-  /// **'Error de configuración de Google (clientConfigurationError).\\n\\nCausa probable: la SHA-1 de la firma de esta app no está registrada en Google Cloud Console para el paquete com.inklus.inklus.\\n\\nSolución:\\n1. Ve a Google Cloud Console → APIs y servicios → Credenciales\\n2. Crea o edita el ID de cliente OAuth de Android con el paquete com.inklus.inklus y la SHA-1 de tu firma\\n3. Habilita Google Sign-In en la pantalla de consentimiento\\n\\nError original: {details}'**
+  /// **'Error de configuración de Google (clientConfigurationError).\\n\\nCausa probable: la SHA-1 de la firma de esta app no está registrada en Google Cloud Console para el paquete com.markidev.krakink.\\n\\nSolución:\\n1. Ve a Google Cloud Console → APIs y servicios → Credenciales\\n2. Crea o edita el ID de cliente OAuth de Android con el paquete com.markidev.krakink y la SHA-1 de tu firma\\n3. Habilita Google Sign-In en la pantalla de consentimiento\\n\\nError original: {details}'**
   String driveConfigBody(String details);
 
   /// No description provided for @noticeStylus.
@@ -3527,7 +3527,7 @@ abstract class AppLocalizations {
   /// No description provided for @driveRestoreNone.
   ///
   /// In es, this message translates to:
-  /// **'No hay copias de Inklus en tu Google Drive'**
+  /// **'No hay copias de KrakInk en tu Google Drive'**
   String get driveRestoreNone;
 
   /// No description provided for @driveRestoreUpToDate.

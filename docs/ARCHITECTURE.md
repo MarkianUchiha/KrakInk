@@ -1,6 +1,6 @@
 # 🏗️ Arquitectura de Inklus
 
-Guía técnica para quien vaya a contribuir. Inklus es una app de escritura a mano para tablets con stylus (tipo GoodNotes), **Flutter 3.47 / Dart 3.13**, Material 3, UI y comentarios en **español**. Targets: **Android** (principal) + **Linux desktop** (desarrollo).
+Guía técnica para quien vaya a contribuir. Inklus es una app de escritura a mano para tablets con stylus (tipo GoodNotes), **Flutter 3.47 / Dart 3.13**, Material 3, UI y comentarios en **español**. Target: **Android** (única plataforma).
 
 > Cómo contribuir: [`CONTRIBUTING.md`](../CONTRIBUTING.md) · Sistema de diseño: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) · Traducir: [`TRANSLATING.md`](TRANSLATING.md) · Publicar versiones: [`RELEASING.md`](RELEASING.md) · Próximos pasos: [`ROADMAP.md`](../ROADMAP.md)
 
@@ -10,9 +10,8 @@ Guía técnica para quien vaya a contribuir. Inklus es una app de escritura a ma
 flutter pub get
 flutter analyze            # debe quedar en 0 issues
 flutter test               # test/*.dart: modelos, storage, backup, cifrado, lienzo, historial, l10n
-flutter test integration_test -d linux   # flujos de punta a punta (también en CI con xvfb)
+flutter test integration_test -d <android>   # flujos de punta a punta (dispositivo o emulador)
 flutter gen-l10n           # tras editar lib/l10n/*.arb (también lo hace pub get/build)
-flutter run -d linux       # desarrollo en escritorio
 flutter run                # tablet Android conectada
 flutter build apk --debug  # APK → build/app/outputs/flutter-apk/
 dart run flutter_launcher_icons   # regenerar iconos desde assets/icon/
@@ -87,7 +86,7 @@ l10n/ (lib/l10n)           ARB (app_es = fuente, app_en) → AppLocalizations; `
                              del sistema (`kAppLocale` solo para capturas/tests). Errores visibles: lanzar
                              `AppError(código)` y mostrar con `userError(l10n, e)`; servicios nunca devuelven texto
                              de UI (usar enums/`message(l10n)`). Tras `await`, en un State usar `_l10n`.
-integration_test/          flujos de punta a punta (`flutter test integration_test -d linux|tablet`)
+integration_test/          flujos de punta a punta (`flutter test integration_test -d <android>`)
 docs/                      privacy.md (política, enlazada en la app), testing.md (guion en dispositivo)
 tool/screenshots/          capturas de la UI real sin dispositivo (fuera de la suite de tests)
 tool/stress/               genera build/inklus_stress.inklus (5.100 trazos + 10 fotos) para perfilar

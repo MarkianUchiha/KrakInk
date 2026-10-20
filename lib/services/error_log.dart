@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import '../constants.dart';
 import 'app_paths.dart';
 import 'file_utils.dart';
+import '../brand.dart';
 
 /// Registro **local** de errores no capturados.
 ///
@@ -30,7 +31,7 @@ abstract final class ErrorLog {
   /// debe provocar otro.
   static Future<void> record(Object error, StackTrace? stack, {String? context}) {
     final entry = StringBuffer()
-      ..writeln('=== ${DateTime.now().toIso8601String()} · Inklus $kAppVersion'
+      ..writeln('=== ${DateTime.now().toIso8601String()} · ${Brand.appName} $kAppVersion'
           ' · ${Platform.operatingSystem}${context == null ? '' : ' · $context'}')
       ..writeln(error)
       ..writeln(_trim(stack));

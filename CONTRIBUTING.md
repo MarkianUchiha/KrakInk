@@ -1,8 +1,8 @@
-# Contributing to Inklus
+# Contributing to KrakInk
 
 *[Leer en español](CONTRIBUTING.es.md)*
 
-Thanks for helping! Inklus is a free, open-source (GPL-3.0-or-later), offline-first handwriting app for stylus tablets. Everything stays free: no premium features, no paid dependencies.
+Thanks for helping! KrakInk is a free, open-source (GPL-3.0-or-later), offline-first handwriting app for stylus tablets. Everything stays free: no premium features, no paid dependencies.
 
 ## Quick start
 
@@ -10,8 +10,8 @@ Thanks for helping! Inklus is a free, open-source (GPL-3.0-or-later), offline-fi
 flutter pub get
 flutter analyze                        # must report 0 issues
 flutter test                           # unit and widget tests
-flutter test integration_test -d linux # end-to-end flows
-flutter run -d linux                   # develop on desktop
+flutter test integration_test -d <android> # end-to-end flows (device or emulator)
+flutter run -d <android>                   # develop on a device or emulator
 ```
 
 Flutter 3.47 / Dart 3.13. Before touching the canvas, read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (the "critical flows" section lists what must not break: stylus input and palm rejection, paint layers, undo/redo, export).

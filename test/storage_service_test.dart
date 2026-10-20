@@ -142,6 +142,38 @@ void main() {
     });
   });
 
+  group('Rutas de imagen en disco', () {
+    test('saveNote guarda la ruta relativa y loadNote la devuelve absoluta',
+        () async {
+      final img = File('${tempDir.path}/images/foto.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync([1, 2, 3]);
+
+      final nb = await storage.createNotebook(title: 'Rutas');
+      final note = nb.notes.first;
+      note.pages.first.images.add(ImageItem(
+        id: 'img_1',
+        localPath: img.path,
+        x: 0,
+        y: 0,
+        width: 10,
+        height: 10,
+      ));
+      await storage.saveNote(nb.id, note);
+
+      final raw = jsonDecode(
+        File('${tempDir.path}/notes/${note.id}.json').readAsStringSync(),
+      ) as Map<String, dynamic>;
+      final page = (raw['pages'] as List).first as Map<String, dynamic>;
+      final stored = ((page['images'] as List).single as Map)['path'];
+      expect(stored, 'images/foto.png');
+
+      final loaded = await storage.loadNote(note.id);
+      final path = loaded!.pages.first.images.single.localPath;
+      expect(File(path).readAsBytesSync(), [1, 2, 3]);
+    });
+  });
+
   group('Respaldo local completo', () {
     test('exportFullBackup + importFullBackup restaura Notebook+Note e imágenes',
         () async {
@@ -177,7 +209,7 @@ void main() {
         final restored = await other.loadNotebook(nb.id);
         expect(restored, isNotNull);
         final restoredImg = restored!.notes.first.pages.first.images.single;
-        // La ruta absoluta se re-mapea a la nueva carpeta base.
+        // La ruta relativa en disco se resuelve contra la nueva carpeta base.
         expect(restoredImg.localPath, '${otherDir.path}/images/foto.png');
         expect(File(restoredImg.localPath).readAsBytesSync(), [1, 2, 3]);
       } finally {

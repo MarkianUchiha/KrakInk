@@ -7,6 +7,7 @@ import '../models/template.dart';
 import 'file_utils.dart';
 import '../models/id.dart';
 import 'app_paths.dart';
+import 'path_codec.dart';
 
 /// Entrada de la biblioteca de plantillas propias.
 class CustomTemplateEntry {
@@ -122,9 +123,12 @@ class TemplateLibraryService {
     }
     try {
       final json = jsonDecode(await indexFile.readAsString()) as List;
-      _entries = json
-          .map((e) => CustomTemplateEntry.fromJson(e as Map<String, dynamic>))
-          .toList();
+      final codec = PathCodec(_dir!.path);
+      _entries = json.map((e) {
+        final map = e as Map<String, dynamic>;
+        map['imagePath'] = codec.decode(map['imagePath'] as String);
+        return CustomTemplateEntry.fromJson(map);
+      }).toList();
     } catch (_) {
       _entries = [];
     }
@@ -132,8 +136,14 @@ class TemplateLibraryService {
 
   Future<void> _saveIndex() async {
     final indexFile = File('${_dir!.path}/index.json');
-    await writeAtomic(indexFile, 
-      jsonEncode(_entries.map((e) => e.toJson()).toList()),
+    // Rutas relativas a la carpeta de plantillas: el índice viaja en el
+    // respaldo completo y tiene que servir en otra carpeta base.
+    final codec = PathCodec(_dir!.path);
+    await writeAtomic(indexFile,
+      jsonEncode([
+        for (final e in _entries)
+          {...e.toJson(), 'imagePath': codec.encode(e.imagePath)},
+      ]),
     );
   }
 }

@@ -84,7 +84,7 @@ class VersionHistoryService {
           DateTime.now().difference(existing.first.savedAt) < minInterval) {
         return false;
       }
-      final json = jsonEncode(note.toJson());
+      final json = jsonEncode(await _storage.noteToStoredJson(note));
       final bytes = gzip.encode(utf8.encode(json));
       final dir = await _dirFor(note.id);
       var millis = DateTime.now().millisecondsSinceEpoch;
@@ -105,7 +105,9 @@ class VersionHistoryService {
   /// Carga el contenido de una versión.
   Future<Note> load(NoteVersion version) async {
     final raw = utf8.decode(gzip.decode(await File(version.path).readAsBytes()));
-    return Note.fromJson(await decodeJsonAsync(raw) as Map<String, dynamic>);
+    return _storage.noteFromStoredJson(
+      await decodeJsonAsync(raw) as Map<String, dynamic>,
+    );
   }
 
   /// Borra las versiones que exceden [maxVersions].

@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="Inklus"
+        android:label="KrakInk"
         android:allowBackup="false"
         android:usesCleartextTraffic="false"
         android:name="${applicationName}"
@@ -27,7 +27,7 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- Abrir .inklus desde Drive / Archivos / compartir. Drive suele mandar
+            <!-- Abrir .krakink desde Drive / Archivos / compartir. Drive suele mandar
                  octet-stream o zip sin extensión en la URI, por eso los tipos MIME. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -38,7 +38,7 @@
                 <data android:mimeType="application/octet-stream"/>
                 <data android:mimeType="application/zip"/>
                 <data android:mimeType="application/x-zip-compressed"/>
-                <data android:mimeType="application/x-inklus"/>
+                <data android:mimeType="application/x-krakink"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -46,8 +46,8 @@
                 <data android:scheme="content"/>
                 <data android:scheme="file"/>
                 <data android:mimeType="*/*"/>
-                <data android:pathPattern=".*\\.inklus"/>
-                <data android:pathPattern=".*\\..*\\.inklus"/>
+                <data android:pathPattern=".*\\.krakink"/>
+                <data android:pathPattern=".*\\..*\\.krakink"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>

@@ -79,7 +79,7 @@ void main() {
 
       // La imagen se extrae a un archivo local real y conserva el contenido.
       final img = doc.pages.first.images.first;
-      expect(img.localPath, isNot(contains('inklus://')));
+      expect(img.localPath, isNot(contains(InklusFormat.scheme)));
       final extracted = File(img.localPath);
       expect(extracted.existsSync(), isTrue);
       expect(extracted.readAsBytesSync(), imageFile.readAsBytesSync());
@@ -154,7 +154,7 @@ void main() {
 
       // Imagen se restaura a archivo local
       final img = restored.pages.first.images.first;
-      expect(img.localPath, isNot(contains('inklus://')));
+      expect(img.localPath, isNot(contains(InklusFormat.scheme)));
       expect(File(img.localPath).existsSync(), isTrue);
     });
 

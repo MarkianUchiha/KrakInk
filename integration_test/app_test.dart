@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Flujos críticos de punta a punta sobre la app real (R5 del roadmap).
 //
-//   flutter test integration_test -d <tablet|emulador|linux>
+//   flutter test integration_test -d <tablet|emulador>
 //
 // Usa una carpeta de datos temporal: no toca las notas del dispositivo.
 import 'dart:io';
@@ -32,13 +32,24 @@ void main() {
     if (data.existsSync()) data.deleteSync(recursive: true);
   });
 
+  /// Un finder con `.last` lanza StateError mientras no hay coincidencias en
+  /// lugar de devolver vacío; en un emulador lento eso pasa antes de que
+  /// termine la transición.
+  bool found(Finder finder) {
+    try {
+      return finder.evaluate().isNotEmpty;
+    } on StateError {
+      return false;
+    }
+  }
+
   /// Espera a que aparezca [finder] (animaciones, E/S real).
   Future<void> waitFor(WidgetTester tester, Finder finder,
       {Duration timeout = const Duration(seconds: 15)}) async {
     final end = DateTime.now().add(timeout);
     while (DateTime.now().isBefore(end)) {
       await tester.pump(const Duration(milliseconds: 100));
-      if (finder.evaluate().isNotEmpty) {
+      if (found(finder)) {
         // Deja terminar la transición: en CI (lento) el widget ya existe
         // pero aún se está moviendo, y el tap caería fuera de él.
         await tester.pump(const Duration(milliseconds: 600));
@@ -52,7 +63,18 @@ void main() {
         .whereType<String>()
         .take(40)
         .join(' | ');
-    throw TestFailure('No apareció: $finder\nEn pantalla: $visible');
+    throw TestFailure(
+      'No apareció: ${finder.describeMatch(Plurality.one)}\n'
+      'En pantalla: $visible',
+    );
+  }
+
+  /// En pantallas de teléfono los botones del asistente quedan debajo del
+  /// pliegue; sin scroll el tap cae fuera de la ventana y no hace nada.
+  Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+    await tester.ensureVisible(finder);
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(finder);
   }
 
   testWidgets('bienvenida → crear cuaderno → escribir con lápiz → se guarda',
@@ -67,11 +89,11 @@ void main() {
     // 2. Crear un cuaderno con los valores por defecto ("Cuaderno 1").
     await tester.tap(find.text('Nuevo cuaderno'));
     await waitFor(tester, find.text('Siguiente'));
-    await tester.tap(find.text('Siguiente'));
+    await tapVisible(tester, find.text('Siguiente'));
     // .last: la biblioteca vacía (debajo) tiene otro botón "Crear cuaderno".
     final create = find.widgetWithText(FilledButton, 'Crear cuaderno').last;
     await waitFor(tester, create);
-    await tester.tap(create);
+    await tapVisible(tester, create);
 
     // 3. Se abre la lista de notas; abrir la primera.
     await waitFor(tester, find.text('Sin título'));

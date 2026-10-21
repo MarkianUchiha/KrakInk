@@ -1,6 +1,6 @@
 # 🚀 Publicar una versión
 
-Distribución sin Google Play: **GitHub Releases** (APK/AAB firmados por la CI en tags `v*`) e idealmente IzzyOnDroid. Licencia GPL-3.0-or-later.
+Distribución en **Google Play** (AAB, empezando por el track de prueba cerrada) y en **GitHub Releases** (APK/AAB firmados por la CI en tags `v*`). Licencia GPL-3.0-or-later.
 
 ## Antes de etiquetar
 
@@ -29,7 +29,7 @@ La CI (`.github/workflows/ci.yml`, job `release`) comprueba que el tag coincida 
 
 ## Google Sign-In / Drive
 
-Las SHA-1 de debug y de release deben estar registradas en Google Cloud (cliente OAuth Android). Para uso público, publica la pantalla de consentimiento (*Publish app*) con la URL de [`privacy.md`](privacy.md); si no, 100 usuarios de prueba y tokens de 7 días.
+Las SHA-1 de debug, de la clave de subida y de la clave de **Play App Signing** (Play Console → Integridad de la app) deben estar registradas en Google Cloud (cliente OAuth Android). Sin la de Play, el login de Drive falla en las instalaciones que vienen de la tienda. Para uso público, publica la pantalla de consentimiento (*Publish app*) con la URL de [`privacy.md`](privacy.md); si no, 100 usuarios de prueba y tokens de 7 días.
 
 ## Después
 

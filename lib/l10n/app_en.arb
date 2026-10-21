@@ -1074,7 +1074,7 @@
       }
     }
   },
-  "errNotInklus": "The file is not an .krakink notebook or an KrakInk backup.",
+  "errNotInklus": "The file is not a .krakink notebook or a KrakInk backup.",
   "errNotInklusFile": "Not a valid .krakink notebook",
   "errNotInklusV2": "Not a valid .krakink v2 notebook",
   "errCatalogTooLarge": "Catalog is too large",

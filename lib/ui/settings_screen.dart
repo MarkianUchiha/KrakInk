@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../brand.dart';
 import '../constants.dart';
 import '../models/note.dart';
 import '../services/drive_sync_service.dart';
@@ -118,7 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 SettingsTile(
                   icon: Icons.edit_outlined,
-                  title: 'Inklus $kAppVersion',
+                  title: '${Brand.appName} $kAppVersion',
                   subtitle: context.l10n.settingsAppTagline,
                 ),
                 SettingsTile(
@@ -404,7 +405,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         final stamp = DateTime.now().toIso8601String().substring(0, 10);
         final saved = await FilePicker.saveFile(
           dialogTitle: l10n.backupSaveTitle,
-          fileName: 'inklus_respaldo_$stamp.zip',
+          fileName: '${Brand.filePrefix}_respaldo_$stamp.zip',
           bytes: bytes,
         );
         if (saved != null) _snack(l10n.backupSaved);

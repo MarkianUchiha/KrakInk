@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inklus/models/note.dart';
 import 'package:inklus/models/text_item.dart';
+import 'package:inklus/services/error_log.dart';
 import 'package:inklus/services/search_service.dart';
 import 'package:inklus/services/storage_service.dart';
 
@@ -54,5 +56,17 @@ void main() {
     await search.indexNote('nb', b);
     expect(search.search('manzana').length, 2);
     expect(search.search('manzana', onlyNoteId: a.id).single.noteId, a.id);
+  });
+
+  test('OBS-05: un índice corrupto queda como ocr.index sin su contenido', () async {
+    ErrorLog.fileProvider = () async => File('${tmp.path}/errors.log');
+    File('${tmp.path}/search_index.json')
+        .writeAsStringSync('{"v": 2, "notes": {"n1": {"handwriting": "diario intimo"}, roto');
+    await search.load();
+    await ErrorLog.idle();
+    final text = await ErrorLog.read();
+    final entry = jsonDecode(text.trim()) as Map<String, dynamic>;
+    expect(entry['operation'], 'ocr.index');
+    expect(text, isNot(contains('diario intimo')));
   });
 }

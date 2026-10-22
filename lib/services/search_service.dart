@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
 import '../models/note.dart';
+import 'error_log.dart';
 import 'file_utils.dart';
 import 'storage_service.dart';
 
@@ -81,8 +83,9 @@ class SearchService {
       for (final e in (json['notes'] as Map<String, dynamic>).entries) {
         _index[e.key] = _NoteIndex.fromJson(e.value as Map<String, dynamic>);
       }
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('SearchService.load: $e');
+      unawaited(ErrorLog.record(e, st, operation: 'ocr.index'));
     }
   }
 
@@ -95,8 +98,9 @@ class SearchService {
           'notes': {for (final e in _index.entries) e.key: e.value.toJson()},
         }),
       );
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('SearchService._save: $e');
+      unawaited(ErrorLog.record(e, st, operation: 'ocr.index'));
     }
   }
 

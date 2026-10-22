@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import '../constants.dart';
 import '../models/page.dart';
 import '../models/stroke.dart';
+import 'error_log.dart';
 import 'export_service.dart';
 import 'image_service.dart';
 import '../brand.dart';
@@ -303,8 +304,10 @@ class OcrService {
         );
         // Si la tinta devolvió texto, usarlo.
         if (!inkResult.isEmpty) return inkResult;
-      } catch (e) {
+      } catch (e, st) {
         debugPrint('OcrService.recognizeSmart (ink): $e');
+        // El usuario no se entera: el fallback de bitmap responde igual.
+        unawaited(ErrorLog.record(e, st, operation: 'ocr.ink'));
         // Continuar con fallback.
       }
     }

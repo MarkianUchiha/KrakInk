@@ -114,3 +114,21 @@ abstract final class ErrorLog {
     return lines.take(25).join('\n');
   }
 }
+
+/// Registra solo el primer fallo de una racha. Una operación que se reintenta
+/// sola (sync con Drive) llenaría el registro con el mismo error y borraría lo
+/// útil al recortar.
+class FailureStreak {
+  FailureStreak(this.operation);
+
+  final String operation;
+  bool _failing = false;
+
+  void fail(Object error, StackTrace? stack) {
+    if (_failing) return;
+    _failing = true;
+    unawaited(ErrorLog.record(error, stack, operation: operation));
+  }
+
+  void succeed() => _failing = false;
+}

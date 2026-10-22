@@ -14,6 +14,7 @@ import '../models/note.dart';
 import '../models/notebook.dart';
 import 'inklus_format.dart';
 import 'backup_crypto.dart';
+import 'error_log.dart';
 import 'storage_service.dart';
 import '../brand.dart';
 
@@ -99,6 +100,12 @@ class DriveSyncService extends ChangeNotifier {
 
   GoogleSignInAccount? _account;
   bool _restoreAttempted = false;
+
+  // El sync automático reintenta solo: sin racha, un fallo repetido llenaría
+  // el registro local.
+  final _tokenFailures = FailureStreak('drive.token');
+  final _uploadFailures = FailureStreak('drive.upload');
+  final _downloadFailures = FailureStreak('drive.download');
 
   /// google_sign_in 7 exige `initialize()` **una sola vez** y esperar a que
   /// termine antes de cualquier otra llamada (si no, el sign-in falla con
@@ -210,9 +217,11 @@ class DriveSyncService extends ChangeNotifier {
     try {
       final authz = await account.authorizationClient
           .authorizationForScopes(const [_driveScope]);
+      _tokenFailures.succeed();
       return authz?.accessToken;
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('DriveSyncService._silentToken: $e');
+      _tokenFailures.fail(e, st);
       return null;
     }
   }
@@ -437,8 +446,9 @@ class DriveSyncService extends ChangeNotifier {
     final String? token;
     try {
       token = promptForConsent ? await _interactiveToken() : await _silentToken();
-    } catch (e) {
+    } catch (e, st) {
       status(SyncStatus.error);
+      _uploadFailures.fail(e, st);
       rethrow;
     }
     if (token == null) {
@@ -489,12 +499,14 @@ class DriveSyncService extends ChangeNotifier {
           );
         }
         status(SyncStatus.synced);
+        _uploadFailures.succeed();
         onSyncComplete?.call(SyncNotice.noteSynced);
       } finally {
         client.close();
       }
-    } catch (e) {
+    } catch (e, st) {
       status(SyncStatus.error);
+      _uploadFailures.fail(e, st);
       rethrow;
     }
   }
@@ -647,7 +659,10 @@ class DriveSyncService extends ChangeNotifier {
             final resp = await client.get(
               Uri.parse('https://www.googleapis.com/drive/v3/files/$id?alt=media'),
             );
-            if (resp.statusCode != 200) continue;
+            if (resp.statusCode != 200) {
+              _downloadFailures.fail(http.ClientException('Drive respondió ${resp.statusCode}'), null);
+              continue;
+            }
             var bytes = resp.bodyBytes;
             if (password != null && password.isNotEmpty) {
               bytes = await _decryptBytes(bytes, password);
@@ -661,8 +676,10 @@ class DriveSyncService extends ChangeNotifier {
               notebookId: folder?.$1,
               notebookTitle: folder?.$2,
             ));
-          } catch (e) {
+            _downloadFailures.succeed();
+          } catch (e, st) {
             debugPrint('DriveSyncService.downloadAllNotes: copia no legible ($name): $e');
+            _downloadFailures.fail(e, st);
           }
         }
         pageToken = page.nextPageToken;

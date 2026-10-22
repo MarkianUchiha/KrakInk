@@ -262,6 +262,7 @@ Hecho de P1–P3, P7, P8, R1, R2, R4–R6, R9: ver versiones 1.4–1.8.
 | Media | **Latencia del lápiz** (R7) | Plugin nativo con *front-buffered rendering* + predicción, solo si 1.5 la muestra alta. |
 | Media | **Páginas en archivos separados** | Solo si la medición con notas de cientos de páginas lo exige (ver Fase 3). |
 | Media | **Varias notas abiertas / pestañas**, atajos ampliados, IzzyOnDroid | |
+| Baja | **Íconos de temporada** | `activity-alias` en `AndroidManifest.xml` para cambiar el ícono del lanzador según la fecha, sin publicar otra versión. |
 | Baja | Audio sincronizado (P4), ventana de zoom (P5), iPadOS/Windows (R8) | Aparcado: coste alto. |
 
 ### 🛒 Marketplace propio de Inklus

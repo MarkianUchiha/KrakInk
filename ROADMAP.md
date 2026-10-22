@@ -241,6 +241,8 @@ P4 audio sincronizado, P5 ventana de zoom, R7 plugin nativo de latencia (solo si
 |---|---|---|
 | R3 | **OAuth en producción** (manual) | Google Cloud → pantalla de consentimiento: URL de `docs/privacy.md` + *Publish app* (si no: 100 usuarios de prueba y tokens de 7 días). |
 | T1 | **Prueba en tablet** | Superar `docs/testing.md`; verificar texto con S-Pen/teclado e inicio de sesión de Drive (SHA-1 debug y release registrados). |
+| T2 | **Overflow en teléfono** | El registro de errores captó `A RenderFlex overflowed by 56 pixels on the right` (dos veces) en un Pixel 10a con Android 17. El registro no guarda qué widget fue: el contexto de `FlutterError` se descarta porque puede traer texto del usuario. Para ubicarlo, guardar solo el tipo de widget (sin texto) o reproducirlo con `flutter run` en un teléfono. |
+| T3 | **Dedo y cajas de texto en teléfono** | En el mismo Pixel no se pudo trazar con el dedo ni editar una caja de texto, aunque `fingerDrawingEnabled` arranca en `true`. Revisar si es la herramienta activa o un fallo de entrada táctil en pantallas sin lápiz. |
 | 1.5 | **Medir rendimiento** | `flutter run --profile` con `build/inklus_stress.inklus`; decide R7 y "páginas en archivos". |
 | 0.4 | **Keystore de release** (manual) | Secretos `ANDROID_KEYSTORE_*` en GitHub antes de repartir APKs. |
 

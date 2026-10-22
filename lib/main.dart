@@ -19,12 +19,16 @@ void main() {
       // dispositivo salvo que el usuario lo comparta).
       FlutterError.onError = (details) {
         FlutterError.presentError(details);
-        ErrorLog.record(details.exception, details.stack,
-            context: details.context?.toDescription());
+        ErrorLog.record(
+          details.exception,
+          details.stack,
+          operation: 'uncaught.flutter',
+          context: details.context?.toDescription(),
+        );
       };
       // Errores asíncronos del motor/plugins.
       PlatformDispatcher.instance.onError = (error, stack) {
-        ErrorLog.record(error, stack, context: 'plataforma');
+        ErrorLog.record(error, stack, operation: 'uncaught.platform');
         return true;
       };
 
@@ -33,7 +37,7 @@ void main() {
     (error, stackTrace) {
       debugPrint('Uncaught exception: $error');
       debugPrintStack(stackTrace: stackTrace);
-      ErrorLog.record(error, stackTrace);
+      ErrorLog.record(error, stackTrace, operation: 'uncaught.zone');
     },
   );
 }

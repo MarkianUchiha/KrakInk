@@ -50,6 +50,7 @@ import 'marketplace_screen.dart';
 import '../services/app_paths.dart';
 import '../l10n/l10n.dart';
 import '../services/app_errors.dart';
+import '../services/error_log.dart';
 import '../brand.dart';
 
 /// Editor de un cuaderno (pantalla principal de escritura).
@@ -993,7 +994,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _c.insertPdfPages(pages);
       _c.fitView(_c.viewportSize);
       _snack(_l10n.pdfImported(pages.length));
-    } catch (e) {
+    } catch (e, st) {
+      unawaited(ErrorLog.record(e, st, operation: 'import.pdf'));
       _snack(_l10n.pdfImportFailed('$e'));
     }
   }

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -6,6 +7,7 @@ import 'package:printing/printing.dart';
 
 import 'file_utils.dart';
 import 'app_paths.dart';
+import 'error_log.dart';
 
 /// Servicio de importación de PDF.
 ///
@@ -46,8 +48,9 @@ class PdfImportService {
       final image = images.first;
       final pngBytes = await image.toPng();
       return Uint8List.fromList(pngBytes);
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('PdfImportService.renderFirstPage: $e');
+      unawaited(ErrorLog.record(e, st, operation: 'import.pdf'));
       return null;
     }
   }
@@ -76,8 +79,9 @@ class PdfImportService {
         results.add(Uint8List.fromList(pngBytes));
       }
       return results;
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('PdfImportService.renderAllPages: $e');
+      unawaited(ErrorLog.record(e, st, operation: 'import.pdf'));
       return [];
     }
   }
@@ -121,8 +125,9 @@ class PdfImportService {
       final file = File('${imagesDir.path}/$fileName');
       await file.writeAsBytes(pngBytes);
       return file.path;
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('PdfImportService.saveRenderedPage: $e');
+      unawaited(ErrorLog.record(e, st, operation: 'import.pdf'));
       return null;
     }
   }

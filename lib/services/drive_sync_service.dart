@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import 'dart:async';
 import 'dart:typed_data';
 
 
@@ -105,7 +106,6 @@ class DriveSyncService extends ChangeNotifier {
   // el registro local.
   final _tokenFailures = FailureStreak('drive.token');
   final _uploadFailures = FailureStreak('drive.upload');
-  final _downloadFailures = FailureStreak('drive.download');
 
   /// google_sign_in 7 exige `initialize()` **una sola vez** y esperar a que
   /// termine antes de cualquier otra llamada (si no, el sign-in falla con
@@ -516,6 +516,20 @@ class DriveSyncService extends ChangeNotifier {
     required String noteId,
     String? password,
   }) async {
+    try {
+      return await _restoreNote(noteId: noteId, password: password);
+    } on NotSignedInException {
+      rethrow;
+    } catch (e, st) {
+      unawaited(ErrorLog.record(e, st, operation: 'drive.download'));
+      rethrow;
+    }
+  }
+
+  Future<Note?> _restoreNote({
+    required String noteId,
+    String? password,
+  }) async {
     if (_account == null) throw const NotSignedInException();
     final token = await _interactiveToken();
     final client = _authClient(token);
@@ -617,6 +631,24 @@ class DriveSyncService extends ChangeNotifier {
       [for (final r in await _downloadAll(password: password)) r.note];
 
   Future<List<_RemoteNote>> _downloadAll({String? password}) async {
+    // Una racha por descarga: un respaldo con muchas copias ilegibles deja
+    // una entrada por causa, no una por archivo.
+    final failures = FailureStreak('drive.download');
+    try {
+      return await _downloadAllWith(failures, password: password);
+    } on NotSignedInException {
+      rethrow;
+    } catch (e, st) {
+      // Token, files.list o red: la restauración entera falló.
+      failures.fail(e, st);
+      rethrow;
+    }
+  }
+
+  Future<List<_RemoteNote>> _downloadAllWith(
+    FailureStreak failures, {
+    String? password,
+  }) async {
     if (_account == null) throw const NotSignedInException();
     final token = await _interactiveToken();
     final client = _authClient(token);
@@ -660,7 +692,7 @@ class DriveSyncService extends ChangeNotifier {
               Uri.parse('https://www.googleapis.com/drive/v3/files/$id?alt=media'),
             );
             if (resp.statusCode != 200) {
-              _downloadFailures.fail(http.ClientException('Drive respondió ${resp.statusCode}'), null);
+              failures.fail(http.ClientException('Drive respondió ${resp.statusCode}'), null);
               continue;
             }
             var bytes = resp.bodyBytes;
@@ -676,10 +708,9 @@ class DriveSyncService extends ChangeNotifier {
               notebookId: folder?.$1,
               notebookTitle: folder?.$2,
             ));
-            _downloadFailures.succeed();
           } catch (e, st) {
             debugPrint('DriveSyncService.downloadAllNotes: copia no legible ($name): $e');
-            _downloadFailures.fail(e, st);
+            failures.fail(e, st);
           }
         }
         pageToken = page.nextPageToken;

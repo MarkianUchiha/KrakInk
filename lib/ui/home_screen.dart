@@ -505,8 +505,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         ),
       );
     } catch (e, st) {
-      // Fuera de Android el OCR no existe: no es un fallo.
-      if (e is! UnsupportedError) unawaited(ErrorLog.record(e, st, operation: 'ocr.recognize'));
+      unawaited(ErrorLog.record(e, st, operation: 'ocr.recognize'));
       if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop();
       _snack(_l10n.ocrFailed('$e'));
@@ -1161,7 +1160,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       });
       _snack(_l10n.inkIndexed(count));
     } catch (e, st) {
-      if (e is! UnsupportedError) unawaited(ErrorLog.record(e, st, operation: 'ocr.recognize'));
+      unawaited(ErrorLog.record(e, st, operation: 'ocr.recognize'));
       _snack(_l10n.inkFailed('$e'));
     }
   }

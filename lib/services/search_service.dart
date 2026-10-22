@@ -64,6 +64,8 @@ class SearchService {
   final StorageService _storage;
   final Map<String, _NoteIndex> _index = {};
   bool _loaded = false;
+  // Se guarda en cada reindexado: sin racha, un disco lleno llenaría el registro.
+  final _failures = FailureStreak('ocr.index');
 
   Future<File> _file() async {
     final base = await _storage.baseDirectory();
@@ -85,7 +87,7 @@ class SearchService {
       }
     } catch (e, st) {
       debugPrint('SearchService.load: $e');
-      unawaited(ErrorLog.record(e, st, operation: 'ocr.index'));
+      _failures.fail(e, st);
     }
   }
 
@@ -98,9 +100,10 @@ class SearchService {
           'notes': {for (final e in _index.entries) e.key: e.value.toJson()},
         }),
       );
+      _failures.succeed();
     } catch (e, st) {
       debugPrint('SearchService._save: $e');
-      unawaited(ErrorLog.record(e, st, operation: 'ocr.index'));
+      _failures.fail(e, st);
     }
   }
 

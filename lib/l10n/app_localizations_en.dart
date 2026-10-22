@@ -1943,7 +1943,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errNotInklus =>
-      'The file is not an .krakink notebook or an KrakInk backup.';
+      'The file is not a .krakink notebook or a KrakInk backup.';
 
   @override
   String get errNotInklusFile => 'Not a valid .krakink notebook';

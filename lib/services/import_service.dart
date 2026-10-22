@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
@@ -13,6 +14,7 @@ import '../models/notebook.dart';
 import 'inklus_format.dart';
 import 'storage_service.dart';
 import 'app_errors.dart';
+import 'error_log.dart';
 import '../l10n/l10n.dart';
 import '../brand.dart';
 
@@ -79,6 +81,7 @@ abstract final class ImportService {
       try {
         return ZipDecoder().decodeBytes(bytes).files.map((f) => f.name).toSet();
       } catch (_) {
+        // No es un ZIP: el usuario eligió otro archivo, no falló la app.
         return <String>{};
       }
     });
@@ -103,6 +106,22 @@ abstract final class ImportService {
     Uint8List bytes, {
     StorageService? storage,
     @visibleForTesting Directory? extractTo,
+  }) async {
+    try {
+      return await _importBytes(bytes, storage: storage, extractTo: extractTo);
+    } on AppError {
+      // "No es de KrakInk": el usuario eligió otro archivo, no falló la app.
+      rethrow;
+    } catch (e, st) {
+      unawaited(ErrorLog.record(e, st, operation: 'import.krakink'));
+      rethrow;
+    }
+  }
+
+  static Future<ImportResult> _importBytes(
+    Uint8List bytes, {
+    StorageService? storage,
+    Directory? extractTo,
   }) async {
     final s = storage ?? StorageService.instance;
     final kind = await detect(bytes);

@@ -1528,7 +1528,7 @@ class CanvasController extends _CanvasCore
       // Avisa una sola vez por racha de fallos (no en cada reintento).
       if (!_saveFailing) {
         _saveFailing = true;
-        unawaited(ErrorLog.record(e, st, context: 'guardar nota'));
+        unawaited(ErrorLog.record(e, st, operation: 'note.save'));
         if (!_disposed) onSaveError?.call(e);
       }
     }

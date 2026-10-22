@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
 import '../models/note.dart';
+import 'error_log.dart';
 import 'file_utils.dart';
 import 'storage_service.dart';
 
@@ -62,6 +64,8 @@ class SearchService {
   final StorageService _storage;
   final Map<String, _NoteIndex> _index = {};
   bool _loaded = false;
+  // Se guarda en cada reindexado: sin racha, un disco lleno llenaría el registro.
+  final _failures = FailureStreak('ocr.index');
 
   Future<File> _file() async {
     final base = await _storage.baseDirectory();
@@ -81,8 +85,9 @@ class SearchService {
       for (final e in (json['notes'] as Map<String, dynamic>).entries) {
         _index[e.key] = _NoteIndex.fromJson(e.value as Map<String, dynamic>);
       }
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('SearchService.load: $e');
+      _failures.fail(e, st);
     }
   }
 
@@ -95,8 +100,10 @@ class SearchService {
           'notes': {for (final e in _index.entries) e.key: e.value.toJson()},
         }),
       );
-    } catch (e) {
+      _failures.succeed();
+    } catch (e, st) {
       debugPrint('SearchService._save: $e');
+      _failures.fail(e, st);
     }
   }
 

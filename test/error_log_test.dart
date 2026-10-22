@@ -121,7 +121,7 @@ void main() {
     streak.fail(StateError('b'), null);
     streak.succeed();
     streak.fail(StateError('c'), null);
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await ErrorLog.idle();
     final logged = entries(await ErrorLog.read());
     expect(logged.map((e) => e['message']), ['Bad state: a', 'Bad state: c']);
     expect(logged.map((e) => e['operation']).toSet(), {'drive.upload'});

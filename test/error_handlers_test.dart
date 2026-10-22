@@ -20,8 +20,7 @@ void main() {
   tearDown(() => tmp.deleteSync(recursive: true));
 
   Future<String> lastOperation() async {
-    // El registro se escribe en segundo plano.
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await ErrorLog.idle();
     final lines = const LineSplitter().convert(await ErrorLog.read());
     return (jsonDecode(lines.last) as Map<String, dynamic>)['operation']
         as String;

@@ -56,7 +56,7 @@ void main() {
     await c.saveNow(); // segundo fallo de la misma racha: sin aviso nuevo
     expect(avisos, 1);
     // El registro se escribe en segundo plano.
-    await Future<void>.delayed(const Duration(milliseconds: 200));
+    await ErrorLog.idle();
     expect(await ErrorLog.count(), 1);
 
     storage.failing = false;
@@ -74,7 +74,7 @@ void main() {
         'disco lleno', '/data/user/0/app/krakink/Cuaderno privado/n1.json');
     scribble();
     await c.saveNow();
-    await Future<void>.delayed(const Duration(milliseconds: 200));
+    await ErrorLog.idle();
     final entry = jsonDecode((await ErrorLog.read()).trim()) as Map<String, dynamic>;
     expect(entry['operation'], 'note.save');
     expect(entry['errorType'], 'FileSystemException');

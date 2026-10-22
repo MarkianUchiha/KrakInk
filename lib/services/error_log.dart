@@ -76,6 +76,12 @@ abstract final class ErrorLog {
     });
   }
 
+  /// Termina cuando se escribió todo lo registrado hasta ahora. Los sitios
+  /// que registran no esperan (`unawaited`); los tests sí necesitan hacerlo,
+  /// y un `Future.delayed` fijo falla con la suite en paralelo.
+  @visibleForTesting
+  static Future<void> idle() => _queue.run(() async {});
+
   /// Contenido completo ('' si no hay errores).
   static Future<String> read() async {
     final file = await fileProvider();

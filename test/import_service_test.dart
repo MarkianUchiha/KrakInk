@@ -78,7 +78,7 @@ void main() {
     }
 
     Future<List<Map<String, dynamic>>> logged() async {
-      await Future<void>.delayed(const Duration(milliseconds: 100));
+      await ErrorLog.idle();
       return [
         for (final l in const LineSplitter().convert(await ErrorLog.read()))
           jsonDecode(l) as Map<String, dynamic>,

@@ -41,7 +41,6 @@ abstract final class ErrorLog {
     Object error,
     StackTrace? stack, {
     required String operation,
-    String? context,
   }) {
     final clean = sanitizeError(error);
     final entry = jsonEncode({
@@ -53,8 +52,6 @@ abstract final class ErrorLog {
       'result': 'error',
       'errorType': clean.errorType,
       'message': clean.message,
-      // El contexto de FlutterError describe widgets y puede arrastrar texto.
-      if (context != null) 'context': sanitizeError(context).message,
       'stack': _trim(stack),
     });
     return _queue.run(() async {
@@ -123,18 +120,19 @@ abstract final class ErrorLog {
 
 /// Registra solo el primer fallo de una racha. Una operación que se reintenta
 /// sola (sync con Drive) llenaría el registro con el mismo error y borraría lo
-/// útil al recortar.
+/// útil al recortar. Un error de otro tipo cuenta como racha nueva: es otra
+/// causa y no debe perderse.
 class FailureStreak {
   FailureStreak(this.operation);
 
   final String operation;
-  bool _failing = false;
+  Type? _lastType;
 
   void fail(Object error, StackTrace? stack) {
-    if (_failing) return;
-    _failing = true;
+    if (error.runtimeType == _lastType) return;
+    _lastType = error.runtimeType;
     unawaited(ErrorLog.record(error, stack, operation: operation));
   }
 
-  void succeed() => _failing = false;
+  void succeed() => _lastType = null;
 }

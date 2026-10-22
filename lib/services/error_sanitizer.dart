@@ -7,11 +7,14 @@ import 'app_errors.dart';
 /// mensaje inesperado podría arrastrar.
 const kMaxErrorMessage = 200;
 
-// Ruta absoluta (Unix o Windows) hasta su último separador. Los segmentos
-// admiten espacios porque los nombres de cuaderno los llevan; si eso borra
-// texto de más, mejor de más que filtrar un nombre.
-final _absoluteDirs = RegExp(
-  r'''(?<=^|[\s'"(])(?:[A-Za-z]:)?[\\/](?:[^\\/\n'"]*[\\/])+''',
+// Ruta absoluta (Unix, Windows o tras `file://`) completa, nombre de archivo
+// incluido: el nombre también es del usuario (título de nota, PDF elegido).
+// Los segmentos admiten espacios porque los nombres de cuaderno los llevan, y
+// el último llega hasta una comilla o el fin de línea: si eso borra texto de
+// más, mejor de más que filtrar un nombre. Exige dos separadores y que no
+// venga pegada a una palabra, para respetar "1/2" o "y/o".
+final _absolutePath = RegExp(
+  r'''(?<![\w.])(?:[A-Za-z]:)?[\\/](?:[^\\/\n'"]*[\\/])+[^\n'"\\/)\]]*''',
 );
 
 /// Tipo y mensaje de un error sin contenido del usuario, para el registro
@@ -30,7 +33,7 @@ final _absoluteDirs = RegExp(
       ].join(': '),
       _ => error.toString(),
     };
-    final message = raw.replaceAll(_absoluteDirs, '');
+    final message = raw.replaceAll(_absolutePath, '<ruta>');
     return (
       errorType: errorType,
       message: message.length > kMaxErrorMessage

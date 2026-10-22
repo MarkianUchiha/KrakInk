@@ -11,11 +11,12 @@ void installErrorHandlers() {
   // que el usuario lo comparta).
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
+    // Sin `details.context`: describe el widget que se construía y puede
+    // traer su texto (título de nota, resultado de OCR).
     ErrorLog.record(
       details.exception,
       details.stack,
       operation: 'uncaught.flutter',
-      context: details.context?.toDescription(),
     );
   };
   // Errores asíncronos del motor/plugins.

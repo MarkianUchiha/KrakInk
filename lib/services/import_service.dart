@@ -77,16 +77,14 @@ abstract final class ImportService {
 
   /// Detecta el tipo de archivo. Lanza [FormatException] si no es de Inklus.
   static Future<ImportKind> detect(Uint8List bytes) async {
-    Set<String> names;
-    try {
-      names = await Isolate.run(
-          () => ZipDecoder().decodeBytes(bytes).files.map((f) => f.name).toSet());
-    } catch (e, st) {
-      // Al usuario le basta "no es de KrakInk"; el registro guarda la causa
-      // real (ZIP corrupto, truncado…) para diagnosticar.
-      unawaited(ErrorLog.record(e, st, operation: 'import.krakink'));
-      names = <String>{};
-    }
+    final names = await Isolate.run(() {
+      try {
+        return ZipDecoder().decodeBytes(bytes).files.map((f) => f.name).toSet();
+      } catch (_) {
+        // No es un ZIP: el usuario eligió otro archivo, no falló la app.
+        return <String>{};
+      }
+    });
     return kindFor(names);
   }
 

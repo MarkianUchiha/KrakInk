@@ -40,10 +40,15 @@ void main() {
 
     installErrorHandlers();
 
+    // El contexto describe el widget que se construía, con su texto.
     FlutterError.onError!(
-      FlutterErrorDetails(exception: StateError('framework')),
+      FlutterErrorDetails(
+        exception: StateError('framework'),
+        context: ErrorDescription('while building Text("diario intimo")'),
+      ),
     );
     expect(await lastOperation(), 'uncaught.flutter');
+    expect(await ErrorLog.read(), isNot(contains('diario intimo')));
 
     expect(
       PlatformDispatcher.instance.onError!(

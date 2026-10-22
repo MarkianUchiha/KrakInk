@@ -37,12 +37,11 @@ void main() {
       ArgumentError('dos'),
       null,
       operation: 'drive.upload',
-      context: 'prueba',
     );
     expect(await ErrorLog.count(), 2);
     final text = await ErrorLog.read();
     expect(text, contains('Bad state: uno'));
-    expect(text, contains('prueba'));
+    expect(text, contains('drive.upload'));
     await ErrorLog.clear();
     expect(await ErrorLog.count(), 0);
   });
@@ -52,14 +51,12 @@ void main() {
       StateError('uno'),
       StackTrace.current,
       operation: 'note.save',
-      context: 'ctx',
     );
     final e = entries(await ErrorLog.read()).single;
     expect(e['operation'], 'note.save');
     expect(e['result'], 'error');
     expect(e['errorType'], 'StateError');
     expect(e['message'], 'Bad state: uno');
-    expect(e['context'], 'ctx');
     expect(e['os'], Platform.operatingSystem);
     expect(e.keys, containsAll(<String>['ts', 'version', 'stack']));
   });
@@ -125,6 +122,17 @@ void main() {
     final logged = entries(await ErrorLog.read());
     expect(logged.map((e) => e['message']), ['Bad state: a', 'Bad state: c']);
     expect(logged.map((e) => e['operation']).toSet(), {'drive.upload'});
+  });
+
+  test('FailureStreak vuelve a registrar si cambia el tipo de error', () async {
+    // Un 403 tras un fallo de red es otra causa: no se debe perder.
+    final streak = FailureStreak('drive.upload');
+    streak.fail(StateError('red'), null);
+    streak.fail(StateError('red otra vez'), null);
+    streak.fail(ArgumentError('cuota'), null);
+    await ErrorLog.idle();
+    final logged = entries(await ErrorLog.read());
+    expect(logged.map((e) => e['errorType']), ['StateError', 'ArgumentError']);
   });
 
   test('un fallo al escribir el registro no lanza', () async {

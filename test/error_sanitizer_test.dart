@@ -40,21 +40,43 @@ void main() {
     expect(r.message, isNot(contains('/data/user')));
   });
 
-  test(
-    'las rutas absolutas en otros errores se reducen al nombre de archivo',
-    () {
-      final r = sanitizeError(
-        StateError('falta /data/user/0/app/krakink/Mis notas/abc.json'),
-      );
-      expect(r.message, contains('abc.json'));
-      expect(r.message, isNot(contains('Mis notas')));
-      final w = sanitizeError(
-        StateError(r'falta C:\Users\ana\krakink\Privado\abc.json'),
-      );
-      expect(w.message, contains('abc.json'));
-      expect(w.message, isNot(contains('Privado')));
-    },
-  );
+  test('las rutas absolutas se quitan enteras, nombre de archivo incluido', () {
+    // El nombre de archivo también es del usuario: título de nota, PDF elegido.
+    final r = sanitizeError(
+      StateError(
+        "Cannot open '/storage/emulated/0/Download/Diagnóstico de Ana.pdf'",
+      ),
+    );
+    expect(r.message, contains('Cannot open'));
+    expect(r.message, isNot(contains('Ana')));
+    expect(r.message, isNot(contains('Download')));
+    final w = sanitizeError(
+      StateError(r'falta C:\Users\ana\krakink\Privado\abc.json'),
+    );
+    expect(w.message, contains('falta'));
+    expect(w.message, isNot(contains('Privado')));
+    expect(w.message, isNot(contains('abc.json')));
+  });
+
+  test('las rutas tras = o : y las URI file:// también se quitan', () {
+    for (final raw in [
+      'path=/data/user/0/app/notebooks/Cuaderno secreto/x.png',
+      'Invalid argument(s): file:///storage/emulated/0/Notas privadas/a.pdf',
+      'error:/data/user/0/app/Mis notas/b.json',
+    ]) {
+      final m = sanitizeError(ArgumentError(raw)).message;
+      expect(m, isNot(contains('secreto')), reason: raw);
+      expect(m, isNot(contains('privadas')), reason: raw);
+      expect(m, isNot(contains('Mis notas')), reason: raw);
+    }
+  });
+
+  test('las fracciones y palabras con barra no son rutas', () {
+    expect(
+      sanitizeError(StateError('página 1/2 y/o')).message,
+      'Bad state: página 1/2 y/o',
+    );
+  });
 
   test('AppError conserva su código, que no lleva contenido', () {
     final r = sanitizeError(const AppError(AppErrorCode.notInklus));

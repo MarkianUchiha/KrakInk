@@ -1283,7 +1283,7 @@ abstract class AppLocalizations {
   /// No description provided for @libEmptyHint.
   ///
   /// In es, this message translates to:
-  /// **'Crea un cuaderno nuevo o importa uno existente\\npara comenzar.'**
+  /// **'Crea un cuaderno nuevo o importa uno existente\npara comenzar.'**
   String get libEmptyHint;
 
   /// No description provided for @noteRenameTitle.
@@ -2951,7 +2951,7 @@ abstract class AppLocalizations {
   /// No description provided for @verRestoreBody.
   ///
   /// In es, this message translates to:
-  /// **'La nota volverá a como estaba el {date}.\\n\\nEl estado actual se guarda antes como una versión local, así que puedes deshacer la restauración desde este mismo historial.'**
+  /// **'La nota volverá a como estaba el {date}.\n\nEl estado actual se guarda antes como una versión local, así que puedes deshacer la restauración desde este mismo historial.'**
   String verRestoreBody(String date);
 
   /// No description provided for @verRestoreFailed.
@@ -3497,7 +3497,7 @@ abstract class AppLocalizations {
   /// No description provided for @driveConfigBody.
   ///
   /// In es, this message translates to:
-  /// **'Error de configuración de Google (clientConfigurationError).\\n\\nCausa probable: la SHA-1 de la firma de esta app no está registrada en Google Cloud Console para el paquete com.markidev.krakink.\\n\\nSolución:\\n1. Ve a Google Cloud Console → APIs y servicios → Credenciales\\n2. Crea o edita el ID de cliente OAuth de Android con el paquete com.markidev.krakink y la SHA-1 de tu firma\\n3. Habilita Google Sign-In en la pantalla de consentimiento\\n\\nError original: {details}'**
+  /// **'Error de configuración de Google (clientConfigurationError).\n\nCausa probable: la SHA-1 de la firma de esta app no está registrada en Google Cloud Console para el paquete com.markidev.krakink.\n\nSolución:\n1. Ve a Google Cloud Console → APIs y servicios → Credenciales\n2. Crea o edita el ID de cliente OAuth de Android con el paquete com.markidev.krakink y la SHA-1 de tu firma\n3. Habilita Google Sign-In en la pantalla de consentimiento\n\nError original: {details}'**
   String driveConfigBody(String details);
 
   /// No description provided for @noticeStylus.

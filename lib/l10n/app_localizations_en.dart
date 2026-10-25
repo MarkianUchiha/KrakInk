@@ -676,7 +676,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libEmptyHint =>
-      'Create a new notebook or import an existing one\\nto get started.';
+      'Create a new notebook or import an existing one\nto get started.';
 
   @override
   String get noteRenameTitle => 'Rename note';
@@ -1639,7 +1639,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String verRestoreBody(String date) {
-    return 'The note will go back to how it was on $date.\\n\\nThe current state is saved first as a local version, so you can undo the restore from this same history.';
+    return 'The note will go back to how it was on $date.\n\nThe current state is saved first as a local version, so you can undo the restore from this same history.';
   }
 
   @override
@@ -1976,7 +1976,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String driveConfigBody(String details) {
-    return 'Google configuration error (clientConfigurationError).\\n\\nLikely cause: this app\'s signing SHA-1 is not registered in Google Cloud Console for the package com.markidev.krakink.\\n\\nFix:\\n1. Go to Google Cloud Console → APIs & Services → Credentials\\n2. Create or edit the Android OAuth client ID with package com.markidev.krakink and your signing SHA-1\\n3. Enable Google Sign-In on the consent screen\\n\\nOriginal error: $details';
+    return 'Google configuration error (clientConfigurationError).\n\nLikely cause: this app\'s signing SHA-1 is not registered in Google Cloud Console for the package com.markidev.krakink.\n\nFix:\n1. Go to Google Cloud Console → APIs & Services → Credentials\n2. Create or edit the Android OAuth client ID with package com.markidev.krakink and your signing SHA-1\n3. Enable Google Sign-In on the consent screen\n\nOriginal error: $details';
   }
 
   @override

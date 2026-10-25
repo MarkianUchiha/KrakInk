@@ -678,7 +678,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get libEmptyHint =>
-      'Erstelle ein neues Notizbuch oder importiere ein vorhandenes,\\num loszulegen.';
+      'Erstelle ein neues Notizbuch oder importiere ein vorhandenes,\num loszulegen.';
 
   @override
   String get noteRenameTitle => 'Notiz umbenennen';
@@ -1649,7 +1649,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String verRestoreBody(String date) {
-    return 'Die Notiz kehrt zum Stand vom $date zurück.\\n\\nDer aktuelle Stand wird zuvor als lokale Version gespeichert, sodass du die Wiederherstellung in diesem Verlauf rückgängig machen kannst.';
+    return 'Die Notiz kehrt zum Stand vom $date zurück.\n\nDer aktuelle Stand wird zuvor als lokale Version gespeichert, sodass du die Wiederherstellung in diesem Verlauf rückgängig machen kannst.';
   }
 
   @override
@@ -1990,7 +1990,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String driveConfigBody(String details) {
-    return 'Google-Konfigurationsfehler (clientConfigurationError).\\n\\nWahrscheinliche Ursache: Der Signatur-SHA-1 dieser App ist in der Google Cloud Console nicht für das Paket com.markidev.krakink registriert.\\n\\nLösung:\\n1. Öffne Google Cloud Console → APIs & Dienste → Anmeldedaten\\n2. Erstelle oder bearbeite die Android-OAuth-Client-ID mit dem Paket com.markidev.krakink und deinem Signatur-SHA-1\\n3. Aktiviere Google Sign-In auf dem Zustimmungsbildschirm\\n\\nUrsprünglicher Fehler: $details';
+    return 'Google-Konfigurationsfehler (clientConfigurationError).\n\nWahrscheinliche Ursache: Der Signatur-SHA-1 dieser App ist in der Google Cloud Console nicht für das Paket com.markidev.krakink registriert.\n\nLösung:\n1. Öffne Google Cloud Console → APIs & Dienste → Anmeldedaten\n2. Erstelle oder bearbeite die Android-OAuth-Client-ID mit dem Paket com.markidev.krakink und deinem Signatur-SHA-1\n3. Aktiviere Google Sign-In auf dem Zustimmungsbildschirm\n\nUrsprünglicher Fehler: $details';
   }
 
   @override

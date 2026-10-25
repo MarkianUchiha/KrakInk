@@ -677,7 +677,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get libEmptyHint =>
-      'Crea un cuaderno nuevo o importa uno existente\\npara comenzar.';
+      'Crea un cuaderno nuevo o importa uno existente\npara comenzar.';
 
   @override
   String get noteRenameTitle => 'Renombrar nota';
@@ -1642,7 +1642,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String verRestoreBody(String date) {
-    return 'La nota volverá a como estaba el $date.\\n\\nEl estado actual se guarda antes como una versión local, así que puedes deshacer la restauración desde este mismo historial.';
+    return 'La nota volverá a como estaba el $date.\n\nEl estado actual se guarda antes como una versión local, así que puedes deshacer la restauración desde este mismo historial.';
   }
 
   @override
@@ -1979,7 +1979,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String driveConfigBody(String details) {
-    return 'Error de configuración de Google (clientConfigurationError).\\n\\nCausa probable: la SHA-1 de la firma de esta app no está registrada en Google Cloud Console para el paquete com.markidev.krakink.\\n\\nSolución:\\n1. Ve a Google Cloud Console → APIs y servicios → Credenciales\\n2. Crea o edita el ID de cliente OAuth de Android con el paquete com.markidev.krakink y la SHA-1 de tu firma\\n3. Habilita Google Sign-In en la pantalla de consentimiento\\n\\nError original: $details';
+    return 'Error de configuración de Google (clientConfigurationError).\n\nCausa probable: la SHA-1 de la firma de esta app no está registrada en Google Cloud Console para el paquete com.markidev.krakink.\n\nSolución:\n1. Ve a Google Cloud Console → APIs y servicios → Credenciales\n2. Crea o edita el ID de cliente OAuth de Android con el paquete com.markidev.krakink y la SHA-1 de tu firma\n3. Habilita Google Sign-In en la pantalla de consentimiento\n\nError original: $details';
   }
 
   @override

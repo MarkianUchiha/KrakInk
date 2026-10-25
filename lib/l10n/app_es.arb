@@ -355,7 +355,7 @@
       }
     }
   },
-  "libEmptyHint": "Crea un cuaderno nuevo o importa uno existente\\npara comenzar.",
+  "libEmptyHint": "Crea un cuaderno nuevo o importa uno existente\npara comenzar.",
   "noteRenameTitle": "Renombrar nota",
   "noteDeleteTitle": "Eliminar nota",
   "noteNew": "Nueva nota",
@@ -935,7 +935,7 @@
       }
     }
   },
-  "verRestoreBody": "La nota volverá a como estaba el {date}.\\n\\nEl estado actual se guarda antes como una versión local, así que puedes deshacer la restauración desde este mismo historial.",
+  "verRestoreBody": "La nota volverá a como estaba el {date}.\n\nEl estado actual se guarda antes como una versión local, así que puedes deshacer la restauración desde este mismo historial.",
   "@verRestoreBody": {
     "placeholders": {
       "date": {
@@ -1147,7 +1147,7 @@
   "errOcrUnsupported": "OCR solo está disponible en Android e iOS.",
   "errNotSignedIn": "Inicia sesión con Google primero.",
   "errEncrypted": "La copia está cifrada: hace falta la contraseña",
-  "driveConfigBody": "Error de configuración de Google (clientConfigurationError).\\n\\nCausa probable: la SHA-1 de la firma de esta app no está registrada en Google Cloud Console para el paquete com.markidev.krakink.\\n\\nSolución:\\n1. Ve a Google Cloud Console → APIs y servicios → Credenciales\\n2. Crea o edita el ID de cliente OAuth de Android con el paquete com.markidev.krakink y la SHA-1 de tu firma\\n3. Habilita Google Sign-In en la pantalla de consentimiento\\n\\nError original: {details}",
+  "driveConfigBody": "Error de configuración de Google (clientConfigurationError).\n\nCausa probable: la SHA-1 de la firma de esta app no está registrada en Google Cloud Console para el paquete com.markidev.krakink.\n\nSolución:\n1. Ve a Google Cloud Console → APIs y servicios → Credenciales\n2. Crea o edita el ID de cliente OAuth de Android con el paquete com.markidev.krakink y la SHA-1 de tu firma\n3. Habilita Google Sign-In en la pantalla de consentimiento\n\nError original: {details}",
   "@driveConfigBody": {
     "placeholders": {
       "details": {

@@ -183,7 +183,7 @@ GitHub Actions CI runs analysis, tests and integration tests on every PR, and pu
 
 ### Icon and README animations
 
-The icon source is `assets/icon/*.svg` (→ `dart run flutter_launcher_icons`). The animated icon and the *How it works* SVGs are generated, dependency-free, with:
+The icon source is `assets/brand/krakink-icono.svg`; the adaptive icon is a vector drawable and the legacy/Play PNGs come from `flutter test tool/icon/generate_icons_test.dart`. The animated icon and the *How it works* SVGs are generated, dependency-free, with:
 
 ```bash
 python3 tool/docs_assets/generate.py   # → docs/assets/ (icon.svg, icon-animated.svg, icon.png, anim/*.svg)

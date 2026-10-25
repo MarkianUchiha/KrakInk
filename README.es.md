@@ -183,7 +183,7 @@ La CI de GitHub Actions ejecuta análisis, tests y pruebas de integración en ca
 
 ### Icono y animaciones del README
 
-La fuente del icono es `assets/icon/*.svg` (→ `dart run flutter_launcher_icons`). El icono animado y los SVG de *Cómo funciona* se generan, sin dependencias, con:
+La fuente del icono es `assets/brand/krakink-icono.svg`; el icono adaptativo es un vector de Android y los PNG legacy y de Play salen de `flutter test tool/icon/generate_icons_test.dart`. El icono animado y los SVG de *Cómo funciona* se generan, sin dependencias, con:
 
 ```bash
 python3 tool/docs_assets/generate.py   # → docs/assets/ (icon.svg, icon-animated.svg, icon.png, anim/*.svg)

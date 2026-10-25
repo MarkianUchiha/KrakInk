@@ -30,7 +30,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'theme/inklus_colors.dart';
 import 'theme/tokens.dart';
-import 'widgets/inklus_logo.dart';
+import 'widgets/krakink_logo.dart';
 import 'marketplace_screen.dart';
 import '../l10n/l10n.dart';
 import '../services/app_errors.dart';
@@ -880,7 +880,7 @@ class _Brand extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      const InklusLogo(size: 32),
+      const KrakInkLogo(size: 32),
       const SizedBox(width: Spacing.md),
       Text(
         Brand.appName,

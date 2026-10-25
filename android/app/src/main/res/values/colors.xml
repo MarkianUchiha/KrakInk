@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#3B82F6</color>
+    <!-- Tinta (#111318) y Hueso (#F3EFE6) de la identidad visual. -->
+    <color name="ic_launcher_background">#111318</color>
+    <color name="splash_background">#F3EFE6</color>
 </resources>

@@ -14,7 +14,7 @@ flutter test integration_test -d <android>   # flujos de punta a punta (disposit
 flutter gen-l10n           # tras editar lib/l10n/*.arb (también lo hace pub get/build)
 flutter run                # tablet Android conectada
 flutter build apk --debug  # APK → build/app/outputs/flutter-apk/
-dart run flutter_launcher_icons   # regenerar iconos desde assets/icon/
+flutter test tool/icon/generate_icons_test.dart   # PNG del ícono legacy y de Play
 ```
 
 ## Arquitectura (lib/)

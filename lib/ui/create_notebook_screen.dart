@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'theme/inklus_colors.dart';
 
 import '../constants.dart';
+import '../models/cover_colors.dart';
 import '../models/template.dart';
 import '../services/image_service.dart';
 import '../services/pdf_import_service.dart';
@@ -91,7 +92,7 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController();
-    _coverColorValue = _coverColors[0].$2;
+    _coverColorValue = _coverColors[0];
     _nameController.addListener(() => setState(() {}));
   }
 
@@ -442,7 +443,7 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
               itemCount: _coverColors.length,
               separatorBuilder: (_, _) => const SizedBox(width: Spacing.xs),
               itemBuilder: (context, index) {
-                final (_, colorValue) = _coverColors[index];
+                final colorValue = _coverColors[index];
                 final isSelected = colorValue == _coverColorValue;
                 return Semantics(
                   button: true,
@@ -467,7 +468,7 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
                             color: Color(colorValue!),
                             border: Border.all(
                               color: isSelected
-                                  ? Colors.white
+                                  ? context.colors.onSurface
                                   : context.colors.outline,
                               width: isSelected ? 3 : 1,
                             ),
@@ -482,10 +483,10 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
                                 : null,
                           ),
                           child: isSelected
-                              ? const Icon(
+                              ? Icon(
                                   Icons.check,
                                   size: 16,
-                                  color: Colors.white,
+                                  color: CoverColors.textOn(Color(colorValue)),
                                 )
                               : null,
                         ),
@@ -512,7 +513,10 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
                 children: [
                   Text(
                     context.l10n.createNext,
+                    // bodyLarge trae onSurface del tema: hay que devolverle
+                    // el color del botón o queda oscuro sobre el primario.
                     style: context.text.bodyLarge?.copyWith(
+                      color: context.colors.onPrimary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -741,6 +745,7 @@ class _CreateNotebookScreenState extends State<CreateNotebookScreen> {
               child: Text(
                 context.l10n.createAction,
                 style: context.text.bodyLarge?.copyWith(
+                  color: context.colors.onPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),

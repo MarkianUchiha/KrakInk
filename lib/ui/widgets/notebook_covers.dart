@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import '../../l10n/l10n.dart';
+import '../../models/cover_colors.dart';
 
 /// Tipos de portada disponibles para el cuaderno.
 ///
@@ -323,18 +324,22 @@ class NotebookCoverPainter extends CustomPainter {
 }
 
 /// Nombre traducido de un color de portada (`kCoverColors`); `null` = sin color.
-String coverColorName(AppLocalizations l10n, int? value) => switch (value) {
-      null => l10n.colorNone,
-      0xFF3B82F6 => l10n.colorBlue,
-      0xFF4CAF50 => l10n.colorGreen,
-      0xFFE53935 => l10n.colorRed,
-      0xFFFF9800 => l10n.colorOrange,
-      0xFF9C27B0 => l10n.colorPurple,
-      0xFFEC407A => l10n.colorPink,
-      0xFF26C6DA => l10n.colorTurquoise,
-      0xFF78909C => l10n.colorGray,
-      _ => l10n.smartOther,
-    };
+String coverColorName(AppLocalizations l10n, int? value) {
+  if (value == null) return l10n.colorNone;
+  final names = {
+    CoverColors.tinta: l10n.colorInk,
+    CoverColors.abismo: l10n.colorAbyss,
+    CoverColors.coral: l10n.colorCoral,
+    CoverColors.hueso: l10n.colorBone,
+    CoverColors.piedra: l10n.colorStone,
+    CoverColors.marea: l10n.colorTide,
+    CoverColors.musgo: l10n.colorMoss,
+    CoverColors.ocre: l10n.colorOchre,
+    CoverColors.vino: l10n.colorWine,
+    CoverColors.ciruela: l10n.colorPlum,
+  };
+  return names[Color(value)] ?? l10n.smartOther;
+}
 
 /// Nombre traducido de cada estilo de portada.
 String coverStyleName(AppLocalizations l10n, CoverStyle s) => switch (s) {

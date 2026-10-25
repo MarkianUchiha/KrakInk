@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import '../constants.dart';
+import '../models/cover_colors.dart';
 import '../models/note.dart';
 import '../models/page.dart' as models;
 
@@ -307,7 +308,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
 
   /// Asigna un color de portada al cuaderno.
   Future<void> _setNotebookColor(NotebookMeta meta) async {
-    const colors = kCoverColors;
+    final colors = kCoverColors;
     final selected = await showModalBottomSheet<int?>(
       context: context,
       builder: (context) => SafeArea(
@@ -323,19 +324,19 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
               runSpacing: 12,
               alignment: WrapAlignment.center,
               children: colors.map((c) {
-                final isSelected = c.$2 == meta.colorValue;
+                final isSelected = c == meta.colorValue;
                 return Semantics(
                   button: true,
                   selected: isSelected,
-                  label: coverColorName(context.l10n, c.$2),
+                  label: coverColorName(context.l10n, c),
                   child: GestureDetector(
-                    onTap: () => Navigator.pop(context, c.$2),
+                    onTap: () => Navigator.pop(context, c),
                     child: Container(
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: c.$2 != null
-                            ? Color(c.$2!)
+                        color: c != null
+                            ? Color(c)
                             : context.colors.surfaceContainerHighest,
                         shape: BoxShape.circle,
                         border: Border.all(
@@ -345,17 +346,17 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
                           width: isSelected ? 3 : 1,
                         ),
                       ),
-                      child: c.$2 == null
+                      child: c == null
                           ? Icon(
                               Icons.close,
                               size: 20,
                               color: context.colors.onSurfaceVariant,
                             )
                           : isSelected
-                          ? const Icon(
+                          ? Icon(
                               Icons.check,
                               size: 20,
-                              color: Colors.white,
+                              color: CoverColors.textOn(Color(c)),
                             )
                           : null,
                     ),
@@ -1222,7 +1223,9 @@ class _NotebookCover extends StatelessWidget {
         isDark: isDark,
         radius: radius.topLeft.x,
       ),
-      child: Center(child: _TitlePlate(title)),
+      child: Center(
+        child: _CoverTitle(title, color: CoverColors.textOn(baseColor)),
+      ),
     );
     if (style == CoverStyle.custom && coverImagePath != null) {
       return ClipRRect(
@@ -1239,43 +1242,28 @@ class _NotebookCover extends StatelessWidget {
   }
 }
 
-/// Placa de papel con el título: contraste garantizado sobre cualquier
-/// color o imagen de portada (tinta oscura sobre papel claro).
-class _TitlePlate extends StatelessWidget {
-  const _TitlePlate(this.title);
+/// Título impreso sobre la tapa, en el color de texto que da contraste
+/// AA con el color de la tapa (Tinta o Hueso).
+class _CoverTitle extends StatelessWidget {
+  const _CoverTitle(this.title, {required this.color});
   final String title;
+  final Color color;
 
   @override
-  Widget build(BuildContext context) {
-    final inklus = context.inklus;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: inklus.paper.withAlpha(232),
-          borderRadius: Radii.smAll,
-          border: Border.all(color: inklus.ink.withAlpha(40)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Spacing.sm,
-            vertical: Spacing.xs,
-          ),
-          child: Text(
-            title,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: context.text.labelMedium?.copyWith(
-              fontFamily: textFontFamily('lora'),
-              fontWeight: FontWeight.w700,
-              color: inklus.ink,
-            ),
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
+        child: Text(
+          title,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: context.text.labelMedium?.copyWith(
+            fontFamily: textFontFamily('lora'),
+            fontWeight: FontWeight.w700,
+            color: color,
           ),
         ),
-      ),
-    );
-  }
+      );
 }
 
 /// Limita el ancho del contenido en pantallas muy anchas (la rejilla de

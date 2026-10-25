@@ -204,7 +204,7 @@ void main() {
       final nb = Notebook(
         id: 'nb_test',
         title: 'Cuaderno de prueba',
-        colorValue: 0xFF3B82F6,
+        colorValue: 0xFF1F3A4D,
         tags: ['clase', 'matemáticas'],
         notes: [note],
       );
@@ -215,7 +215,7 @@ void main() {
 
       expect(roundtrip.id, 'nb_test');
       expect(roundtrip.title, 'Cuaderno de prueba');
-      expect(roundtrip.colorValue, 0xFF3B82F6);
+      expect(roundtrip.colorValue, 0xFF1F3A4D);
       expect(roundtrip.tags, ['clase', 'matemáticas']);
       expect(roundtrip.notes.length, 1);
     });
@@ -270,7 +270,7 @@ void main() {
         createdAt: DateTime(2026, 1, 1),
         updatedAt: DateTime(2026, 6, 15),
         pages: [Page.blank()],
-        colorValue: 0xFF4CAF50,
+        colorValue: 0xFF4A5D3A,
         tags: ['importante'],
       );
       final legacyFile = File('${tmpDir.path}/current_document.json');
@@ -280,7 +280,7 @@ void main() {
       final metas = await storage.loadIndex();
       expect(metas.length, 1);
       expect(metas.first.title, 'Documento legacy');
-      expect(metas.first.colorValue, 0xFF4CAF50);
+      expect(metas.first.colorValue, 0xFF4A5D3A);
       expect(metas.first.tags, ['importante']);
 
       // El archivo legacy debe haberse eliminado
@@ -421,9 +421,9 @@ void main() {
 
     test('setNotebookColor asigna y lee color de portada', () async {
       final nb = await storage.createNotebook(title: 'Color');
-      await storage.setNotebookColor(nb.id, 0xFFE53935);
+      await storage.setNotebookColor(nb.id, 0xFF6E2A35);
       final loaded = await storage.loadNotebook(nb.id);
-      expect(loaded!.colorValue, 0xFFE53935);
+      expect(loaded!.colorValue, 0xFF6E2A35);
 
       // Quitar color
       await storage.setNotebookColor(nb.id, null);
@@ -647,16 +647,16 @@ void main() {
         createdAt: DateTime(2026, 1, 1),
         updatedAt: DateTime(2026, 1, 1),
         pages: [Page.blank()],
-        colorValue: 0xFF9C27B0,
+        colorValue: 0xFF5B4A6B,
       );
       final legacyFile = File('${tmpDir.path}/current_document.json');
       await legacyFile.writeAsString(jsonEncode(doc.toJson()));
 
       final metas = await storage.loadIndex();
-      expect(metas.first.colorValue, 0xFF9C27B0);
+      expect(metas.first.colorValue, 0xFF5B4A6B);
 
       final nb = await storage.loadNotebook(metas.first.id);
-      expect(nb!.colorValue, 0xFF9C27B0);
+      expect(nb!.colorValue, 0xFF5B4A6B);
     });
 
     test('migración mapea Document.tags → Notebook.tags', () async {
@@ -717,7 +717,7 @@ void main() {
           createdAt: DateTime(2026, 1, i + 1),
           updatedAt: DateTime(2026, 6, i + 1),
           pages: [page],
-          colorValue: [0xFF3B82F6, 0xFF4CAF50, 0xFFE53935][i],
+          colorValue: [0xFF1F3A4D, 0xFF4A5D3A, 0xFF6E2A35][i],
           tags: [const ['tag_a'], const ['tag_b', 'tag_c'], const <String>[]][i],
         );
         docs.add(doc);
@@ -797,7 +797,7 @@ void main() {
         createdAt: DateTime(2026, 1, 1),
         updatedAt: DateTime(2026, 6, 15),
         pages: [page],
-        colorValue: 0xFF4CAF50,
+        colorValue: 0xFF4A5D3A,
         tags: ['tag1'],
       );
 

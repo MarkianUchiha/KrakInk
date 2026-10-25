@@ -98,7 +98,7 @@ void main() {
   Future<void> seed() async {
     final s = StorageService.instance;
     if ((await s.loadIndex()).isNotEmpty) return;
-    for (final (t, c) in [('Matemáticas', 0xFF1E88E5), ('Diario', 0xFFE53935), ('Física II', 0xFF43A047), ('Ideas', 0xFFFDD835)]) {
+    for (final (t, c) in [('Matemáticas', 0xFF1F3A4D), ('Diario', 0xFF6E2A35), ('Física II', 0xFF2F6F6A), ('Ideas', 0xFFC8963E)]) {
       await s.createNotebook(title: t, colorValue: c, template: const PageTemplate(type: TemplateType.ruled));
     }
   }

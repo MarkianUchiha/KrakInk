@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import 'cover_colors.dart';
 import 'note.dart';
 import 'id.dart';
 
@@ -76,7 +77,7 @@ class Notebook {
       Notebook(
         id: json['id'] as String,
         title: json['title'] as String? ?? 'Mi cuaderno',
-        colorValue: (json['color'] as num?)?.toInt(),
+        colorValue: CoverColors.migrateLegacy((json['color'] as num?)?.toInt()),
         coverStyle: json['coverStyle'] as String? ?? 'simple',
         coverImagePath: json['coverImagePath'] as String?,
         tags: (json['tags'] as List? ?? [])

@@ -6,8 +6,10 @@ Objetivo: que cada pantalla se sienta del mismo producto, al nivel de GoodNotes/
 
 | Qué | Dónde |
 |---|---|
-| `ThemeData` claro/oscuro (Material 3, esquema `fidelity`) | `ui/theme/app_theme.dart` |
+| `ThemeData` claro/oscuro (Material 3; roles de marca fijados sobre `fidelity`) | `ui/theme/app_theme.dart` |
+| Colores de la identidad (Tinta, Hueso, Abismo, Coral) | `ui/theme/brand_colors.dart` |
 | Colores propios (`context.inklus`, `context.colors`, `context.text`, `context.isDark`) | `ui/theme/inklus_colors.dart` |
+| Paleta de tapas, `textOn` y migración de colores viejos | `models/cover_colors.dart` |
 | Medidas: `Spacing`, `Radii`, `Motion`, `Sizes`, `Breakpoints` | `ui/theme/tokens.dart` |
 | Pantallas secundarias: `InklusPage`, `PageHeader`, `SectionCard`, `SettingsTile`, `EmptyState`, `SheetHeader` | `ui/widgets/page_scaffold.dart` |
 | Diálogos: `showConfirmDialog`, `showTextPrompt`, `runWithLoading` | `ui/widgets/dialogs.dart` |
@@ -34,6 +36,8 @@ Objetivo: que cada pantalla se sienta del mismo producto, al nivel de GoodNotes/
 
 ## Marca e icono
 
-- **Icono**: plumilla blanca escribiendo un trazo dorado sobre degradado azul (`#5B8CFF → #2A4FD6`, tinta `#FFD66B → #FF9F43`). Fuente vectorial en `assets/icon/` (`icon_full.svg`, `icon_foreground.svg`, `icon_background.svg`); los PNG de `flutter_launcher_icons` salen de ahí con `rsvg-convert`.
+- **Paleta**: Tinta `#111318` (texto, fondo oscuro), Hueso `#F3EFE6` (fondo claro), Abismo `#1F3A4D` (secundario), Coral `#E4572E` (acentos). En claro el primario es el coral oscurecido `#B8401C`, porque el coral puro da 3.21:1 sobre Hueso y no pasa AA. Error en carmín (`#A3133F` / `#FF8FB8`) para no confundirlo con el coral. `test/app_theme_test.dart` verifica los contrastes.
+- **Tapas**: 10 colores en `CoverColors`; el título va directo sobre la tapa en `CoverColors.textOn` (Tinta o Hueso, el de más contraste). Los colores de Inklus se traducen al leer (`CoverColors.migrateLegacy`).
+- **Icono**: el calamar de `assets/brand/krakink-icono.svg` en Hueso sobre Tinta. El adaptativo (`drawable/ic_launcher_foreground.xml`, también monocromo) es un vector con el mismo path; los PNG legacy y `assets/brand/play-icon-512.png` salen de `flutter test tool/icon/generate_icons_test.dart`. En la app, `KrakInkLogo` dibuja el mismo path.
 - **README**: `docs/assets/icon-animated.svg` (la plumilla escribe el trazo en bucle) y `docs/assets/anim/*.{en,es}.svg` (presión, rechazo de palma, figuras, lazo). Son SVG/SMIL escritos a mano y **generados** por `tool/docs_assets/generate.py` (sin dependencias; edita el script, no los SVG).
 - Una animación nueva = una función `scene_*` en el script, con fondo propio (se ve igual en tema claro y oscuro) y textos es/en en `TXT`.

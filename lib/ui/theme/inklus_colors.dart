@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import 'package:flutter/material.dart';
 
+import 'brand_colors.dart';
+
 /// Colores propios de Inklus que no existen en [ColorScheme] (papel,
 /// escritorio, selección de trazos…). Se leen con `context.inklus`.
 ///
@@ -50,7 +52,7 @@ class InklusColors extends ThemeExtension<InklusColors> {
     toolbar: Color(0xFFFFFFFF),
     toolbarBorder: Color(0x14000000),
     selection: Color(0xFF0D9488),
-    danger: Color(0xFFDC2626),
+    danger: BrandColors.errorLight,
     success: Color(0xFF059669),
     warning: Color(0xFFD97706),
     shadow: Color(0x1F000000),
@@ -63,7 +65,7 @@ class InklusColors extends ThemeExtension<InklusColors> {
     toolbar: Color(0xFF232428),
     toolbarBorder: Color(0x1FFFFFFF),
     selection: Color(0xFF2DD4BF),
-    danger: Color(0xFFF87171),
+    danger: BrandColors.errorDark,
     success: Color(0xFF34D399),
     warning: Color(0xFFFBBF24),
     shadow: Color(0x66000000),

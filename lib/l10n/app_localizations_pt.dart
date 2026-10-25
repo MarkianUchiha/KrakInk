@@ -1835,28 +1835,34 @@ class AppLocalizationsPt extends AppLocalizations {
   String get colorNone => 'Sem cor';
 
   @override
-  String get colorBlue => 'Azul';
+  String get colorInk => 'Tinta';
 
   @override
-  String get colorGreen => 'Verde';
+  String get colorAbyss => 'Abismo';
 
   @override
-  String get colorRed => 'Vermelho';
+  String get colorCoral => 'Coral';
 
   @override
-  String get colorOrange => 'Laranja';
+  String get colorBone => 'Osso';
 
   @override
-  String get colorPurple => 'Roxo';
+  String get colorStone => 'Pedra';
 
   @override
-  String get colorPink => 'Rosa';
+  String get colorTide => 'Maré';
 
   @override
-  String get colorTurquoise => 'Turquesa';
+  String get colorMoss => 'Musgo';
 
   @override
-  String get colorGray => 'Cinza';
+  String get colorOchre => 'Ocre';
+
+  @override
+  String get colorWine => 'Vinho';
+
+  @override
+  String get colorPlum => 'Ameixa';
 
   @override
   String get onb1Body =>

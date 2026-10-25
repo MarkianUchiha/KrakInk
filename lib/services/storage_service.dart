@@ -7,6 +7,7 @@ import 'dart:isolate';
 import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
 
+import '../models/cover_colors.dart';
 import '../models/document.dart';
 import '../models/note.dart';
 import '../models/notebook.dart';
@@ -86,7 +87,7 @@ class NotebookMeta {
         updatedAt:
             DateTime.tryParse(json['updatedAt'] as String? ?? '') ??
                 DateTime.fromMillisecondsSinceEpoch(0),
-        colorValue: (json['color'] as num?)?.toInt(),
+        colorValue: CoverColors.migrateLegacy((json['color'] as num?)?.toInt()),
         syncEnabled: json['syncEnabled'] as bool?,
         coverStyle: json['coverStyle'] as String? ?? 'simple',
         coverImagePath: json['coverImagePath'] as String?,

@@ -3272,53 +3272,65 @@ abstract class AppLocalizations {
   /// **'Sin color'**
   String get colorNone;
 
-  /// No description provided for @colorBlue.
+  /// No description provided for @colorInk.
   ///
   /// In es, this message translates to:
-  /// **'Azul'**
-  String get colorBlue;
+  /// **'Tinta'**
+  String get colorInk;
 
-  /// No description provided for @colorGreen.
+  /// No description provided for @colorAbyss.
   ///
   /// In es, this message translates to:
-  /// **'Verde'**
-  String get colorGreen;
+  /// **'Abismo'**
+  String get colorAbyss;
 
-  /// No description provided for @colorRed.
+  /// No description provided for @colorCoral.
   ///
   /// In es, this message translates to:
-  /// **'Rojo'**
-  String get colorRed;
+  /// **'Coral'**
+  String get colorCoral;
 
-  /// No description provided for @colorOrange.
+  /// No description provided for @colorBone.
   ///
   /// In es, this message translates to:
-  /// **'Naranja'**
-  String get colorOrange;
+  /// **'Hueso'**
+  String get colorBone;
 
-  /// No description provided for @colorPurple.
+  /// No description provided for @colorStone.
   ///
   /// In es, this message translates to:
-  /// **'Morado'**
-  String get colorPurple;
+  /// **'Piedra'**
+  String get colorStone;
 
-  /// No description provided for @colorPink.
+  /// No description provided for @colorTide.
   ///
   /// In es, this message translates to:
-  /// **'Rosa'**
-  String get colorPink;
+  /// **'Marea'**
+  String get colorTide;
 
-  /// No description provided for @colorTurquoise.
+  /// No description provided for @colorMoss.
   ///
   /// In es, this message translates to:
-  /// **'Turquesa'**
-  String get colorTurquoise;
+  /// **'Musgo'**
+  String get colorMoss;
 
-  /// No description provided for @colorGray.
+  /// No description provided for @colorOchre.
   ///
   /// In es, this message translates to:
-  /// **'Gris'**
-  String get colorGray;
+  /// **'Ocre'**
+  String get colorOchre;
+
+  /// No description provided for @colorWine.
+  ///
+  /// In es, this message translates to:
+  /// **'Vino'**
+  String get colorWine;
+
+  /// No description provided for @colorPlum.
+  ///
+  /// In es, this message translates to:
+  /// **'Ciruela'**
+  String get colorPlum;
 
   /// No description provided for @onb1Body.
   ///

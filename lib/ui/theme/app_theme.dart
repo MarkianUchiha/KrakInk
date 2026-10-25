@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import 'package:flutter/material.dart';
 
+import 'brand_colors.dart';
 import 'inklus_colors.dart';
 import 'tokens.dart';
 
@@ -15,8 +16,11 @@ import 'tokens.dart';
 /// - Los componentes (diálogos, hojas, snackbars, sliders…) se configuran
 ///   aquí una vez, no en cada pantalla.
 abstract final class AppTheme {
-  /// Color de marca (azul tinta).
-  static const Color seed = Color(0xFF3B6FF6);
+  /// Abismo aclarado: secundario legible sobre Tinta en modo oscuro.
+  static const Color _abismoLight = Color(0xFF9DB8CC);
+
+  /// Abismo muy claro: contenedor secundario sobre Hueso.
+  static const Color _abismoPale = Color(0xFFD5E0E8);
 
   static ThemeData light() => _build(Brightness.light);
   static ThemeData dark() => _build(Brightness.dark);
@@ -24,14 +28,35 @@ abstract final class AppTheme {
   static ThemeData _build(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
     final extra = isDark ? InklusColors.dark : InklusColors.light;
+    // fromSeed solo aporta los tonos derivados (contenedores, outline…);
+    // los roles que define la identidad se fijan a mano, porque fromSeed
+    // los aproxima y no respeta los contrastes que pide la marca.
     final scheme = ColorScheme.fromSeed(
-      seedColor: seed,
+      seedColor: BrandColors.coral,
       brightness: brightness,
-      // fidelity: respeta el tono de la marca (tonalSpot lo vira a violeta).
+      // fidelity: respeta el tono de la marca (tonalSpot lo desatura).
       dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
-      // Neutros cálidos (papel) en claro; grafito en oscuro.
-      surface: isDark ? const Color(0xFF1B1C1F) : const Color(0xFFF7F5F0),
-    ).copyWith(error: extra.danger);
+    ).copyWith(
+      // En claro el coral puro no pasa AA como texto: se usa el oscurecido.
+      primary: isDark ? BrandColors.coral : BrandColors.coralText,
+      onPrimary: isDark ? BrandColors.tinta : BrandColors.hueso,
+      secondary: isDark ? _abismoLight : BrandColors.abismo,
+      onSecondary: isDark ? BrandColors.tinta : BrandColors.hueso,
+      secondaryContainer: isDark ? BrandColors.abismo : _abismoPale,
+      onSecondaryContainer: isDark ? BrandColors.hueso : BrandColors.abismo,
+      surface: isDark ? BrandColors.tinta : BrandColors.hueso,
+      onSurface: isDark ? BrandColors.hueso : BrandColors.tinta,
+      // Neutros escalonados desde Hueso/Tinta: los de fromSeed salen
+      // teñidos de coral (barras y campos se veían rosados).
+      surfaceContainerLowest: isDark ? const Color(0xFF0C0E12) : const Color(0xFFFBF9F4),
+      surfaceContainerLow: isDark ? const Color(0xFF181B21) : const Color(0xFFEFEBE2),
+      surfaceContainer: isDark ? const Color(0xFF1C1F26) : const Color(0xFFEAE5DB),
+      surfaceContainerHigh: isDark ? const Color(0xFF23272F) : const Color(0xFFE4DFD4),
+      surfaceContainerHighest: isDark ? const Color(0xFF2B2F38) : const Color(0xFFDDD7CB),
+      onSurfaceVariant: isDark ? const Color(0xFFC9C3B8) : const Color(0xFF4A4740),
+      error: extra.danger,
+      onError: isDark ? BrandColors.tinta : BrandColors.hueso,
+    );
 
     final base = ThemeData(
       useMaterial3: true,

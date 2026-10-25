@@ -1845,28 +1845,34 @@ class AppLocalizationsDe extends AppLocalizations {
   String get colorNone => 'Keine Farbe';
 
   @override
-  String get colorBlue => 'Blau';
+  String get colorInk => 'Tinte';
 
   @override
-  String get colorGreen => 'Grün';
+  String get colorAbyss => 'Abgrund';
 
   @override
-  String get colorRed => 'Rot';
+  String get colorCoral => 'Koralle';
 
   @override
-  String get colorOrange => 'Orange';
+  String get colorBone => 'Knochen';
 
   @override
-  String get colorPurple => 'Lila';
+  String get colorStone => 'Stein';
 
   @override
-  String get colorPink => 'Rosa';
+  String get colorTide => 'Gezeiten';
 
   @override
-  String get colorTurquoise => 'Türkis';
+  String get colorMoss => 'Moos';
 
   @override
-  String get colorGray => 'Grau';
+  String get colorOchre => 'Ocker';
+
+  @override
+  String get colorWine => 'Wein';
+
+  @override
+  String get colorPlum => 'Pflaume';
 
   @override
   String get onb1Body =>

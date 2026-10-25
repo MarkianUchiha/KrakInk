@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import 'dart:ui';
 
+import 'models/cover_colors.dart';
 import 'models/stroke.dart';
 import 'brand.dart';
 // NOTA: Colors.black54, etc. están en package:flutter/material.dart.
@@ -31,7 +32,8 @@ const String kPrivacyPolicyUrl = '${Brand.repoUrl}/blob/main/docs/privacy.md';
 // Tema / Colores de acento
 // ---------------------------------------------------------------------------
 
-/// Color primario de la app (azul Material 3).
+/// Guías y selección del lienzo. No es el color de marca: ese vive en
+/// `ui/theme/brand_colors.dart` y se lee del tema.
 const Color kAccentColor = Color(0xFF3B6FF6);
 
 /// Variante del primario con opacidad reducida (fondos de chips, badges).
@@ -126,17 +128,11 @@ const List<Color> kDefaultPalette = [
 // Colores de portada de cuaderno
 // ---------------------------------------------------------------------------
 
-/// Lista de (nombre, colorValue) para el selector de color de portada.
-const List<(String, int?)> kCoverColors = [
-  ('Sin color', null),
-  ('Azul', 0xFF3B82F6),
-  ('Verde', 0xFF4CAF50),
-  ('Rojo', 0xFFE53935),
-  ('Naranja', 0xFFFF9800),
-  ('Morado', 0xFF9C27B0),
-  ('Rosa', 0xFFEC407A),
-  ('Turquesa', 0xFF26C6DA),
-  ('Gris', 0xFF78909C),
+/// Valores ARGB del selector de color de portada; `null` = "Sin color".
+/// Los nombres salen de `coverColorName` (traducidos).
+final List<int?> kCoverColors = [
+  null,
+  for (final c in CoverColors.all) c.toARGB32(),
 ];
 
 // ---------------------------------------------------------------------------

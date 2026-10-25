@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import 'cover_colors.dart';
 import 'page.dart';
 import 'id.dart';
 
@@ -51,7 +52,7 @@ class Document {
         pages: (json['pages'] as List? ?? [])
             .map((p) => Page.fromJson(p as Map<String, dynamic>))
             .toList(),
-        colorValue: (json['color'] as num?)?.toInt(),
+        colorValue: CoverColors.migrateLegacy((json['color'] as num?)?.toInt()),
         tags: (json['tags'] as List? ?? [])
             .map((t) => t as String)
             .toList(),

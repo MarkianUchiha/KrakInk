@@ -53,7 +53,7 @@ class NotebookMeta {
     this.coverImagePath,
     this.favorite = false,
     List<String>? tags,
-  })  : tags = tags ?? const [];
+  }) : tags = tags ?? const [];
 
   /// Por defecto la sincronización está activa.
   bool get isSyncEnabled => syncEnabled ?? true;
@@ -68,46 +68,45 @@ class NotebookMeta {
     bool clearCoverImage = false,
     List<String>? tags,
     bool? favorite,
-  }) =>
-      NotebookMeta(
-        id: id,
-        title: title ?? this.title,
-        updatedAt: updatedAt ?? this.updatedAt,
-        colorValue: colorValue ?? this.colorValue,
-        syncEnabled: syncEnabled ?? this.syncEnabled,
-        coverStyle: coverStyle ?? this.coverStyle,
-        coverImagePath: clearCoverImage ? null : (coverImagePath ?? this.coverImagePath),
-        tags: tags ?? this.tags,
-        favorite: favorite ?? this.favorite,
-      );
+  }) => NotebookMeta(
+    id: id,
+    title: title ?? this.title,
+    updatedAt: updatedAt ?? this.updatedAt,
+    colorValue: colorValue ?? this.colorValue,
+    syncEnabled: syncEnabled ?? this.syncEnabled,
+    coverStyle: coverStyle ?? this.coverStyle,
+    coverImagePath: clearCoverImage
+        ? null
+        : (coverImagePath ?? this.coverImagePath),
+    tags: tags ?? this.tags,
+    favorite: favorite ?? this.favorite,
+  );
 
   factory NotebookMeta.fromJson(Map<String, dynamic> json) => NotebookMeta(
-        id: json['id'] as String,
-        title: json['title'] as String? ?? 'Sin título',
-        updatedAt:
-            DateTime.tryParse(json['updatedAt'] as String? ?? '') ??
-                DateTime.fromMillisecondsSinceEpoch(0),
-        colorValue: CoverColors.migrateLegacy((json['color'] as num?)?.toInt()),
-        syncEnabled: json['syncEnabled'] as bool?,
-        coverStyle: json['coverStyle'] as String? ?? 'simple',
-        coverImagePath: json['coverImagePath'] as String?,
-        favorite: json['fav'] as bool? ?? false,
-        tags: (json['tags'] as List? ?? [])
-            .map((t) => t as String)
-            .toList(),
-      );
+    id: json['id'] as String,
+    title: json['title'] as String? ?? 'Sin título',
+    updatedAt:
+        DateTime.tryParse(json['updatedAt'] as String? ?? '') ??
+        DateTime.fromMillisecondsSinceEpoch(0),
+    colorValue: CoverColors.migrateLegacy((json['color'] as num?)?.toInt()),
+    syncEnabled: json['syncEnabled'] as bool?,
+    coverStyle: json['coverStyle'] as String? ?? 'simple',
+    coverImagePath: json['coverImagePath'] as String?,
+    favorite: json['fav'] as bool? ?? false,
+    tags: (json['tags'] as List? ?? []).map((t) => t as String).toList(),
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'updatedAt': updatedAt.toIso8601String(),
-        if (colorValue != null) 'color': colorValue,
-        if (syncEnabled != null) 'syncEnabled': syncEnabled,
-        if (coverStyle != 'simple') 'coverStyle': coverStyle,
-        if (coverImagePath != null) 'coverImagePath': coverImagePath,
-        if (tags.isNotEmpty) 'tags': tags,
-        if (favorite) 'fav': true,
-      };
+    'id': id,
+    'title': title,
+    'updatedAt': updatedAt.toIso8601String(),
+    if (colorValue != null) 'color': colorValue,
+    if (syncEnabled != null) 'syncEnabled': syncEnabled,
+    if (coverStyle != 'simple') 'coverStyle': coverStyle,
+    if (coverImagePath != null) 'coverImagePath': coverImagePath,
+    if (tags.isNotEmpty) 'tags': tags,
+    if (favorite) 'fav': true,
+  };
 }
 
 /// Persistencia local de cuadernos (JSON en la carpeta de datos de la app).
@@ -333,7 +332,9 @@ class StorageService {
         if (raw.trim().isNotEmpty) {
           final json = jsonDecode(raw) as Map<String, dynamic>;
           if (json['formatVersion'] != _formatVersion) {
-            debugPrint('StorageService: detectado formato antiguo, migrando...');
+            debugPrint(
+              'StorageService: detectado formato antiguo, migrando...',
+            );
             metas = await _migrateToNotebookFormat(base);
           }
         }
@@ -418,9 +419,7 @@ class StorageService {
   ///
   /// Se ejecuta una sola vez cuando se detecta un index.json sin
   /// formatVersion o con formatVersion < 2.
-  Future<List<NotebookMeta>> _migrateToNotebookFormat(
-    Directory base,
-  ) async {
+  Future<List<NotebookMeta>> _migrateToNotebookFormat(Directory base) async {
     // 1. Leer el índice antiguo (key 'documents')
     final file = await _indexFile(base);
     if (!await file.exists()) return [];
@@ -684,17 +683,19 @@ class StorageService {
     await _updateIndex(base, (metas) {
       final prev = metas.where((m) => m.id == notebook.id).firstOrNull;
       metas.removeWhere((m) => m.id == notebook.id);
-      metas.add(NotebookMeta(
-        id: notebook.id,
-        title: notebook.title,
-        updatedAt: notebook.updatedAt,
-        colorValue: notebook.colorValue,
-        syncEnabled: prev?.syncEnabled,
-        favorite: prev?.favorite ?? false,
-        coverStyle: notebook.coverStyle,
-        coverImagePath: notebook.coverImagePath,
-        tags: notebook.tags,
-      ));
+      metas.add(
+        NotebookMeta(
+          id: notebook.id,
+          title: notebook.title,
+          updatedAt: notebook.updatedAt,
+          colorValue: notebook.colorValue,
+          syncEnabled: prev?.syncEnabled,
+          favorite: prev?.favorite ?? false,
+          coverStyle: notebook.coverStyle,
+          coverImagePath: notebook.coverImagePath,
+          tags: notebook.tags,
+        ),
+      );
     });
   }
 
@@ -931,7 +932,11 @@ class StorageService {
   /// Con [touch] (edición local) la nota pasa a fecha "ahora"; sin él se
   /// conserva la suya (copias restauradas de Drive: si no, parecerían más
   /// nuevas que el original y ganarían el last-write-wins).
-  Future<void> saveNote(String notebookId, Note note, {bool touch = true}) async {
+  Future<void> saveNote(
+    String notebookId,
+    Note note, {
+    bool touch = true,
+  }) async {
     final base = await _baseDir();
     // touch() ANTES de escribir: el archivo debe llevar la fecha de este
     // guardado (last-write-wins de Drive y "Recientes" la leen de disco).
@@ -1009,20 +1014,19 @@ class StorageService {
     if (!removed) return;
 
     // A la papelera recordando de qué cuaderno venía (para devolverla).
-    await _moveToTrash(base, await _noteFile(base, noteId), noteId, marker: {
-      'notebookId': notebookId,
-      'notebookTitle': ?notebookTitle,
-    });
+    await _moveToTrash(
+      base,
+      await _noteFile(base, noteId),
+      noteId,
+      marker: {'notebookId': notebookId, 'notebookTitle': ?notebookTitle},
+    );
 
     // Limpiar imágenes huérfanas en background.
     unawaited(collectOrphanedImages());
   }
 
   /// Duplica un Note dentro del mismo Notebook.
-  Future<Note> duplicateNote(
-    String notebookId,
-    String noteId,
-  ) async {
+  Future<Note> duplicateNote(String notebookId, String noteId) async {
     final original = await loadNote(noteId);
     if (original == null) throw StateError('Note no encontrado: $noteId');
 
@@ -1100,7 +1104,9 @@ class StorageService {
 
   /// JSON de cada archivo de la papelera (id → contenido). Los ilegibles se
   /// omiten.
-  Future<Map<String, (File, Map<String, dynamic>)>> _readTrash(Directory base) async {
+  Future<Map<String, (File, Map<String, dynamic>)>> _readTrash(
+    Directory base,
+  ) async {
     final dir = _trashDir(base);
     final result = <String, (File, Map<String, dynamic>)>{};
     if (!await dir.exists()) return result;
@@ -1137,38 +1143,44 @@ class StorageService {
       final marker = json[_trashKey] as Map<String, dynamic>?;
       final deletedAt =
           DateTime.tryParse(marker?['deletedAt'] as String? ?? '') ??
-              await file.lastModified();
+          await file.lastModified();
       if (now.difference(deletedAt) > trashRetention) {
         expired.add(id);
         continue;
       }
       if (json.containsKey('noteIds')) {
-        entries.add(TrashEntry(
-          id: id,
-          kind: TrashKind.notebook,
-          title: json['title'] as String? ?? 'Cuaderno',
-          deletedAt: deletedAt,
-          colorValue: (json['color'] as num?)?.toInt(),
-          noteCount: _noteIdsOf(json).length,
-        ));
+        entries.add(
+          TrashEntry(
+            id: id,
+            kind: TrashKind.notebook,
+            title: json['title'] as String? ?? 'Cuaderno',
+            deletedAt: deletedAt,
+            colorValue: (json['color'] as num?)?.toInt(),
+            noteCount: _noteIdsOf(json).length,
+          ),
+        );
       } else if (marker?['notebookId'] != null || id.startsWith('note')) {
-        entries.add(TrashEntry(
-          id: id,
-          kind: TrashKind.note,
-          title: json['title'] as String? ?? 'Nota',
-          deletedAt: deletedAt,
-          notebookId: marker?['notebookId'] as String?,
-          notebookTitle: marker?['notebookTitle'] as String?,
-        ));
+        entries.add(
+          TrashEntry(
+            id: id,
+            kind: TrashKind.note,
+            title: json['title'] as String? ?? 'Nota',
+            deletedAt: deletedAt,
+            notebookId: marker?['notebookId'] as String?,
+            notebookTitle: marker?['notebookTitle'] as String?,
+          ),
+        );
       } else {
         final doc = Document.fromJson(json);
-        entries.add(TrashEntry(
-          id: id,
-          kind: TrashKind.legacyDocument,
-          title: doc.title,
-          deletedAt: deletedAt,
-          colorValue: doc.colorValue,
-        ));
+        entries.add(
+          TrashEntry(
+            id: id,
+            kind: TrashKind.legacyDocument,
+            title: doc.title,
+            deletedAt: deletedAt,
+            colorValue: doc.colorValue,
+          ),
+        );
       }
     }
     for (final id in expired) {
@@ -1206,15 +1218,17 @@ class StorageService {
       if (nb != null) {
         await _updateIndex(base, (metas) {
           metas.removeWhere((m) => m.id == nb.id);
-          metas.add(NotebookMeta(
-            id: nb.id,
-            title: nb.title,
-            updatedAt: nb.updatedAt,
-            colorValue: nb.colorValue,
-            coverStyle: nb.coverStyle,
-            coverImagePath: nb.coverImagePath,
-            tags: nb.tags,
-          ));
+          metas.add(
+            NotebookMeta(
+              id: nb.id,
+              title: nb.title,
+              updatedAt: nb.updatedAt,
+              colorValue: nb.colorValue,
+              coverStyle: nb.coverStyle,
+              coverImagePath: nb.coverImagePath,
+              tags: nb.tags,
+            ),
+          );
         });
       }
     } else if (marker?['notebookId'] != null || id.startsWith('note')) {
@@ -1230,11 +1244,13 @@ class StorageService {
         if (!restored) await _deleteNoteFile(note.id);
       }
       if (!restored) {
-        await saveNotebook(Notebook(
-          id: newId('nb'),
-          title: marker?['notebookTitle'] as String? ?? 'Notas recuperadas',
-          notes: [note],
-        ));
+        await saveNotebook(
+          Notebook(
+            id: newId('nb'),
+            title: marker?['notebookTitle'] as String? ?? 'Notas recuperadas',
+            notes: [note],
+          ),
+        );
       }
       await trashFile.delete();
     } else {
@@ -1321,10 +1337,12 @@ class StorageService {
     final base = await _baseDir();
     final files = <String, Uint8List>{};
 
-    final manifest = utf8.encode(jsonEncode({
-      'backupVersion': _backupVersion,
-      'createdAt': DateTime.now().toIso8601String(),
-    }));
+    final manifest = utf8.encode(
+      jsonEncode({
+        'backupVersion': _backupVersion,
+        'createdAt': DateTime.now().toIso8601String(),
+      }),
+    );
     files[_backupManifest] = Uint8List.fromList(manifest);
 
     final indexFile = await _indexFile(base);
@@ -1388,7 +1406,9 @@ class StorageService {
       }
       final outPath = safeJoin(base.path, name);
       if (outPath == null) {
-        debugPrint('StorageService.importFullBackup: ruta insegura ignorada: $name');
+        debugPrint(
+          'StorageService.importFullBackup: ruta insegura ignorada: $name',
+        );
         continue;
       }
       await writeAtomic(File(outPath), entry.value);
@@ -1406,8 +1426,11 @@ class StorageService {
         final json =
             jsonDecode(utf8.decode(indexBytes)) as Map<String, dynamic>;
         if (json['formatVersion'] == _formatVersion) {
-          restored.addAll((json['notebooks'] as List? ?? [])
-              .map((m) => NotebookMeta.fromJson(m as Map<String, dynamic>)));
+          restored.addAll(
+            (json['notebooks'] as List? ?? []).map(
+              (m) => NotebookMeta.fromJson(m as Map<String, dynamic>),
+            ),
+          );
         } else {
           isLegacyIndex = true;
         }
@@ -1476,7 +1499,8 @@ class StorageService {
           if (raw.trim().isEmpty) continue;
           // Intentar como Note
           final noteJson = jsonDecode(raw);
-          if (noteJson is Map<String, dynamic> && noteJson.containsKey('pages')) {
+          if (noteJson is Map<String, dynamic> &&
+              noteJson.containsKey('pages')) {
             final note = _noteFromDisk(base, noteJson);
             _extractImagePaths(note, referenced);
           }
@@ -1552,12 +1576,16 @@ class StorageService {
           await entity.delete();
           deleted++;
         } catch (e) {
-          debugPrint('StorageService.collectOrphanedImages: ${entity.path}: $e');
+          debugPrint(
+            'StorageService.collectOrphanedImages: ${entity.path}: $e',
+          );
         }
       }
 
       if (deleted > 0) {
-        debugPrint('StorageService: $deleted imagen(es) huérfana(s) eliminada(s).');
+        debugPrint(
+          'StorageService: $deleted imagen(es) huérfana(s) eliminada(s).',
+        );
       }
     } catch (e) {
       debugPrint('StorageService.collectOrphanedImages: $e');
@@ -1607,8 +1635,10 @@ class TrashEntry {
 
   /// Días que le quedan antes del borrado automático.
   int get daysLeft {
-    final left = StorageService.trashRetention -
-        DateTime.now().difference(deletedAt);
-    return left.isNegative ? 0 : (left.inMinutes / Duration.minutesPerDay).ceil();
+    final left =
+        StorageService.trashRetention - DateTime.now().difference(deletedAt);
+    return left.isNegative
+        ? 0
+        : (left.inMinutes / Duration.minutesPerDay).ceil();
   }
 }

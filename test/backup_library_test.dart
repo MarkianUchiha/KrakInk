@@ -89,4 +89,15 @@ void main() {
 
     expect((await metas(target))[nb.id]!.folderId, isNull);
   });
+
+  test('las etiquetas del catálogo se unen y el sembrado se respeta', () async {
+    await source.seedTagsOnce(['Trabajo', 'Ideas']);
+    await target.seedTagsOnce(['Estudiar']);
+
+    await target.importFullBackup(await source.exportFullBackup());
+
+    final lib = await target.loadLibrary();
+    expect(lib.tags, ['Estudiar', 'Trabajo', 'Ideas']);
+    expect(lib.tagsSeeded, isTrue);
+  });
 }

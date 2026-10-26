@@ -640,11 +640,14 @@ class StorageService {
     }
   }
 
-  /// Devuelve todas las etiquetas únicas usadas en todos los cuadernos.
+  /// Etiquetas del catálogo más las que usa algún cuaderno, ordenadas.
+  ///
+  /// Se unen las dos fuentes porque un renombrado o un borrado que falle a
+  /// la mitad deja etiquetas en cuadernos que ya no están en el catálogo:
+  /// así siguen a la vista y se pueden volver a renombrar o borrar.
   Future<List<String>> allTags() async {
-    final metas = await loadIndex();
-    final tags = <String>{};
-    for (final m in metas) {
+    final tags = <String>{...(await loadLibrary()).tags};
+    for (final m in await loadIndex()) {
       tags.addAll(m.tags);
     }
     return tags.toList()..sort();
@@ -1101,6 +1104,9 @@ class StorageService {
   }
 
   /// Establece las etiquetas de un Notebook.
+  ///
+  /// Las etiquetas nuevas entran al catálogo: quitarlas de este cuaderno no
+  /// las borra de las sugerencias (para eso está [deleteTag]).
   Future<void> setNotebookTags(String id, List<String> tags) async {
     await _editNotebook(id, (json) {
       if (tags.isEmpty) {
@@ -1109,6 +1115,90 @@ class StorageService {
         json['tags'] = List<String>.from(tags);
       }
       return true;
+    });
+    if (tags.isEmpty) return;
+    await _updateLibrary(await _baseDir(), (lib) {
+      for (final t in tags) {
+        if (!lib.tags.contains(t)) lib.tags.add(t);
+      }
+    });
+  }
+
+  /// Siembra el catálogo con las etiquetas [base] (ya traducidas) la primera
+  /// vez. Después son datos del usuario: si las borra no vuelven, y cambiar
+  /// de idioma no las traduce.
+  ///
+  /// Incluye las etiquetas que ya usan los cuadernos, para que quien
+  /// actualiza la app las encuentre en el catálogo.
+  Future<void> seedTagsOnce(List<String> base) async {
+    final dir = await _baseDir();
+    if ((await loadLibrary()).tagsSeeded) return;
+    final inUse = [for (final m in await loadIndex()) ...m.tags];
+    await _updateLibrary(dir, (lib) {
+      if (lib.tagsSeeded) return;
+      for (final t in [...base, ...inUse]) {
+        if (!lib.tags.contains(t)) lib.tags.add(t);
+      }
+      lib.tagsSeeded = true;
+    });
+  }
+
+  /// Renombra una etiqueta en todos los cuadernos y en el catálogo. Si
+  /// [newName] ya existe, se fusionan sin duplicarse.
+  ///
+  /// El catálogo se actualiza al final: si algo falla a la mitad, repetir
+  /// el renombrado termina el trabajo.
+  Future<void> renameTag(String oldName, String newName) async {
+    final clean = newName.trim();
+    if (clean.isEmpty || clean == oldName) return;
+    await _logged('tags.rename', () async {
+      for (final meta in await loadIndex()) {
+        if (!meta.tags.contains(oldName)) continue;
+        await _editNotebook(meta.id, (json) {
+          final tags = [
+            for (final t in json['tags'] as List? ?? []) t as String,
+          ];
+          final renamed = <String>[];
+          for (final t in tags) {
+            final v = t == oldName ? clean : t;
+            if (!renamed.contains(v)) renamed.add(v);
+          }
+          json['tags'] = renamed;
+          return true;
+        });
+      }
+      await _updateLibrary(await _baseDir(), (lib) {
+        final idx = lib.tags.indexOf(oldName);
+        if (lib.tags.contains(clean)) {
+          lib.tags.remove(oldName);
+        } else if (idx >= 0) {
+          lib.tags[idx] = clean;
+        } else {
+          lib.tags.add(clean);
+        }
+      });
+    });
+  }
+
+  /// Quita una etiqueta del catálogo y de todos los cuadernos. Los
+  /// cuadernos no se tocan más allá de eso.
+  Future<void> deleteTag(String tag) async {
+    await _logged('tags.delete', () async {
+      for (final meta in await loadIndex()) {
+        if (!meta.tags.contains(tag)) continue;
+        await _editNotebook(meta.id, (json) {
+          final tags = [
+            for (final t in json['tags'] as List? ?? []) t as String,
+          ]..remove(tag);
+          if (tags.isEmpty) {
+            json.remove('tags');
+          } else {
+            json['tags'] = tags;
+          }
+          return true;
+        });
+      }
+      await _updateLibrary(await _baseDir(), (lib) => lib.tags.remove(tag));
     });
   }
 

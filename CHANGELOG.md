@@ -4,6 +4,35 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); v
 
 Cada versión se escribe en español y en inglés (sección `### English`): el workflow de release copia la sección completa a las notas de GitHub.
 
+## [0.1.0] — pendiente
+
+Primera versión de KrakInk, fork de [Inklus](https://github.com/Pedroj-64/inklus) 1.9.0. Se distribuye con un nombre de paquete nuevo (`com.markidev.krakink`) y no actualiza una instalación de Inklus.
+
+### Añadido
+- **Identidad KrakInk**: ícono y logo del calamar, paleta Tinta/Hueso/Abismo/Coral en la interfaz y diez colores de tapa nuevos. Los colores de los cuadernos que ya existían se migran solos.
+- **Registro local de errores** estructurado y saneado, sin contenido de las notas: guardado, Drive, importación y OCR. No sale del dispositivo salvo que lo compartas desde Ajustes.
+
+### Cambiado
+- La versión de Ajustes y del registro de errores se lee del paquete instalado.
+- Solo Android. Se quitan los builds de Linux.
+
+### Corregido
+- Barra del editor sin desbordes en pantallas de teléfono.
+- Las imágenes se guardan con rutas relativas a la carpeta de datos.
+- Saltos de línea que se veían como `\n` en algunos textos.
+
+### English
+
+First KrakInk release, a fork of [Inklus](https://github.com/Pedroj-64/inklus) 1.9.0. It ships under a new package name (`com.markidev.krakink`) and does not update an Inklus install.
+
+- **Added:** KrakInk identity (squid icon and logo, Ink/Bone/Abyss/Coral palette, ten new cover colors with automatic migration). Structured, sanitized local error log with no note content; it never leaves the device unless you share it from Settings.
+- **Changed:** the version shown in Settings and the error log is read from the installed package. Android only; Linux builds removed.
+- **Fixed:** editor toolbar overflow on phones, image paths stored relative to the data folder, line breaks shown as `\n`.
+
+## Historial de Inklus (proyecto original)
+
+Las versiones siguientes son del proyecto original, antes del fork.
+
 ## [1.9.0] — 2026-10-15
 
 ### Añadido

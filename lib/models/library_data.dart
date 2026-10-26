@@ -37,7 +37,7 @@ class LibraryData {
 
   /// Las etiquetas base ya se sembraron. Se guarda para no volver a crearlas
   /// si el usuario las borra.
-  final bool tagsSeeded;
+  bool tagsSeeded;
 
   LibraryData({
     List<Folder>? folders,

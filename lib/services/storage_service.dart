@@ -1644,6 +1644,13 @@ class StorageService {
       if (await f.exists()) files[name] = await f.readAsBytes();
     }
 
+    // Va aparte de _backupRootFiles porque al restaurar se fusiona en vez de
+    // reemplazarse (ver [_mergeLibrary]).
+    final library = await _libraryFile(base);
+    if (await library.exists()) {
+      files[_libraryName] = await library.readAsBytes();
+    }
+
     for (final folder in _backupFolders) {
       final dir = Directory('${base.path}/$folder');
       if (!await dir.exists()) continue;
@@ -1744,7 +1751,61 @@ class StorageService {
         metas.add(m);
       }
     });
+    await _mergeLibrary(base, entries[_libraryName], restored);
     return restored.length;
+  }
+
+  /// Fusiona el `library.json` de un respaldo con el local y arregla la
+  /// carpeta de los cuadernos [restored].
+  ///
+  /// Reemplazarlo, como los demás archivos sueltos, borraría las carpetas
+  /// locales y dejaría cuadernos apuntando a carpetas que no existen.
+  /// - Carpetas: unión por id. Si el respaldo trae otro id con el nombre de
+  ///   una carpeta local, sus cuadernos van a la local (los nombres son únicos).
+  /// - Etiquetas: unión, primero las locales.
+  /// - Un cuaderno cuya carpeta no existe tras fusionar queda sin carpeta.
+  Future<void> _mergeLibrary(
+    Directory base,
+    Uint8List? bytes,
+    List<NotebookMeta> restored,
+  ) async {
+    var incoming = LibraryData();
+    if (bytes != null) {
+      try {
+        incoming = LibraryData.fromJson(
+          jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>,
+        );
+      } catch (e, st) {
+        unawaited(ErrorLog.record(e, st, operation: 'backup.library'));
+      }
+    }
+    final remap = <String, String>{};
+    final folderIds = await _updateLibrary(base, (lib) {
+      for (final f in incoming.folders) {
+        if (lib.folders.any((l) => l.id == f.id)) continue;
+        final sameName = lib.folderNamed(f.name);
+        if (sameName != null) {
+          remap[f.id] = sameName.id;
+        } else {
+          lib.folders.add(f);
+        }
+      }
+      for (final t in incoming.tags) {
+        if (!lib.tags.contains(t)) lib.tags.add(t);
+      }
+      lib.tagsSeeded = lib.tagsSeeded || incoming.tagsSeeded;
+      return lib.folders.map((f) => f.id).toSet();
+    });
+    for (final m in restored) {
+      final folderId = m.folderId;
+      if (folderId == null) continue;
+      final target = remap[folderId];
+      if (target != null) {
+        await moveToFolder(m.id, target);
+      } else if (!folderIds.contains(folderId)) {
+        await moveToFolder(m.id, null);
+      }
+    }
   }
 
   // -------------------------------------------------------------------------

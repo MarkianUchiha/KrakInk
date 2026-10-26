@@ -37,15 +37,15 @@ class Notebook {
     this.coverImagePath,
     List<String>? tags,
     List<Note>? notes,
-  })  : tags = tags ?? [],
-        notes = notes ?? [];
+  }) : tags = tags ?? [],
+       notes = notes ?? [];
 
   /// Crea un cuaderno vacío con un note en blanco.
   factory Notebook.newBlank({String? id, String? title}) => Notebook(
-        id: id ?? newId('nb'),
-        title: title ?? 'Mi cuaderno',
-        notes: [Note.newBlank()],
-      );
+    id: id ?? newId('nb'),
+    title: title ?? 'Mi cuaderno',
+    notes: [Note.newBlank()],
+  );
 
   /// Primer note del cuaderno (el que se abre por defecto).
   Note? get firstNote => notes.isEmpty ? null : notes.first;
@@ -53,9 +53,7 @@ class Notebook {
   /// Fecha de última actualización basada en el note más reciente.
   DateTime get updatedAt {
     if (notes.isEmpty) return DateTime(2020);
-    return notes
-        .map((n) => n.updatedAt)
-        .reduce((a, b) => a.isAfter(b) ? a : b);
+    return notes.map((n) => n.updatedAt).reduce((a, b) => a.isAfter(b) ? a : b);
   }
 
   /// Fecha de creación del cuaderno (el note más antiguo).
@@ -73,18 +71,15 @@ class Notebook {
   factory Notebook.fromJson(
     Map<String, dynamic> json, {
     List<Note>? loadedNotes,
-  }) =>
-      Notebook(
-        id: json['id'] as String,
-        title: json['title'] as String? ?? 'Mi cuaderno',
-        colorValue: CoverColors.migrateLegacy((json['color'] as num?)?.toInt()),
-        coverStyle: json['coverStyle'] as String? ?? 'simple',
-        coverImagePath: json['coverImagePath'] as String?,
-        tags: (json['tags'] as List? ?? [])
-            .map((t) => t as String)
-            .toList(),
-        notes: loadedNotes ?? [],
-      );
+  }) => Notebook(
+    id: json['id'] as String,
+    title: json['title'] as String? ?? 'Mi cuaderno',
+    colorValue: CoverColors.migrateLegacy((json['color'] as num?)?.toInt()),
+    coverStyle: json['coverStyle'] as String? ?? 'simple',
+    coverImagePath: json['coverImagePath'] as String?,
+    tags: (json['tags'] as List? ?? []).map((t) => t as String).toList(),
+    notes: loadedNotes ?? [],
+  );
 
   /// Serializa el Notebook a JSON.
   ///
@@ -92,23 +87,23 @@ class Notebook {
   /// guardan como archivos individuales para minimizar el tamaño del
   /// archivo del notebook y permitir sync selectiva por note.
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'noteIds': notes.map((n) => n.id).toList(),
-        if (colorValue != null) 'color': colorValue,
-        if (coverStyle != 'simple') 'coverStyle': coverStyle,
-        if (coverImagePath != null) 'coverImagePath': coverImagePath,
-        if (tags.isNotEmpty) 'tags': tags,
-      };
+    'id': id,
+    'title': title,
+    'noteIds': notes.map((n) => n.id).toList(),
+    if (colorValue != null) 'color': colorValue,
+    if (coverStyle != 'simple') 'coverStyle': coverStyle,
+    if (coverImagePath != null) 'coverImagePath': coverImagePath,
+    if (tags.isNotEmpty) 'tags': tags,
+  };
 
   /// Serializa el Notebook con los metadatos básicos de cada note
   /// (para el índice, sin cargar todo el contenido).
   Map<String, dynamic> toIndexJson() => {
-        'id': id,
-        'title': title,
-        'color': colorValue,
-        'tags': tags,
-        'noteCount': notes.length,
-        'updatedAt': updatedAt.toIso8601String(),
-      };
+    'id': id,
+    'title': title,
+    'color': colorValue,
+    'tags': tags,
+    'noteCount': notes.length,
+    'updatedAt': updatedAt.toIso8601String(),
+  };
 }

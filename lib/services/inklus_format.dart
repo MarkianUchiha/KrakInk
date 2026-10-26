@@ -36,6 +36,14 @@ import '../brand.dart';
 ///
 /// Se mantiene compatibilidad con v1 (document.json) para importar
 /// archivos antiguos.
+/// Cuaderno leído de un `.krakink` v2, con el nombre de su carpeta.
+class ImportedNotebook {
+  final Notebook notebook;
+  final String? folderName;
+
+  const ImportedNotebook(this.notebook, {this.folderName});
+}
+
 class InklusFormat {
   InklusFormat._();
 
@@ -57,7 +65,13 @@ class InklusFormat {
   ///
   /// Cada [Note] se serializa como un archivo JSON independiente dentro
   /// del ZIP, y las imágenes de todas las páginas se embeben en `images/`.
-  static Future<Uint8List> exportNotebookBytes(Notebook notebook) async {
+  ///
+  /// [folderName] es el nombre de la carpeta del cuaderno: los ids de carpeta
+  /// son de cada dispositivo, así que al importar se busca por nombre.
+  static Future<Uint8List> exportNotebookBytes(
+    Notebook notebook, {
+    String? folderName,
+  }) async {
     // 1) Recopilar imágenes de todos los notes.
     final images = <String, Future<Uint8List>>{};
 
@@ -83,6 +97,8 @@ class InklusFormat {
       if (notebook.coverImagePath != null)
         'coverImagePath': notebook.coverImagePath,
       if (notebook.tags.isNotEmpty) 'tags': notebook.tags,
+      if (notebook.favorite) 'fav': true,
+      'folderName': ?folderName,
       'noteIds': notebook.notes.map((n) => n.id).toList(),
     };
     final nbBytes = utf8.encode(jsonEncode(notebookMeta));
@@ -128,8 +144,9 @@ class InklusFormat {
     return importBytes(bytes, extractTo: extractTo);
   }
 
-  /// Importa un .inklus v2 y devuelve un [Notebook] restaurado.
-  static Future<Notebook> importNotebookBytes(
+  /// Importa un .inklus v2 y devuelve el [Notebook] restaurado con el nombre
+  /// de su carpeta (sin carpeta asignada: eso lo resuelve quien lo guarda).
+  static Future<ImportedNotebook> importNotebookBytes(
     Uint8List bytes, {
     Directory? extractTo,
   }) async {
@@ -191,14 +208,19 @@ class InklusFormat {
       notes.add(note);
     }
 
-    return Notebook(
-      id: docId,
-      title: nbJson['title'] as String? ?? 'Sin título',
-      colorValue: (nbJson['color'] as num?)?.toInt(),
-      coverStyle: nbJson['coverStyle'] as String? ?? 'simple',
-      coverImagePath: nbJson['coverImagePath'] as String?,
-      tags: (nbJson['tags'] as List? ?? []).map((t) => t as String).toList(),
-      notes: notes,
+    final folderName = nbJson['folderName'];
+    return ImportedNotebook(
+      Notebook(
+        id: docId,
+        title: nbJson['title'] as String? ?? 'Sin título',
+        colorValue: (nbJson['color'] as num?)?.toInt(),
+        coverStyle: nbJson['coverStyle'] as String? ?? 'simple',
+        coverImagePath: nbJson['coverImagePath'] as String?,
+        tags: (nbJson['tags'] as List? ?? []).map((t) => t as String).toList(),
+        favorite: nbJson['fav'] == true,
+        notes: notes,
+      ),
+      folderName: folderName is String ? folderName : null,
     );
   }
 

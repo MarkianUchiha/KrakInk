@@ -428,8 +428,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   );
 
   Future<void> _exportInklusCopy() => _export(() async {
-    final nb = await _storage.loadNotebook(widget.notebookId);
-    if (nb != null) return InklusFormat.exportNotebookBytes(nb);
+    final e = await _storage.notebookForExport(widget.notebookId);
+    if (e != null) {
+      return InklusFormat.exportNotebookBytes(
+        e.notebook,
+        folderName: e.folderName,
+      );
+    }
     // Fallback: exportar solo el note actual.
     return InklusFormat.exportNoteBytes(_c.note);
   }, '${_safeName(_c.note.title)}.${Brand.fileExtension}');
@@ -1150,13 +1155,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   // --- Estadísticas ---
   void _openStats() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => const WritingStatsScreen()));
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const WritingStatsScreen()));
   }
 
   void _openSettings() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
   }
 
   // --- Búsqueda en contenido ---

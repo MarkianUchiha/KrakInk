@@ -141,13 +141,14 @@ abstract final class ImportService {
           bytes,
           extractTo: extractTo,
         );
-        if (result is Notebook) {
-          await s.saveNotebook(result);
+        if (result is ImportedNotebook) {
+          final nb = result.notebook;
+          await s.importNotebook(nb, folderName: result.folderName);
           return ImportResult(
             kind,
-            title: result.title,
-            count: result.notes.length,
-            notebookId: result.id,
+            title: nb.title,
+            count: nb.notes.length,
+            notebookId: nb.id,
           );
         }
         final doc = result as Document;

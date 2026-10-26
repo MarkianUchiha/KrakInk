@@ -784,6 +784,39 @@ class StorageService {
     }
   }
 
+  /// Cuaderno listo para exportar, con su favorito (también el heredado
+  /// que solo vivía en el índice) y el nombre de su carpeta.
+  Future<({Notebook notebook, String? folderName})?> notebookForExport(
+    String id,
+  ) async {
+    final nb = await loadNotebook(id);
+    if (nb == null) return null;
+    final meta = (await loadIndex()).where((m) => m.id == id).firstOrNull;
+    if (meta?.favorite ?? false) nb.favorite = true;
+    final folderId = nb.folderId;
+    final folderName = folderId == null
+        ? null
+        : (await loadLibrary()).folders
+              .where((f) => f.id == folderId)
+              .firstOrNull
+              ?.name;
+    return (notebook: nb, folderName: folderName);
+  }
+
+  /// Guarda un cuaderno importado de un `.krakink`.
+  ///
+  /// Si el cuaderno ya existe en este dispositivo conserva su favorito y su
+  /// carpeta (ver [saveNotebook]). Si es nuevo, va a la carpeta llamada
+  /// [folderName], que se crea si no existe.
+  Future<void> importNotebook(Notebook notebook, {String? folderName}) async {
+    final base = await _baseDir();
+    final exists = await (await _notebookFile(base, notebook.id)).exists();
+    if (!exists && folderName != null && folderName.trim().isNotEmpty) {
+      notebook.folderId = (await createFolder(folderName)).id;
+    }
+    await saveNotebook(notebook);
+  }
+
   /// Crea una carpeta. Si ya hay una con ese nombre (sin distinguir
   /// mayúsculas), devuelve esa: los nombres son únicos.
   Future<Folder> createFolder(String name) async {

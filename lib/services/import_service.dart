@@ -32,7 +32,12 @@ enum ImportKind {
 
 /// Resultado de una importación, listo para mostrarse al usuario.
 class ImportResult {
-  const ImportResult(this.kind, {this.title = '', this.count = 0, this.notebookId});
+  const ImportResult(
+    this.kind, {
+    this.title = '',
+    this.count = 0,
+    this.notebookId,
+  });
 
   final ImportKind kind;
 
@@ -42,10 +47,10 @@ class ImportResult {
   final int count;
 
   String message(AppLocalizations l10n) => switch (kind) {
-        ImportKind.fullBackup => l10n.importBackupRestored(count),
-        ImportKind.notebook => l10n.importNotebookDone(title, count),
-        ImportKind.legacyDocument => l10n.importNotebookSimple(title),
-      };
+    ImportKind.fullBackup => l10n.importBackupRestored(count),
+    ImportKind.notebook => l10n.importNotebookDone(title, count),
+    ImportKind.legacyDocument => l10n.importNotebookSimple(title),
+  };
 
   /// Cuaderno creado (null en un respaldo completo).
   final String? notebookId;
@@ -64,7 +69,8 @@ abstract final class ImportService {
 
   /// Como [pickFile], pero conserva el nombre del archivo elegido.
   static Future<PlatformFile?> pickPlatformFile() async {
-    final mobile = defaultTargetPlatform == TargetPlatform.android ||
+    final mobile =
+        defaultTargetPlatform == TargetPlatform.android ||
         defaultTargetPlatform == TargetPlatform.iOS;
     final files = mobile
         ? await FilePicker.pickFiles(type: FileType.any)
@@ -131,7 +137,10 @@ abstract final class ImportService {
         return ImportResult(kind, count: count);
       case ImportKind.notebook:
       case ImportKind.legacyDocument:
-        final result = await InklusFormat.importAuto(bytes, extractTo: extractTo);
+        final result = await InklusFormat.importAuto(
+          bytes,
+          extractTo: extractTo,
+        );
         if (result is Notebook) {
           await s.saveNotebook(result);
           return ImportResult(

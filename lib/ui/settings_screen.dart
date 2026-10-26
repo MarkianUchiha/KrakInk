@@ -9,6 +9,7 @@ import '../constants.dart';
 import '../models/note.dart';
 import '../services/drive_sync_service.dart';
 import '../services/app_errors.dart';
+import '../services/app_version.dart';
 import '../services/error_log.dart';
 import '../services/import_service.dart';
 import '../services/storage_service.dart';
@@ -54,7 +55,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return InklusPage(
       title: context.l10n.settingsTitle,
-      subtitle: context.l10n.settingsSubtitle(kAppVersion),
+      subtitle: context.l10n.settingsSubtitle(AppVersion.current),
       maxWidth: 820,
       slivers: [
         SliverList.list(
@@ -119,7 +120,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 SettingsTile(
                   icon: Icons.edit_outlined,
-                  title: '${Brand.appName} $kAppVersion',
+                  title: '${Brand.appName} $AppVersion.current',
                   subtitle: context.l10n.settingsAppTagline,
                 ),
                 SettingsTile(
@@ -456,7 +457,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       case 'share':
         await SharePlus.instance.share(ShareParams(
           text: await ErrorLog.read(),
-          subject: l10n.settingsErrorLogSubject(kAppVersion),
+          subject: l10n.settingsErrorLogSubject(AppVersion.current),
         ));
       case 'clear':
         await ErrorLog.clear();

@@ -5,7 +5,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-import '../constants.dart';
+import 'app_version.dart';
 import 'app_paths.dart';
 import 'error_sanitizer.dart';
 import 'file_utils.dart';
@@ -46,7 +46,7 @@ abstract final class ErrorLog {
     final entry = jsonEncode({
       'ts': DateTime.now().toIso8601String(),
       'app': Brand.appName,
-      'version': kAppVersion,
+      'version': AppVersion.current,
       'os': Platform.operatingSystem,
       'operation': operation,
       'result': 'error',

@@ -26,6 +26,13 @@ class Notebook {
   /// Etiquetas del cuaderno (para organización y filtrado).
   List<String> tags;
 
+  /// Carpeta del cuaderno (id de `library.json`). null = sin carpeta.
+  String? folderId;
+
+  /// Marcado como favorito. Vive aquí y no solo en el índice para que
+  /// sobreviva a exportar, a la papelera y a un índice reconstruido.
+  bool favorite;
+
   /// Lista de apuntes que contiene este cuaderno.
   final List<Note> notes;
 
@@ -36,6 +43,8 @@ class Notebook {
     this.coverStyle = 'simple',
     this.coverImagePath,
     List<String>? tags,
+    this.folderId,
+    this.favorite = false,
     List<Note>? notes,
   }) : tags = tags ?? [],
        notes = notes ?? [];
@@ -78,6 +87,8 @@ class Notebook {
     coverStyle: json['coverStyle'] as String? ?? 'simple',
     coverImagePath: json['coverImagePath'] as String?,
     tags: (json['tags'] as List? ?? []).map((t) => t as String).toList(),
+    folderId: json['folder'] as String?,
+    favorite: json['fav'] as bool? ?? false,
     notes: loadedNotes ?? [],
   );
 
@@ -94,6 +105,8 @@ class Notebook {
     if (coverStyle != 'simple') 'coverStyle': coverStyle,
     if (coverImagePath != null) 'coverImagePath': coverImagePath,
     if (tags.isNotEmpty) 'tags': tags,
+    if (folderId != null) 'folder': folderId,
+    if (favorite) 'fav': true,
   };
 
   /// Serializa el Notebook con los metadatos básicos de cada note

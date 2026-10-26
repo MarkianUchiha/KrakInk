@@ -43,6 +43,9 @@ class NotebookMeta {
   /// Marcado como favorito (aparece en la sección Favoritos).
   final bool favorite;
 
+  /// Carpeta del cuaderno (id de `library.json`). null = sin carpeta.
+  final String? folderId;
+
   const NotebookMeta({
     required this.id,
     required this.title,
@@ -52,6 +55,7 @@ class NotebookMeta {
     this.coverStyle = 'simple',
     this.coverImagePath,
     this.favorite = false,
+    this.folderId,
     List<String>? tags,
   }) : tags = tags ?? const [];
 
@@ -68,6 +72,8 @@ class NotebookMeta {
     bool clearCoverImage = false,
     List<String>? tags,
     bool? favorite,
+    String? folderId,
+    bool clearFolder = false,
   }) => NotebookMeta(
     id: id,
     title: title ?? this.title,
@@ -80,6 +86,7 @@ class NotebookMeta {
         : (coverImagePath ?? this.coverImagePath),
     tags: tags ?? this.tags,
     favorite: favorite ?? this.favorite,
+    folderId: clearFolder ? null : (folderId ?? this.folderId),
   );
 
   factory NotebookMeta.fromJson(Map<String, dynamic> json) => NotebookMeta(
@@ -93,6 +100,7 @@ class NotebookMeta {
     coverStyle: json['coverStyle'] as String? ?? 'simple',
     coverImagePath: json['coverImagePath'] as String?,
     favorite: json['fav'] as bool? ?? false,
+    folderId: json['folder'] as String?,
     tags: (json['tags'] as List? ?? []).map((t) => t as String).toList(),
   );
 
@@ -106,6 +114,7 @@ class NotebookMeta {
     if (coverImagePath != null) 'coverImagePath': coverImagePath,
     if (tags.isNotEmpty) 'tags': tags,
     if (favorite) 'fav': true,
+    if (folderId != null) 'folder': folderId,
   };
 }
 
@@ -588,12 +597,25 @@ class StorageService {
     });
   }
 
-  /// Marca / desmarca un cuaderno como favorito (solo toca el índice).
+  /// Marca / desmarca un cuaderno como favorito.
   Future<void> setFavorite(String id, bool favorite) async {
-    final base = await _baseDir();
-    await _updateIndex(base, (metas) {
-      final idx = metas.indexWhere((m) => m.id == id);
-      if (idx >= 0) metas[idx] = metas[idx].copyWith(favorite: favorite);
+    // false explícito y no quitar la clave: sin ella se usaría el valor
+    // heredado del índice (ver [_favoriteOf]).
+    await _editNotebook(id, (json) {
+      json['fav'] = favorite;
+      return true;
+    });
+  }
+
+  /// Mueve un cuaderno a la carpeta [folderId], o lo saca si es null.
+  Future<void> moveToFolder(String id, String? folderId) async {
+    await _editNotebook(id, (json) {
+      if (folderId == null) {
+        json.remove('folder');
+      } else {
+        json['folder'] = folderId;
+      }
+      return true;
     });
   }
 
@@ -674,10 +696,22 @@ class StorageService {
 
     // Guardar el Notebook (solo IDs, no contenido de notes); en la misma
     // cola que [_editNotebook] para no pisar una edición en curso.
+    // Si el archivo ya existe, el favorito y la carpeta se toman de disco:
+    // el editor guarda su copia en memoria, que no se entera de lo que se
+    // cambió desde la biblioteca mientras estaba abierto.
     final file = await _notebookFile(base, notebook.id);
-    await _notebookQueue.run(
-      () => writeAtomic(file, jsonEncode(notebook.toJson())),
-    );
+    final written = await _notebookQueue.run(() async {
+      final json = notebook.toJson();
+      final disk = await _readJsonOrNull(file);
+      if (disk != null) {
+        json.remove('fav');
+        json.remove('folder');
+        if (disk['fav'] is bool) json['fav'] = disk['fav'];
+        if (disk['folder'] is String) json['folder'] = disk['folder'];
+      }
+      await writeAtomic(file, jsonEncode(json));
+      return json;
+    });
 
     // Actualizar índice (conserva syncEnabled del meta anterior).
     await _updateIndex(base, (metas) {
@@ -690,7 +724,8 @@ class StorageService {
           updatedAt: notebook.updatedAt,
           colorValue: notebook.colorValue,
           syncEnabled: prev?.syncEnabled,
-          favorite: prev?.favorite ?? false,
+          favorite: _favoriteOf(written, prev),
+          folderId: written['folder'] as String?,
           coverStyle: notebook.coverStyle,
           coverImagePath: notebook.coverImagePath,
           tags: notebook.tags,
@@ -758,7 +793,8 @@ class StorageService {
         updatedAt: touch ? DateTime.now() : prev.updatedAt,
         colorValue: (changed['color'] as num?)?.toInt(),
         syncEnabled: prev.syncEnabled,
-        favorite: prev.favorite,
+        favorite: _favoriteOf(changed, prev),
+        folderId: changed['folder'] as String?,
         coverStyle: prev.coverStyle,
         coverImagePath: prev.coverImagePath,
         tags: (changed['tags'] as List? ?? const [])
@@ -767,6 +803,24 @@ class StorageService {
       );
     });
     return true;
+  }
+
+  /// Favorito según el archivo del cuaderno. Los favoritos de antes solo
+  /// vivían en el índice: si el archivo no lo dice, se respeta el índice.
+  static bool _favoriteOf(Map<String, dynamic> json, NotebookMeta? prev) =>
+      json.containsKey('fav') ? json['fav'] == true : (prev?.favorite ?? false);
+
+  /// JSON de [file], o null si no existe, está vacío o no se puede leer.
+  static Future<Map<String, dynamic>?> _readJsonOrNull(File file) async {
+    try {
+      if (!await file.exists()) return null;
+      final raw = await file.readAsString();
+      if (raw.trim().isEmpty) return null;
+      return jsonDecode(raw) as Map<String, dynamic>;
+    } catch (e) {
+      debugPrint('StorageService._readJsonOrNull: $e');
+      return null;
+    }
   }
 
   static List<String> _noteIdsOf(Map<String, dynamic> json) =>
@@ -779,6 +833,7 @@ class StorageService {
     String coverStyle = 'simple',
     String? coverImagePath,
     List<String>? tags,
+    String? folderId,
     PageTemplate? template,
     List<Page>? pages,
   }) async {
@@ -797,6 +852,7 @@ class StorageService {
       coverStyle: coverStyle,
       coverImagePath: coverImagePath,
       tags: tags,
+      folderId: folderId,
       notes: [note],
     );
     await saveNotebook(notebook);
@@ -1227,6 +1283,8 @@ class StorageService {
               coverStyle: nb.coverStyle,
               coverImagePath: nb.coverImagePath,
               tags: nb.tags,
+              favorite: nb.favorite,
+              folderId: nb.folderId,
             ),
           );
         });

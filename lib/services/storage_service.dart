@@ -16,6 +16,7 @@ import '../models/template.dart';
 import '../models/id.dart';
 import 'file_utils.dart';
 import 'app_paths.dart';
+import 'error_log.dart';
 import 'path_codec.dart';
 
 /// Metadatos de un cuaderno para el índice (sin páginas/trazos).
@@ -133,6 +134,7 @@ class StorageService {
   static const _documentsFolder = 'documents';
   static const _notebooksFolder = 'notebooks';
   static const _notesFolder = 'notes';
+  static const _coversFolder = 'covers';
   static const _legacyFileName = 'current_document.json';
   static const _formatVersion = 2;
 
@@ -248,12 +250,12 @@ class StorageService {
       // Intentar formato nuevo (v2) primero
       if (json['formatVersion'] == _formatVersion) {
         return (json['notebooks'] as List? ?? [])
-            .map((m) => NotebookMeta.fromJson(m as Map<String, dynamic>))
+            .map((m) => _metaFromDisk(base, m as Map<String, dynamic>))
             .toList();
       }
       // Formato antiguo: key 'documents'
       return (json['documents'] as List? ?? [])
-          .map((m) => NotebookMeta.fromJson(m as Map<String, dynamic>))
+          .map((m) => _metaFromDisk(base, m as Map<String, dynamic>))
           .toList();
     } catch (e) {
       debugPrint('StorageService._readIndex: índice corrupto ($e)');
@@ -273,7 +275,7 @@ class StorageService {
       try {
         final json =
             jsonDecode(await entity.readAsString()) as Map<String, dynamic>;
-        var meta = NotebookMeta.fromJson(json);
+        var meta = _metaFromDisk(base, json);
         if (!json.containsKey('updatedAt')) {
           meta = meta.copyWith(updatedAt: await entity.lastModified());
         }
@@ -301,9 +303,68 @@ class StorageService {
       file,
       jsonEncode({
         'formatVersion': _formatVersion,
-        'notebooks': metas.map((m) => m.toJson()).toList(),
+        'notebooks': [for (final m in metas) _encodeCover(base, m.toJson())],
       }),
     );
+  }
+
+  /// [NotebookMeta] desde el JSON de disco, con la portada en ruta absoluta.
+  static NotebookMeta _metaFromDisk(Directory base, Map<String, dynamic> json) {
+    final meta = NotebookMeta.fromJson(json);
+    final cover = meta.coverImagePath;
+    if (cover == null) return meta;
+    return meta.copyWith(coverImagePath: PathCodec(base.path).decode(cover));
+  }
+
+  /// La portada se guarda relativa a la carpeta de datos, como las imágenes
+  /// de las notas (ver [PathCodec]). Modifica [json] y lo devuelve.
+  static Map<String, dynamic> _encodeCover(
+    Directory base,
+    Map<String, dynamic> json,
+  ) {
+    final cover = json['coverImagePath'];
+    if (cover is String) {
+      json['coverImagePath'] = PathCodec(base.path).encode(cover);
+    }
+    return json;
+  }
+
+  /// Inverso de [_encodeCover].
+  static Map<String, dynamic> _decodeCover(
+    Directory base,
+    Map<String, dynamic> json,
+  ) {
+    final cover = json['coverImagePath'];
+    if (cover is String) {
+      json['coverImagePath'] = PathCodec(base.path).decode(cover);
+    }
+    return json;
+  }
+
+  /// Copia la imagen de portada [source] a `covers/<notebookId>.<ext>`.
+  ///
+  /// El selector de archivos entrega una ruta en la caché de la app, que el
+  /// sistema puede vaciar y que no entra al respaldo. Si la copia falla se
+  /// queda la ruta original: mejor una portada frágil que ninguna.
+  Future<String> _storeCover(
+    Directory base,
+    String source,
+    String notebookId,
+  ) async {
+    try {
+      final dir = Directory('${base.path}/$_coversFolder');
+      if (!await dir.exists()) await dir.create(recursive: true);
+      final dot = source.lastIndexOf('.');
+      final ext = dot > source.lastIndexOf(RegExp(r'[\\/]'))
+          ? source.substring(dot)
+          : '';
+      final dest = '${dir.path}/$notebookId$ext';
+      await File(source).copy(dest);
+      return dest;
+    } catch (e, st) {
+      unawaited(ErrorLog.record(e, st, operation: 'notebook.cover'));
+      return source;
+    }
   }
 
   /// Lee, modifica y reescribe el índice de forma serializada.
@@ -678,7 +739,7 @@ class StorageService {
         if (note != null) notes.add(note);
       }
 
-      return Notebook.fromJson(json, loadedNotes: notes);
+      return Notebook.fromJson(_decodeCover(base, json), loadedNotes: notes);
     } catch (e) {
       debugPrint('StorageService.loadNotebook: $e');
       return null;
@@ -701,7 +762,7 @@ class StorageService {
     // cambió desde la biblioteca mientras estaba abierto.
     final file = await _notebookFile(base, notebook.id);
     final written = await _notebookQueue.run(() async {
-      final json = notebook.toJson();
+      final json = _encodeCover(base, notebook.toJson());
       final disk = await _readJsonOrNull(file);
       if (disk != null) {
         json.remove('fav');
@@ -845,12 +906,15 @@ class StorageService {
     } else if (template != null && note.pages.isNotEmpty) {
       note.pages.first.template = template;
     }
+    final id = newId('nb');
     final notebook = Notebook(
-      id: newId('nb'),
+      id: id,
       title: title ?? 'Mi cuaderno',
       colorValue: colorValue,
       coverStyle: coverStyle,
-      coverImagePath: coverImagePath,
+      coverImagePath: coverImagePath == null
+          ? null
+          : await _storeCover(await _baseDir(), coverImagePath, id),
       tags: tags,
       folderId: folderId,
       notes: [note],
@@ -915,11 +979,21 @@ class StorageService {
       newNotes.add(newNote);
     }
 
+    // La portada se copia a un archivo propio: si ambos compartieran la
+    // ruta, borrar uno dejaría sin portada al otro. El favorito no se
+    // copia: la copia es un cuaderno nuevo.
+    final copyId = newId('nb');
+    final cover = nb.coverImagePath;
     final newNb = Notebook(
-      id: newId('nb'),
+      id: copyId,
       title: '${nb.title} (copia)',
       colorValue: nb.colorValue,
+      coverStyle: nb.coverStyle,
+      coverImagePath: cover == null || !await File(cover).exists()
+          ? cover
+          : await _storeCover(await _baseDir(), cover, copyId),
       tags: List<String>.from(nb.tags),
+      folderId: nb.folderId,
       notes: newNotes,
     );
     await saveNotebook(newNb);
@@ -1367,6 +1441,7 @@ class StorageService {
     _notesFolder,
     _documentsFolder,
     'images',
+    _coversFolder,
     'restored', // imágenes extraídas de .inklus / Drive
     'pdf_imports',
     'templates',
@@ -1599,20 +1674,27 @@ class StorageService {
     }
   }
 
-  bool _collectingOrphans = false;
+  /// Limpieza en curso, si la hay.
+  Future<void>? _orphanRun;
 
   /// Elimina imágenes de `inklus/images/` que no están referenciadas por
   /// ningún Note (activo o en papelera). Ejecuta en background.
   ///
   /// Las imágenes modificadas hace menos de [minAge] se respetan: pueden
   /// pertenecer a una nota cuyo autoguardado aún no se ha escrito.
+  ///
+  /// Si ya hay una limpieza en curso no se lanza otra: se espera a esa, así
+  /// quien llama sabe que al volver la limpieza ya pasó.
   Future<void> collectOrphanedImages({
     Duration minAge = const Duration(minutes: 10),
-  }) async {
-    if (_collectingOrphans) return;
-    _collectingOrphans = true;
+  }) =>
+      _orphanRun ??= _collectOrphans(minAge)
+          .whenComplete(() => _orphanRun = null);
+
+  Future<void> _collectOrphans(Duration minAge) async {
     try {
       final base = await _baseDir();
+      await _collectOrphanedCovers(base);
       final imagesDir = Directory('${base.path}/images');
       if (!await imagesDir.exists()) return;
 
@@ -1647,8 +1729,28 @@ class StorageService {
       }
     } catch (e) {
       debugPrint('StorageService.collectOrphanedImages: $e');
-    } finally {
-      _collectingOrphans = false;
+    }
+  }
+
+  /// Borra las portadas de `covers/` cuyo cuaderno ya no existe ni está en
+  /// la papelera. El archivo se llama como el cuaderno (ver [_storeCover]).
+  Future<void> _collectOrphanedCovers(Directory base) async {
+    final dir = Directory('${base.path}/$_coversFolder');
+    if (!await dir.exists()) return;
+    await for (final entity in dir.list()) {
+      if (entity is! File) continue;
+      final name = entity.uri.pathSegments.last;
+      final dot = name.lastIndexOf('.');
+      final id = dot > 0 ? name.substring(0, dot) : name;
+      final alive =
+          await File('${base.path}/$_notebooksFolder/$id.json').exists() ||
+          await File('${_trashDir(base).path}/$id.json').exists();
+      if (alive) continue;
+      try {
+        await entity.delete();
+      } catch (e) {
+        debugPrint('StorageService._collectOrphanedCovers: $e');
+      }
     }
   }
 }

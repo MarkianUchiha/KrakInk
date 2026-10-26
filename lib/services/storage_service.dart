@@ -14,6 +14,7 @@ import '../models/notebook.dart';
 import '../models/page.dart';
 import '../models/template.dart';
 import '../models/id.dart';
+import '../models/library_data.dart';
 import 'file_utils.dart';
 import 'app_paths.dart';
 import 'error_log.dart';
@@ -131,6 +132,7 @@ class NotebookMeta {
 /// replica a Google Drive cuando hay sesión iniciada.
 class StorageService {
   static const _indexName = 'index.json';
+  static const _libraryName = 'library.json';
   static const _documentsFolder = 'documents';
   static const _notebooksFolder = 'notebooks';
   static const _notesFolder = 'notes';
@@ -670,13 +672,15 @@ class StorageService {
 
   /// Mueve un cuaderno a la carpeta [folderId], o lo saca si es null.
   Future<void> moveToFolder(String id, String? folderId) async {
-    await _editNotebook(id, (json) {
-      if (folderId == null) {
-        json.remove('folder');
-      } else {
-        json['folder'] = folderId;
-      }
-      return true;
+    await _logged('folder.move', () {
+      return _editNotebook(id, (json) {
+        if (folderId == null) {
+          json.remove('folder');
+        } else {
+          json['folder'] = folderId;
+        }
+        return true;
+      });
     });
   }
 
@@ -713,6 +717,125 @@ class StorageService {
     await file.copy(trashFile.path);
     await file.delete();
     await _updateIndex(base, (metas) => metas.removeWhere((m) => m.id == id));
+  }
+
+  // -------------------------------------------------------------------------
+  // Biblioteca: carpetas y catálogo de etiquetas (`library.json`)
+  // -------------------------------------------------------------------------
+
+  /// Serializa las lecturas-modificación-escritura de `library.json`.
+  final SerialQueue _libraryQueue = SerialQueue();
+
+  Future<File> _libraryFile(Directory base) async =>
+      File('${base.path}/$_libraryName');
+
+  /// Lee `library.json`. Si falta está vacío; si está corrupto se aparta
+  /// (`library.json.corrupt-<ts>`) para no pisarlo en el siguiente guardado:
+  /// las carpetas se pueden recuperar a mano.
+  Future<LibraryData> _readLibrary(Directory base) async {
+    final file = await _libraryFile(base);
+    if (!await file.exists()) return LibraryData();
+    try {
+      final raw = await file.readAsString();
+      if (raw.trim().isEmpty) return LibraryData();
+      return LibraryData.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (e, st) {
+      unawaited(ErrorLog.record(e, st, operation: 'library.read'));
+      try {
+        await file.rename(
+          '${file.path}.corrupt-${DateTime.now().millisecondsSinceEpoch}',
+        );
+      } catch (_) {}
+      return LibraryData();
+    }
+  }
+
+  /// Lee, modifica y reescribe `library.json` de forma serializada.
+  /// Devuelve lo que devuelva [mutate].
+  Future<T> _updateLibrary<T>(
+    Directory base,
+    T Function(LibraryData lib) mutate,
+  ) {
+    return _libraryQueue.run(() async {
+      final lib = await _readLibrary(base);
+      final result = mutate(lib);
+      await writeAtomic(await _libraryFile(base), jsonEncode(lib.toJson()));
+      return result;
+    });
+  }
+
+  /// Carpetas y catálogo de etiquetas.
+  Future<LibraryData> loadLibrary() async {
+    final base = await _baseDir();
+    return _libraryQueue.run(() => _readLibrary(base));
+  }
+
+  /// Ejecuta [action] y, si falla, lo registra con `operation` antes de
+  /// relanzar (OBS-01). Sin el nombre de la carpeta: es dato del usuario.
+  static Future<T> _logged<T>(
+    String operation,
+    Future<T> Function() action,
+  ) async {
+    try {
+      return await action();
+    } catch (e, st) {
+      unawaited(ErrorLog.record(e, st, operation: operation));
+      rethrow;
+    }
+  }
+
+  /// Crea una carpeta. Si ya hay una con ese nombre (sin distinguir
+  /// mayúsculas), devuelve esa: los nombres son únicos.
+  Future<Folder> createFolder(String name) async {
+    final clean = name.trim();
+    if (clean.isEmpty) throw ArgumentError.value(name, 'name', 'vacío');
+    final base = await _baseDir();
+    return _logged('folder.create', () {
+      return _updateLibrary(base, (lib) {
+        final existing = lib.folderNamed(clean);
+        if (existing != null) return existing;
+        final folder = Folder(
+          id: newId('folder'),
+          name: clean,
+          createdAt: DateTime.now(),
+        );
+        lib.folders.add(folder);
+        return folder;
+      });
+    });
+  }
+
+  /// Renombra una carpeta. Devuelve false si el nombre está vacío o ya lo
+  /// usa otra carpeta (no se fusionan carpetas por renombrar).
+  Future<bool> renameFolder(String id, String name) async {
+    final clean = name.trim();
+    if (clean.isEmpty) return false;
+    final base = await _baseDir();
+    return _logged('folder.rename', () {
+      return _updateLibrary(base, (lib) {
+        final idx = lib.folders.indexWhere((f) => f.id == id);
+        if (idx < 0) return false;
+        final other = lib.folderNamed(clean);
+        if (other != null && other.id != id) return false;
+        lib.folders[idx] = lib.folders[idx].copyWith(name: clean);
+        return true;
+      });
+    });
+  }
+
+  /// Borra una carpeta. Sus cuadernos quedan sin carpeta y **nunca** se
+  /// borran. Primero se mueven y al final se quita la carpeta: si algo falla
+  /// a la mitad queda una carpeta vacía, no un cuaderno apuntando a nada.
+  Future<void> deleteFolder(String id) async {
+    final base = await _baseDir();
+    await _logged('folder.delete', () async {
+      for (final meta in await loadIndex()) {
+        if (meta.folderId == id) await moveToFolder(meta.id, null);
+      }
+      await _updateLibrary(base, (lib) {
+        lib.folders.removeWhere((f) => f.id == id);
+      });
+    });
   }
 
   // -------------------------------------------------------------------------

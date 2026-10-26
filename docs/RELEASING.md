@@ -6,9 +6,16 @@ Distribución en **Google Play** (AAB, empezando por el track de prueba cerrada)
 
 1. `flutter analyze` (0 issues), `flutter test`, `flutter test integration_test -d <android>`.
 2. Prueba en tablet con el guion de [`testing.md`](testing.md).
-3. Sube la versión en **`pubspec.yaml`** (`version: X.Y.Z+N`, `N` siempre creciente) y en **`lib/constants.dart`** (`kAppVersion`). `test/app_version_test.dart` comprueba que coincidan.
+3. Sube la versión en **`pubspec.yaml`** (`version: X.Y.Z+N`), que es el único lugar donde vive. Ver [Numeración](#numeración).
 4. Añade la sección `## [X.Y.Z] — AAAA-MM-DD` a `CHANGELOG.md`, **en español y en inglés** (sección `### English`): el workflow copia esa sección completa a las notas de la release.
 5. Actualiza `ROADMAP.md` si cambia el estado del proyecto.
+
+## Numeración
+
+- `version: X.Y.Z+N` en `pubspec.yaml`. `X.Y.Z` es el `versionName` que se ve en Play y `N` es el `versionCode`.
+- `N` **solo sube** y nunca se reutiliza: Play rechaza un AAB con un `versionCode` que ya subiste, aunque haya sido a otra pista.
+- `0.x.y` durante la beta y `1.0.0` en la salida pública. La primera versión de KrakInk es `0.1.0+1`. Los tags `v1.8.0` y `v1.9.0` son del proyecto original.
+- La app lee la versión del paquete instalado (`lib/services/app_version.dart`), y de ahí la toman Ajustes y el registro de errores. Si en Ajustes aparece `KrakInk ?`, la lectura falló y el registro tiene una entrada `app.version`.
 
 ## Etiquetar
 

@@ -536,12 +536,13 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
         ? const Center(child: CircularProgressIndicator())
         : _MaxWidth(
             child: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(child: _buildHeader(metas.length)),
-              ..._buildContentSlivers(),
-              const SliverToBoxAdapter(child: SizedBox(height: 96)),
-            ],
-          ));
+              slivers: [
+                SliverToBoxAdapter(child: _buildHeader(metas.length)),
+                ..._buildContentSlivers(),
+                const SliverToBoxAdapter(child: SizedBox(height: 96)),
+              ],
+            ),
+          );
     return Scaffold(
       appBar: wide
           ? null
@@ -1251,19 +1252,19 @@ class _CoverTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
-        child: Text(
-          title,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-          style: context.text.labelMedium?.copyWith(
-            fontFamily: textFontFamily('lora'),
-            fontWeight: FontWeight.w700,
-            color: color,
-          ),
-        ),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
+    child: Text(
+      title,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.center,
+      style: context.text.labelMedium?.copyWith(
+        fontFamily: textFontFamily('lora'),
+        fontWeight: FontWeight.w700,
+        color: color,
+      ),
+    ),
+  );
 }
 
 /// Limita el ancho del contenido en pantallas muy anchas (la rejilla de
@@ -1274,10 +1275,10 @@ class _MaxWidth extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Align(
-        alignment: Alignment.topCenter,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: Sizes.contentMaxWidth),
-          child: child,
-        ),
-      );
+    alignment: Alignment.topCenter,
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: Sizes.contentMaxWidth),
+      child: child,
+    ),
+  );
 }

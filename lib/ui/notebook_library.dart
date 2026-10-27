@@ -62,8 +62,9 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
   /// Texto de búsqueda.
   String _searchQuery = '';
 
-  /// Criterio de ordenación.
+  /// Criterio de ordenación. Se recuerda, igual que la vista.
   _SortBy _sortBy = _SortBy.updatedDesc;
+  static const _prefSort = 'library_sort';
 
   /// Carpeta dinámica activa (null = ver todos).
   SmartFolder? _activeFolder;
@@ -75,12 +76,27 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
   bool _listView = false;
   static const _prefListView = 'library_list_view';
 
-  Future<void> _loadViewPref() async {
+  Future<void> _loadPrefs() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final v = prefs.getBool(_prefListView) ?? false;
-      if (mounted && v != _listView) setState(() => _listView = v);
+      // Se guarda el nombre y no el índice: reordenar el enum no cambia
+      // el orden que el usuario eligió. Un valor desconocido usa el default.
+      final sortName = prefs.getString(_prefSort);
+      final sort = _SortBy.values.where((s) => s.name == sortName).firstOrNull;
+      if (!mounted) return;
+      setState(() {
+        _listView = v;
+        if (sort != null) _sortBy = sort;
+      });
     } catch (_) {}
+  }
+
+  void _setSort(_SortBy sort) {
+    setState(() => _sortBy = sort);
+    SharedPreferences.getInstance()
+        .then((p) => p.setString(_prefSort, sort.name))
+        .catchError((_) => false);
   }
 
   void _setListView(bool list) {
@@ -126,7 +142,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
   void initState() {
     super.initState();
     _reload();
-    _loadViewPref();
+    _loadPrefs();
     // Restaura la sesión de Google (silenciosa).
     DriveSyncService.instance.restoreSession();
     // Archivos .inklus abiertos desde fuera (Drive, Archivos…), Android.
@@ -520,7 +536,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
         ),
       ),
     ).then((v) {
-      if (v != null) setState(() => _sortBy = v);
+      if (v != null) _setSort(v);
     });
   }
 

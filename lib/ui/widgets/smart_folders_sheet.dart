@@ -22,13 +22,13 @@ enum SmartFolderType {
 
   /// Nombre traducido del tipo de carpeta.
   String label(AppLocalizations l10n) => switch (this) {
-        all => l10n.libNavAll,
-        recent => l10n.libNavRecent,
-        thisWeek => l10n.smartThisWeek,
-        byColor => l10n.smartByColor,
-        byTag => l10n.smartByTag,
-        noTags => l10n.smartNoTags,
-      };
+    all => l10n.libNavAll,
+    recent => l10n.libNavRecent,
+    thisWeek => l10n.smartThisWeek,
+    byColor => l10n.smartByColor,
+    byTag => l10n.smartByTag,
+    noTags => l10n.smartNoTags,
+  };
 }
 
 /// Carpeta dinámica con su filtro aplicado.
@@ -37,19 +37,16 @@ class SmartFolder {
   final String? tagFilter;
   final int? colorFilter;
 
-  const SmartFolder({
-    required this.type,
-    this.tagFilter,
-    this.colorFilter,
-  });
+  const SmartFolder({required this.type, this.tagFilter, this.colorFilter});
 
   String displayName(AppLocalizations l10n) => switch (type) {
-        SmartFolderType.byColor => colorFilter != null
-            ? coverColorName(l10n, colorFilter!)
-            : l10n.smartByColor,
-        SmartFolderType.byTag => tagFilter ?? l10n.smartByTag,
-        _ => type.label(l10n),
-      };
+    SmartFolderType.byColor =>
+      colorFilter != null
+          ? coverColorName(l10n, colorFilter!)
+          : l10n.smartByColor,
+    SmartFolderType.byTag => tagFilter ?? l10n.smartByTag,
+    _ => type.label(l10n),
+  };
 
   /// Filtra la lista de metas según el criterio de esta carpeta.
   List<NotebookMeta> apply(List<NotebookMeta> metas) {
@@ -62,7 +59,11 @@ class SmartFolder {
       case SmartFolderType.thisWeek:
         final now = DateTime.now();
         final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-        final start = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
+        final start = DateTime(
+          startOfWeek.year,
+          startOfWeek.month,
+          startOfWeek.day,
+        );
         return metas.where((m) => m.updatedAt.isAfter(start)).toList();
       case SmartFolderType.byColor:
         if (colorFilter == null) return metas;
@@ -131,8 +132,9 @@ class _SmartFoldersSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labelStyle = context.text.titleSmall
-        ?.copyWith(color: context.colors.onSurfaceVariant);
+    final labelStyle = context.text.titleSmall?.copyWith(
+      color: context.colors.onSurfaceVariant,
+    );
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
       minChildSize: 0.3,
@@ -140,7 +142,12 @@ class _SmartFoldersSheet extends StatelessWidget {
       expand: false,
       builder: (context, scrollController) => ListView(
         controller: scrollController,
-        padding: const EdgeInsets.fromLTRB(Spacing.lg, 0, Spacing.lg, Spacing.xl),
+        padding: const EdgeInsets.fromLTRB(
+          Spacing.lg,
+          0,
+          Spacing.lg,
+          Spacing.xl,
+        ),
         children: [
           SheetHeader(
             icon: Icons.auto_awesome_outlined,
@@ -169,12 +176,17 @@ class _SmartFoldersSheet extends StatelessWidget {
                 for (final color in allColors)
                   _chip(
                     context,
-                    SmartFolder(type: SmartFolderType.byColor, colorFilter: color),
+                    SmartFolder(
+                      type: SmartFolderType.byColor,
+                      colorFilter: color,
+                    ),
                     avatar: Container(
                       width: 14,
                       height: 14,
-                      decoration:
-                          BoxDecoration(color: Color(color), shape: BoxShape.circle),
+                      decoration: BoxDecoration(
+                        color: Color(color),
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ),
               ],
@@ -206,10 +218,16 @@ class _SmartFoldersSheet extends StatelessWidget {
     );
   }
 
-  Widget _chip(BuildContext context, SmartFolder folder, {required Widget avatar}) {
+  Widget _chip(
+    BuildContext context,
+    SmartFolder folder, {
+    required Widget avatar,
+  }) {
     return FilterChip(
       avatar: avatar,
-      label: Text('${folder.displayName(context.l10n)} · ${folder.apply(metas).length}'),
+      label: Text(
+        '${folder.displayName(context.l10n)} · ${folder.apply(metas).length}',
+      ),
       selected: _isSelected(folder),
       showCheckmark: false,
       onSelected: (_) => Navigator.pop(context, folder),
@@ -219,12 +237,17 @@ class _SmartFoldersSheet extends StatelessWidget {
   Widget _buildFolderItem(BuildContext context, SmartFolder folder) {
     final selected = _isSelected(folder);
     final count = folder.apply(metas).length;
-    final accent = selected ? context.colors.primary : context.colors.onSurfaceVariant;
+    final accent = selected
+        ? context.colors.primary
+        : context.colors.onSurfaceVariant;
     return ListTile(
       selected: selected,
       selectedTileColor: context.colors.secondaryContainer,
       leading: Icon(folder.type.icon, color: accent),
-      title: Text(folder.displayName(context.l10n), style: context.text.titleMedium),
+      title: Text(
+        folder.displayName(context.l10n),
+        style: context.text.titleMedium,
+      ),
       trailing: Text(
         '$count',
         style: context.text.labelLarge?.copyWith(color: accent),

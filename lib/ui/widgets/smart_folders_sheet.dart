@@ -8,10 +8,9 @@ import '../theme/inklus_colors.dart';
 import '../theme/tokens.dart';
 import 'page_scaffold.dart';
 
-/// Tipo de carpeta dinámica.
+/// Tipo de filtro. "Recientes" no está: ya es una sección del menú.
 enum SmartFolderType {
   all(Icons.folder_outlined),
-  recent(Icons.access_time),
   thisWeek(Icons.date_range),
   byColor(Icons.palette_outlined),
   byTag(Icons.label_outline),
@@ -23,7 +22,6 @@ enum SmartFolderType {
   /// Nombre traducido del tipo de carpeta.
   String label(AppLocalizations l10n) => switch (this) {
     all => l10n.libNavAll,
-    recent => l10n.libNavRecent,
     thisWeek => l10n.smartThisWeek,
     byColor => l10n.smartByColor,
     byTag => l10n.smartByTag,
@@ -53,9 +51,6 @@ class SmartFolder {
     switch (type) {
       case SmartFolderType.all:
         return metas;
-      case SmartFolderType.recent:
-        final cutoff = DateTime.now().subtract(const Duration(days: 7));
-        return metas.where((m) => m.updatedAt.isAfter(cutoff)).toList();
       case SmartFolderType.thisWeek:
         final now = DateTime.now();
         final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
@@ -156,7 +151,6 @@ class _SmartFoldersSheet extends StatelessWidget {
           ),
           for (final type in const [
             SmartFolderType.all,
-            SmartFolderType.recent,
             SmartFolderType.thisWeek,
             SmartFolderType.noTags,
           ])

@@ -1787,10 +1787,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get statsDaysWithPages => 'Jours avec de nouvelles pages';
 
   @override
-  String get smartTitle => 'Dossiers intelligents';
+  String get smartTitle => 'Filtres';
 
   @override
-  String get smartSubtitle => 'Organisez vos cahiers automatiquement';
+  String get smartSubtitle =>
+      'Affichez les cahiers par date, couleur ou étiquette';
 
   @override
   String get smartByColor => 'Par couleur';
@@ -2176,4 +2177,39 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tplHalfLetter => 'Demi-lettre';
+
+  @override
+  String get libNavFilters => 'Filtres';
+
+  @override
+  String get folderNew => 'Nouveau dossier';
+
+  @override
+  String get folderNameHint => 'Nom du dossier';
+
+  @override
+  String get folderCreate => 'Créer';
+
+  @override
+  String get folderRename => 'Renommer le dossier';
+
+  @override
+  String get folderDelete => 'Supprimer le dossier';
+
+  @override
+  String folderDeleteBody(String name) {
+    return 'Le dossier « $name » sera supprimé. Ses cahiers passent dans Sans dossier ; aucun n’est supprimé.';
+  }
+
+  @override
+  String get folderNameTaken => 'Un dossier porte déjà ce nom';
+
+  @override
+  String get folderMoveTo => 'Déplacer vers un dossier';
+
+  @override
+  String get folderNone => 'Sans dossier';
+
+  @override
+  String get folderOptions => 'Options du dossier';
 }

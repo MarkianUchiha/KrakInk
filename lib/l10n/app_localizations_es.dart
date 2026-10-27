@@ -1772,10 +1772,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get statsDaysWithPages => 'Días con páginas nuevas';
 
   @override
-  String get smartTitle => 'Carpetas inteligentes';
+  String get smartTitle => 'Filtros';
 
   @override
-  String get smartSubtitle => 'Organiza tus cuadernos automáticamente';
+  String get smartSubtitle => 'Muestra cuadernos por fecha, color o etiqueta';
 
   @override
   String get smartByColor => 'Por color';
@@ -2154,4 +2154,39 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tplHalfLetter => 'Media carta';
+
+  @override
+  String get libNavFilters => 'Filtros';
+
+  @override
+  String get folderNew => 'Nueva carpeta';
+
+  @override
+  String get folderNameHint => 'Nombre de la carpeta';
+
+  @override
+  String get folderCreate => 'Crear';
+
+  @override
+  String get folderRename => 'Renombrar carpeta';
+
+  @override
+  String get folderDelete => 'Borrar carpeta';
+
+  @override
+  String folderDeleteBody(String name) {
+    return 'Se borrará la carpeta \"$name\". Sus cuadernos pasan a Sin carpeta; no se borra ninguno.';
+  }
+
+  @override
+  String get folderNameTaken => 'Ya existe una carpeta con ese nombre';
+
+  @override
+  String get folderMoveTo => 'Mover a carpeta';
+
+  @override
+  String get folderNone => 'Sin carpeta';
+
+  @override
+  String get folderOptions => 'Opciones de la carpeta';
 }

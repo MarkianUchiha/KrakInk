@@ -507,8 +507,8 @@
   "statsRecord": "Rekord",
   "statsActivity": "Aktivität — letzte 30 Tage",
   "statsDaysWithPages": "Tage mit neuen Seiten",
-  "smartTitle": "Intelligente Ordner",
-  "smartSubtitle": "Ordne deine Notizbücher automatisch",
+  "smartTitle": "Filter",
+  "smartSubtitle": "Zeige Notizbücher nach Datum, Farbe oder Tag",
   "smartByColor": "Nach Farbe",
   "smartByTag": "Nach Tag",
   "onbSkip": "Überspringen",
@@ -606,5 +606,16 @@
   "menuTwoFingerUndo": "Rückgängig mit Zwei-Finger-Tipp",
   "popEraserAutoRevert": "Nach dem Radieren zum vorherigen Werkzeug zurückkehren",
   "saveFailed": "Die Notiz konnte nicht gespeichert werden. Gib Speicherplatz frei: Es wird automatisch erneut versucht.",
-  "tplHalfLetter": "Half Letter"
+  "tplHalfLetter": "Half Letter",
+  "libNavFilters": "Filter",
+  "folderNew": "Neuer Ordner",
+  "folderNameHint": "Ordnername",
+  "folderCreate": "Erstellen",
+  "folderRename": "Ordner umbenennen",
+  "folderDelete": "Ordner löschen",
+  "folderDeleteBody": "Der Ordner „{name}“ wird gelöscht. Seine Notizbücher kommen zu Ohne Ordner; keines wird gelöscht.",
+  "folderNameTaken": "Es gibt schon einen Ordner mit diesem Namen",
+  "folderMoveTo": "In Ordner verschieben",
+  "folderNone": "Ohne Ordner",
+  "folderOptions": "Ordneroptionen"
 }

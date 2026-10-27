@@ -1779,10 +1779,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get statsDaysWithPages => 'Tage mit neuen Seiten';
 
   @override
-  String get smartTitle => 'Intelligente Ordner';
+  String get smartTitle => 'Filter';
 
   @override
-  String get smartSubtitle => 'Ordne deine Notizbücher automatisch';
+  String get smartSubtitle => 'Zeige Notizbücher nach Datum, Farbe oder Tag';
 
   @override
   String get smartByColor => 'Nach Farbe';
@@ -2166,4 +2166,39 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tplHalfLetter => 'Half Letter';
+
+  @override
+  String get libNavFilters => 'Filter';
+
+  @override
+  String get folderNew => 'Neuer Ordner';
+
+  @override
+  String get folderNameHint => 'Ordnername';
+
+  @override
+  String get folderCreate => 'Erstellen';
+
+  @override
+  String get folderRename => 'Ordner umbenennen';
+
+  @override
+  String get folderDelete => 'Ordner löschen';
+
+  @override
+  String folderDeleteBody(String name) {
+    return 'Der Ordner „$name“ wird gelöscht. Seine Notizbücher kommen zu Ohne Ordner; keines wird gelöscht.';
+  }
+
+  @override
+  String get folderNameTaken => 'Es gibt schon einen Ordner mit diesem Namen';
+
+  @override
+  String get folderMoveTo => 'In Ordner verschieben';
+
+  @override
+  String get folderNone => 'Ohne Ordner';
+
+  @override
+  String get folderOptions => 'Ordneroptionen';
 }

@@ -1772,10 +1772,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statsDaysWithPages => 'Dias com páginas novas';
 
   @override
-  String get smartTitle => 'Pastas inteligentes';
+  String get smartTitle => 'Filtros';
 
   @override
-  String get smartSubtitle => 'Organize seus cadernos automaticamente';
+  String get smartSubtitle => 'Mostre cadernos por data, cor ou etiqueta';
 
   @override
   String get smartByColor => 'Por cor';
@@ -2156,4 +2156,39 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tplHalfLetter => 'Meia carta';
+
+  @override
+  String get libNavFilters => 'Filtros';
+
+  @override
+  String get folderNew => 'Nova pasta';
+
+  @override
+  String get folderNameHint => 'Nome da pasta';
+
+  @override
+  String get folderCreate => 'Criar';
+
+  @override
+  String get folderRename => 'Renomear pasta';
+
+  @override
+  String get folderDelete => 'Excluir pasta';
+
+  @override
+  String folderDeleteBody(String name) {
+    return 'A pasta \"$name\" será excluída. Os cadernos dela vão para Sem pasta; nenhum é excluído.';
+  }
+
+  @override
+  String get folderNameTaken => 'Já existe uma pasta com esse nome';
+
+  @override
+  String get folderMoveTo => 'Mover para pasta';
+
+  @override
+  String get folderNone => 'Sem pasta';
+
+  @override
+  String get folderOptions => 'Opções da pasta';
 }

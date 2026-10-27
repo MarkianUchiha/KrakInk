@@ -507,8 +507,8 @@
   "statsRecord": "Record",
   "statsActivity": "Activité — 30 derniers jours",
   "statsDaysWithPages": "Jours avec de nouvelles pages",
-  "smartTitle": "Dossiers intelligents",
-  "smartSubtitle": "Organisez vos cahiers automatiquement",
+  "smartTitle": "Filtres",
+  "smartSubtitle": "Affichez les cahiers par date, couleur ou étiquette",
   "smartByColor": "Par couleur",
   "smartByTag": "Par étiquette",
   "onbSkip": "Passer",
@@ -606,5 +606,16 @@
   "menuTwoFingerUndo": "Annuler d’un toucher à deux doigts",
   "popEraserAutoRevert": "Revenir à l’outil précédent après avoir effacé",
   "saveFailed": "Impossible d’enregistrer la note. Libérez de l’espace : une nouvelle tentative aura lieu automatiquement.",
-  "tplHalfLetter": "Demi-lettre"
+  "tplHalfLetter": "Demi-lettre",
+  "libNavFilters": "Filtres",
+  "folderNew": "Nouveau dossier",
+  "folderNameHint": "Nom du dossier",
+  "folderCreate": "Créer",
+  "folderRename": "Renommer le dossier",
+  "folderDelete": "Supprimer le dossier",
+  "folderDeleteBody": "Le dossier « {name} » sera supprimé. Ses cahiers passent dans Sans dossier ; aucun n’est supprimé.",
+  "folderNameTaken": "Un dossier porte déjà ce nom",
+  "folderMoveTo": "Déplacer vers un dossier",
+  "folderNone": "Sans dossier",
+  "folderOptions": "Options du dossier"
 }

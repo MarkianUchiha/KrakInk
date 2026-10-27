@@ -3149,13 +3149,13 @@ abstract class AppLocalizations {
   /// No description provided for @smartTitle.
   ///
   /// In es, this message translates to:
-  /// **'Carpetas inteligentes'**
+  /// **'Filtros'**
   String get smartTitle;
 
   /// No description provided for @smartSubtitle.
   ///
   /// In es, this message translates to:
-  /// **'Organiza tus cuadernos automáticamente'**
+  /// **'Muestra cuadernos por fecha, color o etiqueta'**
   String get smartSubtitle;
 
   /// No description provided for @smartByColor.
@@ -3745,6 +3745,72 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Media carta'**
   String get tplHalfLetter;
+
+  /// No description provided for @libNavFilters.
+  ///
+  /// In es, this message translates to:
+  /// **'Filtros'**
+  String get libNavFilters;
+
+  /// No description provided for @folderNew.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva carpeta'**
+  String get folderNew;
+
+  /// No description provided for @folderNameHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la carpeta'**
+  String get folderNameHint;
+
+  /// No description provided for @folderCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear'**
+  String get folderCreate;
+
+  /// No description provided for @folderRename.
+  ///
+  /// In es, this message translates to:
+  /// **'Renombrar carpeta'**
+  String get folderRename;
+
+  /// No description provided for @folderDelete.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar carpeta'**
+  String get folderDelete;
+
+  /// No description provided for @folderDeleteBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borrará la carpeta \"{name}\". Sus cuadernos pasan a Sin carpeta; no se borra ninguno.'**
+  String folderDeleteBody(String name);
+
+  /// No description provided for @folderNameTaken.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya existe una carpeta con ese nombre'**
+  String get folderNameTaken;
+
+  /// No description provided for @folderMoveTo.
+  ///
+  /// In es, this message translates to:
+  /// **'Mover a carpeta'**
+  String get folderMoveTo;
+
+  /// No description provided for @folderNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin carpeta'**
+  String get folderNone;
+
+  /// No description provided for @folderOptions.
+  ///
+  /// In es, this message translates to:
+  /// **'Opciones de la carpeta'**
+  String get folderOptions;
 }
 
 class _AppLocalizationsDelegate

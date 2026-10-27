@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import '../constants.dart';
 import '../models/cover_colors.dart';
+import '../models/library_data.dart';
 import '../models/note.dart';
 import '../models/page.dart' as models;
 
@@ -23,6 +24,7 @@ import 'create_notebook_screen.dart';
 import 'settings_screen.dart';
 import 'widgets/notebook_covers.dart';
 import 'widgets/dialogs.dart';
+import 'widgets/folder_sheets.dart';
 import '../theme_controller.dart';
 import 'home_screen.dart';
 import 'widgets/search_sheet.dart';
@@ -66,8 +68,15 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
   _SortBy _sortBy = _SortBy.updatedDesc;
   static const _prefSort = 'library_sort';
 
-  /// Carpeta dinámica activa (null = ver todos).
+  /// Filtro activo (null = sin filtro).
   SmartFolder? _activeFolder;
+
+  /// Carpetas del usuario y la que está abierta (null = ninguna).
+  List<Folder> _folders = const [];
+  String? _folderId;
+
+  Folder? get _openFolder =>
+      _folders.where((f) => f.id == _folderId).firstOrNull;
 
   /// Sección de la navegación lateral.
   _Section _section = _Section.all;
@@ -181,8 +190,14 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
 
   Future<void> _reload() async {
     final metas = await _storage.loadIndex();
+    final library = await _storage.loadLibrary();
     if (!mounted) return;
-    setState(() => _metas = metas);
+    setState(() {
+      _metas = metas;
+      _folders = library.folders;
+      // La carpeta abierta pudo borrarse o perderse al restaurar.
+      if (_openFolder == null) _folderId = null;
+    });
   }
 
   /// Lista filtrada y ordenada de cuadernos.
@@ -200,7 +215,11 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
         list = list.where((m) => m.favorite).toList();
     }
 
-    // Aplicar carpeta dinámica.
+    if (_folderId != null) {
+      list = list.where((m) => m.folderId == _folderId).toList();
+    }
+
+    // Aplicar filtro.
     if (_activeFolder != null) {
       list = _activeFolder!.apply(list);
     }
@@ -277,6 +296,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
       coverStyle: result.coverStyle.name,
       coverImagePath: result.coverImagePath,
       colorValue: result.coverColorValue,
+      folderId: _folderId,
     );
     if (!mounted) return;
     await _reload();
@@ -321,6 +341,54 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
     await _storage.deleteNotebook(meta.id);
     await _reload();
   }
+
+  Future<void> _createFolder() async {
+    final name = await showFolderNameDialog(context);
+    if (name == null) return;
+    final folder = await _storage.createFolder(name);
+    await _reload();
+    _showFolder(folder.id);
+  }
+
+  Future<void> _renameFolder(Folder folder) async {
+    final name = await showFolderNameDialog(context, initialName: folder.name);
+    if (name == null || name == folder.name) return;
+    final ok = await _storage.renameFolder(folder.id, name);
+    if (!ok && mounted) _snack(context.l10n.folderNameTaken);
+    await _reload();
+  }
+
+  Future<void> _deleteFolder(Folder folder) async {
+    if (!await confirmDeleteFolder(context, folder)) return;
+    await _storage.deleteFolder(folder.id);
+    await _reload();
+  }
+
+  Future<void> _moveToFolder(NotebookMeta meta) async {
+    final pick = await showMoveToFolderSheet(
+      context,
+      folders: _folders,
+      currentId: meta.folderId,
+    );
+    if (pick == null || !mounted) return;
+    var target = pick.id;
+    if (pick.createNew) {
+      final name = await showFolderNameDialog(context);
+      if (name == null) return;
+      target = (await _storage.createFolder(name)).id;
+    }
+    if (target == meta.folderId) return;
+    await _storage.moveToFolder(meta.id, target);
+    await _reload();
+  }
+
+  /// Abre una carpeta. Se sale de la sección y del filtro: dentro de la
+  /// carpeta se ven todos sus cuadernos.
+  void _showFolder(String id) => setState(() {
+    _folderId = id;
+    _section = _Section.all;
+    _activeFolder = null;
+  });
 
   /// Asigna un color de portada al cuaderno.
   Future<void> _setNotebookColor(NotebookMeta meta) async {
@@ -620,7 +688,9 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
     void go(_Section s) => setState(() {
       _section = s;
       _activeFolder = null;
+      _folderId = null;
     });
+    final inSection = _folderId == null;
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: Spacing.lg),
       children: [
@@ -631,35 +701,72 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
         tile(
           Icons.auto_stories_outlined,
           context.l10n.libNavAll,
-          _section == _Section.all && _activeFolder == null,
+          inSection && _section == _Section.all && _activeFolder == null,
           () => go(_Section.all),
           count: all.length,
         ),
         tile(
           Icons.schedule,
           context.l10n.libNavRecent,
-          _section == _Section.recent,
+          inSection && _section == _Section.recent,
           () => go(_Section.recent),
         ),
         tile(
           Icons.star_outline,
           context.l10n.libNavFavorites,
-          _section == _Section.favorites,
+          inSection && _section == _Section.favorites,
           () => go(_Section.favorites),
           count: all.where((m) => m.favorite).length,
         ),
         tile(
-          Icons.folder_special_outlined,
-          context.l10n.libNavFolders,
+          Icons.filter_list,
+          context.l10n.libNavFilters,
           _activeFolder != null,
           _showSmartFolders,
         ),
+        const Divider(indent: Spacing.xl, endIndent: Spacing.xl),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            Spacing.xl,
+            Spacing.xs,
+            Spacing.md,
+            Spacing.xs,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  context.l10n.libNavFolders,
+                  style: context.text.titleSmall?.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              IconButton(
+                tooltip: context.l10n.folderNew,
+                icon: const Icon(Icons.create_new_folder_outlined),
+                onPressed: () {
+                  if (inDrawer) Navigator.pop(context);
+                  _createFolder();
+                },
+              ),
+            ],
+          ),
+        ),
+        for (final f in _folders)
+          tile(
+            _folderId == f.id ? Icons.folder_open : Icons.folder_outlined,
+            f.name,
+            _folderId == f.id,
+            () => _showFolder(f.id),
+            count: all.where((m) => m.folderId == f.id).length,
+          ),
+        const Divider(indent: Spacing.xl, endIndent: Spacing.xl),
         tile(Icons.storefront_outlined, context.l10n.marketTitle, false, () {
           Navigator.of(
             context,
           ).push(MaterialPageRoute(builder: (_) => const MarketplaceScreen()));
         }),
-        const Divider(indent: Spacing.xl, endIndent: Spacing.xl),
         tile(
           Icons.file_download_outlined,
           context.l10n.libImport,
@@ -702,8 +809,33 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
     ),
   );
 
+  /// Renombrar y borrar la carpeta abierta.
+  Widget _folderMenu(Folder folder) => MenuAnchor(
+    menuChildren: [
+      MenuItemButton(
+        leadingIcon: const Icon(Icons.edit_outlined),
+        onPressed: () => _renameFolder(folder),
+        child: Text(context.l10n.folderRename),
+      ),
+      MenuItemButton(
+        leadingIcon: Icon(Icons.delete_outline, color: context.inklus.danger),
+        onPressed: () => _deleteFolder(folder),
+        child: Text(
+          context.l10n.folderDelete,
+          style: TextStyle(color: context.inklus.danger),
+        ),
+      ),
+    ],
+    builder: (context, menu, _) => IconButton(
+      tooltip: context.l10n.folderOptions,
+      icon: const Icon(Icons.more_vert),
+      onPressed: () => menu.isOpen ? menu.close() : menu.open(),
+    ),
+  );
+
   String get _sectionTitle =>
       _activeFolder?.displayName(context.l10n) ??
+      _openFolder?.name ??
       switch (_section) {
         _Section.all => context.l10n.libMyNotebooks,
         _Section.recent => context.l10n.libNavRecent,
@@ -735,6 +867,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
                   label: Text(context.l10n.libClearFilter),
                   onPressed: () => setState(() => _activeFolder = null),
                 ),
+              if (_openFolder case final folder?) _folderMenu(folder),
             ],
           ),
           const SizedBox(height: Spacing.xs),
@@ -823,6 +956,7 @@ class _NotebookLibraryScreenState extends State<NotebookLibraryScreen> {
       onDelete: () => _deleteNotebook(meta),
       onSetColor: () => _setNotebookColor(meta),
       onEditTags: () => _editTags(meta),
+      onMoveToFolder: () => _moveToFolder(meta),
       onToggleFavorite: () => _toggleFavorite(meta),
       onToggleSync: () => _toggleSync(meta),
     );
@@ -920,6 +1054,7 @@ class _NotebookCard extends StatelessWidget {
     required this.onDelete,
     required this.onSetColor,
     required this.onEditTags,
+    required this.onMoveToFolder,
     required this.onToggleFavorite,
     required this.onToggleSync,
   });
@@ -932,6 +1067,7 @@ class _NotebookCard extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onSetColor;
   final VoidCallback onEditTags;
+  final VoidCallback onMoveToFolder;
   final VoidCallback onToggleFavorite;
   final VoidCallback onToggleSync;
 
@@ -963,6 +1099,11 @@ class _NotebookCard extends StatelessWidget {
         leadingIcon: const Icon(Icons.label_outline),
         onPressed: onEditTags,
         child: Text(context.l10n.libTags),
+      ),
+      MenuItemButton(
+        leadingIcon: const Icon(Icons.drive_file_move_outlined),
+        onPressed: onMoveToFolder,
+        child: Text(context.l10n.folderMoveTo),
       ),
       MenuItemButton(
         leadingIcon: Icon(

@@ -10,12 +10,15 @@ import 'package:inklus/ui/notebook_library.dart';
 import 'package:inklus/ui/theme/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// El orden de la biblioteca se recuerda entre aperturas, igual que la vista.
+/// Biblioteca en tablet (1280×800, menú lateral fijo). El flujo completo de
+/// carpetas va en integration_test: con el reloj falso de testWidgets, leer
+/// un archivo recién escrito con E/S real no termina.
 void main() {
   late Directory data;
+  final storage = StorageService.instance;
 
   setUp(() {
-    data = Directory.systemTemp.createTempSync('krakink_sort_');
+    data = Directory.systemTemp.createTempSync('krakink_library_');
     AppPaths.rootOverride = data;
     SharedPreferences.setMockInitialValues({});
   });
@@ -28,6 +31,17 @@ void main() {
       // El sistema limpia la carpeta temporal después.
     }
   });
+
+  /// Con el reloj falso, cada paso de E/S real (índice, library.json,
+  /// preferencias) necesita su propio ciclo de espera real + pump.
+  Future<void> settle(WidgetTester tester, {int cycles = 6}) async {
+    for (var i = 0; i < cycles; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 100)),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+  }
 
   Future<void> pumpLibrary(WidgetTester tester) async {
     tester.view.physicalSize = const Size(1280, 800);
@@ -44,29 +58,15 @@ void main() {
         home: const NotebookLibraryScreen(),
       ),
     );
-    // Con el reloj falso, cada paso de E/S real (índice, preferencias)
-    // necesita su propio ciclo de espera real + pump. El chip de orden solo
-    // aparece cuando ya cargaron los cuadernos.
-    Future<void> cycle() async {
-      await tester.runAsync(
-        () => Future<void>.delayed(const Duration(milliseconds: 100)),
-      );
-      await tester.pump(const Duration(milliseconds: 100));
-    }
-
+    // El chip de orden solo aparece cuando ya cargaron los cuadernos.
     for (var i = 0; i < 40 && find.byType(ActionChip).evaluate().isEmpty; i++) {
-      await cycle();
+      await settle(tester, cycles: 1);
     }
-    // Las preferencias cargan en paralelo al índice.
-    for (var i = 0; i < 3; i++) {
-      await cycle();
-    }
+    await settle(tester, cycles: 3);
   }
 
   testWidgets('elegir A-Z sobrevive a reconstruir la pantalla', (tester) async {
-    await tester.runAsync(
-      () => StorageService.instance.createNotebook(title: 'Cuaderno 1'),
-    );
+    await tester.runAsync(() => storage.createNotebook(title: 'Cuaderno 1'));
     await pumpLibrary(tester);
     expect(find.text('Más recientes'), findsOneWidget);
 
@@ -78,5 +78,13 @@ void main() {
 
     await pumpLibrary(tester);
     expect(find.text('Nombre A–Z'), findsOneWidget);
+  });
+
+  testWidgets('el menú lateral separa Filtros de Carpetas', (tester) async {
+    await tester.runAsync(() => storage.createNotebook(title: 'Cuaderno 1'));
+    await pumpLibrary(tester);
+    expect(find.text('Filtros'), findsOneWidget);
+    expect(find.text('Carpetas'), findsOneWidget);
+    expect(find.byTooltip('Nueva carpeta'), findsOneWidget);
   });
 }

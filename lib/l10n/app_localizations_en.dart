@@ -1769,10 +1769,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsDaysWithPages => 'Days with new pages';
 
   @override
-  String get smartTitle => 'Smart folders';
+  String get smartTitle => 'Filters';
 
   @override
-  String get smartSubtitle => 'Organize your notebooks automatically';
+  String get smartSubtitle => 'Show notebooks by date, color or tag';
 
   @override
   String get smartByColor => 'By color';
@@ -2152,4 +2152,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tplHalfLetter => 'Half Letter';
+
+  @override
+  String get libNavFilters => 'Filters';
+
+  @override
+  String get folderNew => 'New folder';
+
+  @override
+  String get folderNameHint => 'Folder name';
+
+  @override
+  String get folderCreate => 'Create';
+
+  @override
+  String get folderRename => 'Rename folder';
+
+  @override
+  String get folderDelete => 'Delete folder';
+
+  @override
+  String folderDeleteBody(String name) {
+    return 'The folder \"$name\" will be deleted. Its notebooks move to No folder; none are deleted.';
+  }
+
+  @override
+  String get folderNameTaken => 'A folder with that name already exists';
+
+  @override
+  String get folderMoveTo => 'Move to folder';
+
+  @override
+  String get folderNone => 'No folder';
+
+  @override
+  String get folderOptions => 'Folder options';
 }

@@ -507,8 +507,8 @@
   "statsRecord": "Recorde",
   "statsActivity": "Atividade — últimos 30 dias",
   "statsDaysWithPages": "Dias com páginas novas",
-  "smartTitle": "Pastas inteligentes",
-  "smartSubtitle": "Organize seus cadernos automaticamente",
+  "smartTitle": "Filtros",
+  "smartSubtitle": "Mostre cadernos por data, cor ou etiqueta",
   "smartByColor": "Por cor",
   "smartByTag": "Por etiqueta",
   "onbSkip": "Pular",
@@ -606,5 +606,16 @@
   "menuTwoFingerUndo": "Desfazer com toque de dois dedos",
   "popEraserAutoRevert": "Voltar à ferramenta anterior depois de apagar",
   "saveFailed": "Não foi possível salvar a nota. Libere espaço: ela tentará de novo automaticamente.",
-  "tplHalfLetter": "Meia carta"
+  "tplHalfLetter": "Meia carta",
+  "libNavFilters": "Filtros",
+  "folderNew": "Nova pasta",
+  "folderNameHint": "Nome da pasta",
+  "folderCreate": "Criar",
+  "folderRename": "Renomear pasta",
+  "folderDelete": "Excluir pasta",
+  "folderDeleteBody": "A pasta \"{name}\" será excluída. Os cadernos dela vão para Sem pasta; nenhum é excluído.",
+  "folderNameTaken": "Já existe uma pasta com esse nome",
+  "folderMoveTo": "Mover para pasta",
+  "folderNone": "Sem pasta",
+  "folderOptions": "Opções da pasta"
 }

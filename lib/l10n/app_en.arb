@@ -985,8 +985,8 @@
   "statsRecord": "Record",
   "statsActivity": "Activity — last 30 days",
   "statsDaysWithPages": "Days with new pages",
-  "smartTitle": "Smart folders",
-  "smartSubtitle": "Organize your notebooks automatically",
+  "smartTitle": "Filters",
+  "smartSubtitle": "Show notebooks by date, color or tag",
   "smartByColor": "By color",
   "smartByTag": "By tag",
   "onbSkip": "Skip",
@@ -1184,5 +1184,16 @@
   "menuTwoFingerUndo": "Undo with a two-finger tap",
   "popEraserAutoRevert": "Return to the previous tool after erasing",
   "saveFailed": "Couldn't save the note. Free up some space: it will retry automatically.",
-  "tplHalfLetter": "Half Letter"
+  "tplHalfLetter": "Half Letter",
+  "libNavFilters": "Filters",
+  "folderNew": "New folder",
+  "folderNameHint": "Folder name",
+  "folderCreate": "Create",
+  "folderRename": "Rename folder",
+  "folderDelete": "Delete folder",
+  "folderDeleteBody": "The folder \"{name}\" will be deleted. Its notebooks move to No folder; none are deleted.",
+  "folderNameTaken": "A folder with that name already exists",
+  "folderMoveTo": "Move to folder",
+  "folderNone": "No folder",
+  "folderOptions": "Folder options"
 }
